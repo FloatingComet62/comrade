@@ -14,4 +14,5 @@ fun main(_argc -> i32, _argv -> str[]) => u8 {
       default => "Unknown Operation"
     })
   }
+  return 0
 }
