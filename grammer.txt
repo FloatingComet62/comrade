@@ -214,9 +214,9 @@ implement customStruct and customStruct2 with customStruct3 for OPERATORS {
   Division => (..) {...}
 }
 
-io->out(customStruct { x -> 1, y -> 2 } + customStruct { x -> 2, y -> 8 })
+io->out(customStruct { x -> 1, y -> 2 } + customStruct2 { x -> 2, y -> 8 })
 // Output:
-// customStruct { x -> 3, y -> 10 }
+// customStruct3 { x -> 3, y -> 10 }
 
 enum customOperations {
   IDK,
