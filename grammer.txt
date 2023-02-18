@@ -1,6 +1,9 @@
 fun my_function(argument -> ARGUMENT_TYPE, argument2 -> ARGUMENT_TYPE2) => RETURN_TYPE {
 
 }
+fun let mutable_function(..) {...}
+fn const immutable_function(..) {...}
+fn immutable_function(..) {...}
 
 match STATEMENT {
   CASE => BLOCK
@@ -118,7 +121,10 @@ enum TYPES {
   u4, u8, u16, u32, u64, u128,
   i4, i8, i16, i32, i64, i128,
   f4, f8, f16, f32, f64, f128,
-  str, bool
+  str, bool,
+  TYPE[],                                            // array
+  <KEY_TYPE -> VALUE_TYPE>,                          // dictionary
+  fun<ARGUMENT_TYPE1, ARGUMENT_TYPE2 => RETURN_TYPE> // function
 }
 
 
@@ -145,6 +151,7 @@ let thing9 -> <str | u8 -> u8> = {
   "Lmao" => 12
   24 => 45
 }
+io->out(thing9["Lmao"])
 if 5 > 3 {
   io->out("Hello")
 } else {
