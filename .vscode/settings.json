@@ -1,0 +1,19 @@
+{
+  "makefile.launchConfigurations": [
+    {
+      "cwd": "c:\\Users\\shubh\\projects\\comLang",
+      "binaryPath": "c:\\Users\\shubh\\projects\\comLang\\main.exe",
+      "binaryArgs": []
+    },
+    {
+      "cwd": "c:\\Users\\shubh\\projects\\comLang",
+      "binaryPath": "c:\\Users\\shubh\\projects\\comLang\\LF.exe",
+      "binaryArgs": []
+    },
+    {
+      "cwd": "c:\\Users\\shubh\\projects\\comLang",
+      "binaryPath": "c:\\Users\\shubh\\projects\\comLang\\release.exe",
+      "binaryArgs": []
+    }
+  ]
+}
