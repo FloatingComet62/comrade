@@ -15,5 +15,9 @@
       "binaryPath": "c:\\Users\\shubh\\projects\\comLang\\release.exe",
       "binaryArgs": []
     }
-  ]
+  ],
+  "files.associations": {
+    "xstring": "cpp",
+    "iostream": "cpp"
+  }
 }
