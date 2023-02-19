@@ -1,0 +1,45 @@
+| Type: PROGRAM
+| Nodes: [
+| | {
+| |  Type: STATEMENT
+| |  Action: include
+| |  Parameters: [ std, io ]
+| | }
+| | {
+| |  Type: FUNCTION
+| |  Identifier: main // [ main ]
+| |  ReturnType: u8
+| |  Arguments: [
+| |   {
+| |    Identifier: _argc
+| |    Type: i32
+| |   }
+| |   {
+| |    Identifier: _argv
+| |    Type: str[]
+| |   }
+| |  ]
+| |  Nodes: [
+| |  | {
+| |  |  Type: FUNCTION_CALL
+| |  |  Identifier: [ io, out ]
+| |  |  Arguments: [
+| |  |   {
+| |  |    Literal: Hello World
+| |  |    Type: str
+| |  |   }
+| |  |  ]
+| |  | }
+| |  | {
+| |  |  Type: STATEMENT
+| |  |  Action: return
+| |  |  Parameters: [
+| |  |   {
+| |  |    Literal: 0
+| |  |    Type: u8
+| |  |   }
+| |  |  ]
+| |  | }
+| |  ]
+| | } 
+| ]

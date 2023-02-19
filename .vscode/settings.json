@@ -1,23 +1,49 @@
 {
-  "makefile.launchConfigurations": [
-    {
-      "cwd": "c:\\Users\\shubh\\projects\\comLang",
-      "binaryPath": "c:\\Users\\shubh\\projects\\comLang\\main.exe",
-      "binaryArgs": []
-    },
-    {
-      "cwd": "c:\\Users\\shubh\\projects\\comLang",
-      "binaryPath": "c:\\Users\\shubh\\projects\\comLang\\LF.exe",
-      "binaryArgs": []
-    },
-    {
-      "cwd": "c:\\Users\\shubh\\projects\\comLang",
-      "binaryPath": "c:\\Users\\shubh\\projects\\comLang\\release.exe",
-      "binaryArgs": []
-    }
-  ],
   "files.associations": {
+    "atomic": "cpp",
+    "bit": "cpp",
+    "cctype": "cpp",
+    "clocale": "cpp",
+    "cmath": "cpp",
+    "compare": "cpp",
+    "concepts": "cpp",
+    "cstddef": "cpp",
+    "cstdint": "cpp",
+    "cstdio": "cpp",
+    "cstdlib": "cpp",
+    "cstring": "cpp",
+    "ctime": "cpp",
+    "cwchar": "cpp",
+    "exception": "cpp",
+    "fstream": "cpp",
+    "initializer_list": "cpp",
+    "ios": "cpp",
+    "iosfwd": "cpp",
+    "iostream": "cpp",
+    "istream": "cpp",
+    "iterator": "cpp",
+    "limits": "cpp",
+    "memory": "cpp",
+    "new": "cpp",
+    "ostream": "cpp",
+    "stdexcept": "cpp",
+    "streambuf": "cpp",
+    "string": "cpp",
+    "system_error": "cpp",
+    "tuple": "cpp",
+    "type_traits": "cpp",
+    "typeinfo": "cpp",
+    "utility": "cpp",
+    "vector": "cpp",
+    "xfacet": "cpp",
+    "xiosbase": "cpp",
+    "xlocale": "cpp",
+    "xlocinfo": "cpp",
+    "xlocnum": "cpp",
+    "xmemory": "cpp",
+    "xstddef": "cpp",
     "xstring": "cpp",
-    "iostream": "cpp"
+    "xtr1common": "cpp",
+    "xutility": "cpp"
   }
 }
