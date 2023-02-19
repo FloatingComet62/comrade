@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 #include <cstring>
-#include <iostream>
 
 #include "lexer.hpp"
 
@@ -34,6 +33,7 @@ struct Statement {
 struct Argument {
   Token identifier;
   Token type;
+  Argument() { memset(this, 0, sizeof(Argument)); }
 };
 
 /*
@@ -52,6 +52,8 @@ struct Literal {
 union Argument_N_Literal {
   Argument argument;
   Literal literal;
+  // https://stackoverflow.com/questions/321351/initializing-a-union-with-a-non-trivial-constructor
+  Argument_N_Literal() { memset(this, 0, sizeof(Argument_N_Literal)); }
 };
 
 /*
@@ -63,7 +65,7 @@ union Argument_N_Literal {
 struct Function {
   Token identifier; // TODO: std::vector<Token>
   Token returnType;
-  std::vector<Argument_N_Literal> arguments;
+  std::vector<Argument> arguments;
 };
 
 /*
@@ -92,6 +94,7 @@ union NodeData {
 class Node {
   public:
   NodeTypes type;
+  std::string main;
   NodeData* data = new NodeData();
   Node();
 };

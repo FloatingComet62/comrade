@@ -1,7 +1,7 @@
 SRC = $(wildcard src/*.cpp)
 CFLAGS = -Ofast
 
-CPP = g++
+CPP = clang++
 
 debug: $(SRC)
 	$(CPP) $(CFLAGS) $(SRC) -o debug.exe

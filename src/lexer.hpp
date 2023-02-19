@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <tuple>
 #include <vector>
 
 enum TokenTypes {
@@ -9,6 +10,7 @@ enum TokenTypes {
   TYPE,
   BLOCK,
   LITERAL,
+  EOL
 };
 
 
@@ -19,6 +21,7 @@ class Token {
   int line;
   int column;
   Token(TokenTypes t, std::string tS, int l, int c);
+  Token() { memset(this, 0, sizeof(Token)); }
 };
 
 class Lexer {
@@ -30,8 +33,12 @@ class Lexer {
   Lexer(std::string src);
   /*
     Get the next token
+
+    Returns:
+      Token found
+      EOL -> End of Line
   */
-  Token getToken();
+  std::tuple<Token, bool> getToken();
   /*
     Get's all the tokens from data
   */

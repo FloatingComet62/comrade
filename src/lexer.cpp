@@ -1,4 +1,5 @@
 #include "lexer.hpp"
+#include "util.hpp"
 #include <iostream>
 
 Token::Token(TokenTypes t, std::string tS, int l, int c) {
@@ -35,7 +36,7 @@ TokenTypes TokenTypeFromString(std::string string) {
   for (std::string type : types)
     if (string == type || string == (type + "[]"))
       return TokenTypes::TYPE;
-  if (string.size() > 1 && (string.at(0) == '\"' && string.at(string.size()-1)) == '\"' || IsDigitStr(string))
+  if ((string.size() > 1 && (string.at(0) == '\"') && (string.at(string.size()-1)) == '\"') || IsDigitStr(string))
     return TokenTypes::LITERAL;
   if (string.size() > 1 && string.at(0) == '{' && string.at(string.size()-1) == '}')
     return TokenTypes::BLOCK;
@@ -51,7 +52,8 @@ Lexer::Lexer(std::string src) {
 }
 
 std::vector<Token> Lexer::getTillEOLOrBlock(std::vector<Token> tokens, int position) {
-  std::vector<Token> output{};
+  std::function<std::string(Token)> stringToken = [] (Token x) { return x.tokenString; };
+  std::vector<Token> output = {};
   int gettingBlock = 0;
   while (true) {
     if (position > tokens.size()) {
@@ -63,11 +65,9 @@ std::vector<Token> Lexer::getTillEOLOrBlock(std::vector<Token> tokens, int posit
       break;
     }
     Token currentChar = tokens[position];
-    if (!gettingBlock && currentChar.tokenString == "\n") break;
+    if (!gettingBlock && currentChar.type == TokenTypes::EOL) break;
     if (currentChar.tokenString == "{") {
       gettingBlock += 1;
-      output.push_back(Token(TokenTypes::BLOCK, std::to_string(gettingBlock), 0, 0));
-      // so when you encounter this in the output vector, you know the next stuff in the contents of the block
     }
     if (currentChar.tokenString == "}") {
       gettingBlock -= 1;
@@ -75,22 +75,23 @@ std::vector<Token> Lexer::getTillEOLOrBlock(std::vector<Token> tokens, int posit
     }
 
     output.push_back(currentChar);
+    position++;
   }
-
   return output;
 }
 
-Token Lexer::getToken() {
+std::tuple<Token, bool> Lexer::getToken() {
   // get to word
   // token breakers: ' ', '(', ')', ','
 
-  while (data[position] == ' ' || data[position] == '(' || data[position] == ')' || data[position] == ',')
+  while (data[position] == ' ' || data[position] == '\t' || data[position] == '(' || data[position] == ')' || data[position] == ',')
     position++;
 
   // get the word
   std::string output = "";
+  bool EOL = false;
   char currentChar = data[position];
-  while (currentChar != ' ' && currentChar != '(' && currentChar != ')' && currentChar != ',') {
+  while (currentChar != ' ' && currentChar != '\t' && currentChar != '(' && currentChar != ')' && currentChar != ',') {
     if (position > data.length()) break;
 
     // check ->
@@ -110,21 +111,27 @@ Token Lexer::getToken() {
     // check \n
     if (currentChar == '\n') {
       ++line;
+      ++position;
       column = 0;
+      EOL = true;
+      break;
     }
     output += currentChar;
     currentChar = data[++position];
     ++column;
   }
   auto tokenType = TokenTypeFromString(output);
-  return Token(tokenType, output, line, column);
+  return std::tuple<Token, bool>{Token(tokenType, output, line, column), EOL};
 }
 
 std::vector<Token> Lexer::getTokens() {
   std::vector<Token> tokens;
   for (;position <= data.length();) {
     auto t = getToken();
-    if (!t.tokenString.empty()) tokens.push_back(t);
+    auto tt = std::get<0>(t);
+    auto eol = std::get<1>(t);
+    if (!tt.tokenString.empty()) tokens.push_back(tt);
+    if (eol) tokens.push_back(Token(TokenTypes::EOL, "EOL", line, column));
   }
   return tokens;
 }
