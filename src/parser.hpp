@@ -1,28 +1,7 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <cstring>
-
 #include "lexer.hpp"
-
-/* Types of Nodes */
-enum NodeTypes {
-  T_STATEMENT,
-  T_FUNCTION,
-  T_FUNCTION_CALL
-};
-
-/*
-  Statements
-
-  eg.
-  include std->io
-*/
-struct Statement {
-  std::string action;
-  std::vector<Token> parameters;
-};
+#include "util.hpp"
 
 /*
   Function Argument
@@ -32,28 +11,32 @@ struct Statement {
 */
 struct Argument {
   Token identifier;
-  Token type;
-  Argument() { memset(this, 0, sizeof(Argument)); }
+  Types type;
+  // https://stackoverflow.com/questions/321351/initializing-a-union-with-a-non-trivial-constructor
+  Argument();
 };
 
 /*
   Literals
-  
+
   eg. 0, "Hello World"
 */
 struct Literal {
   Token literal;
-  Token type;
+  Types type;
 };
 
+// used to figure out which one has actual data
+enum ANL_Mode { Arg, Lit };
 /*
   Argument + Literal
 */
 union Argument_N_Literal {
+  ANL_Mode mode;
   Argument argument;
   Literal literal;
   // https://stackoverflow.com/questions/321351/initializing-a-union-with-a-non-trivial-constructor
-  Argument_N_Literal() { memset(this, 0, sizeof(Argument_N_Literal)); }
+  Argument_N_Literal();
 };
 
 /*
@@ -63,9 +46,10 @@ union Argument_N_Literal {
   fun main(_argc -> i32, _argv -> str[]) => u8 {...}
 */
 struct Function {
-  Token identifier; // TODO: std::vector<Token>
+  std::vector<Token> identifier;
   Token returnType;
   std::vector<Argument> arguments;
+  std::vector<Node*> nodes;
 };
 
 /*
@@ -76,24 +60,29 @@ struct Function {
 */
 struct Function_Call {
   std::vector<Token> identifer;
-  std::vector<Argument_N_Literal> arguments;
+  std::vector<Argument_N_Literal*> arguments;
 };
 
+// used to figure out which one has actual data
+enum ND_Mode { ST, FUN, FUNC };
+
 union NodeData {
+  ND_Mode mode;
   Statement s;
   Function f;
-  Function_Call fc;
+  Function_Call* fc;
 
   // https://stackoverflow.com/questions/321351/initializing-a-union-with-a-non-trivial-constructor
-  NodeData() { memset(this, 0, sizeof(NodeData)); }
+  NodeData();
 };
 
 /*
   Data cell in the AST
 */
 class Node {
-  public:
+ public:
   NodeTypes type;
+  // used for printing purposes
   std::string main;
   NodeData* data = new NodeData();
   Node();
@@ -103,10 +92,31 @@ class Node {
   AST Generator
 */
 class Parser {
-  public:
+ public:
   std::string data;
+  std::vector<Token> tokens;
   Lexer lexer = Lexer(data);
   std::vector<Node*> program;
-
-  Parser(std::string data);
+  Parser(std::string passed_data);
+  std::vector<Node*> Parse(std::vector<Token> data);
+  /*
+    Returns:
+      Node -> Node to add
+      position -> position to skip to after the function
+  */
+  std::tuple<Node*, int> Include(std::vector<Token> to_parse, Token token,
+                                 int i);
+  /*
+  Returns:
+    Node -> Node to add
+    position -> position to skip to after the function
+  */
+  std::tuple<Node*, int> Fun(std::vector<Token> to_parse, Token token, int i);
+  /*
+  Returns:
+    Node -> Node to add
+    position -> position to skip to after the function
+  */
+  std::tuple<Node*, int> FunCall(std::vector<Token> to_parse, Token token,
+                                 int i);
 };

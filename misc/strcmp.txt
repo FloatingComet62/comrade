@@ -1,0 +1,32 @@
+Problem =>
+
+  std::cout << ":" << currentToken.tokenString << ":";
+  Output >> :}:
+
+  std::cout << currentToken.tokenString == "}" ? "T" : "F";
+  Output >> F
+
+  Issue ->
+    tokenString is "}" but also not "}"
+
+  Proof ->
+    std::cout << currentToken.tokenString.length();
+    Output >> 2
+  
+Solution =>
+
+  strcmp
+
+  std::cout << strcmp(currentToken.tokenString.c_str(), "}") == 0 ? "T" : "F";
+  Output >> T
+
+  Explanation ->
+    strcmp is string compare
+
+    If the strings are equal it returns 0
+    If the first string is longer it returns 1
+    If the first string is shorter it returns -1
+  
+  Credits ->
+  Liam
+  Github: @SpaceFishDev

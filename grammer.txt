@@ -2,8 +2,8 @@ fun my_function(argument -> ARGUMENT_TYPE, argument2 -> ARGUMENT_TYPE2) => RETUR
 
 }
 fun let mutable_function(..) {...}
-fn const immutable_function(..) {...}
-fn immutable_function(..) {...}
+fun const immutable_function(..) {...}
+fun immutable_function(..) {...}
 
 match STATEMENT {
   CASE => BLOCK

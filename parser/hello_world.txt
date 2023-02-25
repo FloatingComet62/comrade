@@ -7,7 +7,7 @@
 | | }
 | | {
 | |  Type: FUNCTION
-| |  Identifier: main // [ main ]
+| |  Identifier: [ main ]
 | |  ReturnType: u8
 | |  Arguments: [
 | |   {

@@ -1,5 +1,5 @@
 SRC = $(wildcard src/*.cpp)
-CFLAGS = -Ofast
+CFLAGS = -Ofast -std=c++20
 
 CPP = clang++
 
