@@ -1,4 +1,0 @@
-std::vector.at(INVALID_INDEX) breaks the program
-std::vector[INVALID_INDEX] freezes the program
-
-C++ is shitdip
