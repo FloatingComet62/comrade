@@ -10,11 +10,10 @@ fn main() {
     Some(path) => {
       let data = read_file(&path);
       let parser = Parser::new(data);
-      println!("{:?}", parser.program)
+      println!("{:?}", parser.parse());
     }
     None => exit("No input files passes", None)
   }
-  println!("Hello, world!");
 }
 
 fn read_file(path: &String) -> String {
