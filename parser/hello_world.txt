@@ -11,11 +11,11 @@
 | |  ReturnType: u8
 | |  Arguments: [
 | |   {
-| |    Identifier: _argc
+| |    Identifier: [ _argc ]
 | |    Type: i32
 | |   }
 | |   {
-| |    Identifier: _argv
+| |    Identifier: [ _argv ]
 | |    Type: str[]
 | |   }
 | |  ]
@@ -25,7 +25,7 @@
 | |  |  Identifier: [ io, out ]
 | |  |  Arguments: [
 | |  |   {
-| |  |    Literal: Hello World
+| |  |    Literal: "Hello World"
 | |  |    Type: str
 | |  |   }
 | |  |  ]
