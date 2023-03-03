@@ -10,7 +10,7 @@ pub enum NodeTypes {
     FUNCTION,
     FUNCTIONCALL,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Argument {
     pub identifier: String,
     pub a_type: Types,

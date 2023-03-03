@@ -13,28 +13,14 @@ pub fn parser(program: &mut Vec<Node>, input: &Vec<String>, i: usize) -> usize {
         } else if cell == ")" {
             break;
         }
-        match getting_args {
-            true => {
-                if cell == "," || cell == ")" || cell == "(" {
-                    continue;
-                }
-                let a_type = type_from_str(cell);
-                match a_type {
-                    Types::None => args.push(Argument {
-                        identifier: cell.to_string(),
-                        a_type: Types::None,
-                    }),
-                    x => {
-                        let len = args.len();
-                        args.get_mut(len - 1)
-                            .unwrap_or_else(|| {
-                                exit("Missing function argument identifier before type", None)
-                            })
-                            .a_type = x;
-                    }
-                }
+        if getting_args {
+            if cell == "," || cell == ")" || cell == "(" {
+                continue;
             }
-            false => identifier.push(cell.to_string()),
+            let a_type = type_from_str(cell);
+            args = handle_a_type(args, cell, a_type)
+        } else {
+            identifier.push(cell.to_string());
         }
     }
     let return_type = type_from_str(&data.1[data.1.len() - 1]);
@@ -50,4 +36,22 @@ pub fn parser(program: &mut Vec<Node>, input: &Vec<String>, i: usize) -> usize {
         None,
     ));
     data.0
+}
+
+fn handle_a_type(args: Vec<Argument>, cell: &String, a_type: Types) -> Vec<Argument> {
+    let mut output = args.clone();
+    match a_type {
+        Types::None => output.push(Argument {
+            identifier: cell.to_string(),
+            a_type: Types::None,
+        }),
+        x => {
+            let len = output.len();
+            output
+                .get_mut(len - 1)
+                .unwrap_or_else(|| exit("Missing function argument identifier before type", None))
+                .a_type = x;
+        }
+    }
+    output
 }
