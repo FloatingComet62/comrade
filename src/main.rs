@@ -4,7 +4,7 @@ use std::fs;
 use comrade::{exit, parser::Parser};
 
 fn main() {
-    let args: Vec<_> = env::args().collect();
+    let _args: Vec<_> = env::args().collect();
     let raw_path = Some("examples/hello_world.txt".to_string()); //args.get(1);
     match raw_path {
         Some(path) => {

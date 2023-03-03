@@ -1,3 +1,5 @@
+use crate::lexer::{load, Lexer, Node};
+
 pub struct Parser {
     pub data: String,
     pub token_splits: Vec<String>,     // splits of token
@@ -94,8 +96,10 @@ impl Parser {
         }
         return output;
     }
-    pub fn parse(self: &Parser) -> Vec<String> {
-        let res: Vec<_> = self.token_splitter(&self.data);
-        return res;
+    pub fn parse(self: &Parser) -> Vec<Node> {
+        let res = self.token_splitter(&self.data);
+        let mut lexer = Lexer::new(res);
+        lexer.program = load(&lexer.splitted_text);
+        return lexer.program;
     }
 }
