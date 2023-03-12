@@ -2,6 +2,7 @@ use crate::Types;
 use std::fmt::Debug;
 
 mod fun;
+mod fun_call;
 mod include_n_return;
 
 #[derive(Debug)]
@@ -20,10 +21,21 @@ pub struct Literal {
     pub literal: String,
     pub l_type: Types,
 }
-#[derive(Debug)]
 pub struct ArgumentLiteral {
     pub argument: Option<Argument>,
     pub literal: Option<Literal>,
+}
+impl Debug for ArgumentLiteral {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Some(argument) = &self.argument {
+            return f.write_str(&format!("{:?}", argument));
+        }
+        if let Some(literal) = &self.literal {
+            return f.write_str(&format!("{:?}", literal));
+        }
+
+        f.write_str("{}")
+    }
 }
 #[derive(Debug)]
 pub struct Statement {
@@ -144,11 +156,23 @@ pub fn load(input: &Vec<String>) -> Vec<Node> {
     let mut program = vec![];
     let mut i = 0;
     while i < input.len() {
+        let data = get_till_eol_or_block(input, i);
         let text = &input[i];
+
+        // skip EOLs
+        if text == "EOL" {
+            i += 1;
+            continue;
+        }
+
         if text == "include" || text == "return" {
             i = include_n_return::parser(&mut program, text, input, i);
         } else if text == "fun" {
-            i = fun::parser(&mut program, input, i);
+            i = fun::parser(&mut program, data);
+            // else if, because it's a function call when there is no "fun"
+            // quite literally
+        } else if data.1.contains(&"(".to_string()) && data.1.contains(&")".to_string()) {
+            i = fun_call::parser(&mut program, data, text);
         }
         i += 1;
     }

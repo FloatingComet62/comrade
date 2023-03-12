@@ -1,9 +1,8 @@
-use super::{get_till_eol_or_block, load, Argument, Function, Node, Types};
+use super::{load, Argument, Function, Node, Types};
 use crate::exit;
 use crate::type_from_str;
 
-pub fn parser(program: &mut Vec<Node>, input: &Vec<String>, i: usize) -> usize {
-    let data = get_till_eol_or_block(input, i);
+pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>)) -> usize {
     let mut getting_args = false;
     let mut args = vec![];
     let mut identifier = vec![];
