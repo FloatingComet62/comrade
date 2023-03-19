@@ -189,7 +189,7 @@ match 5 == 5 {
 const msg = "Hello World"
 io->out(msg)
 
-include math->{constants->{E, PI}, pow}
+include std->math->{constants->{E, PI}, pow}
 
 public thing_available_with_include = 12
 

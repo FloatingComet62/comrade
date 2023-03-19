@@ -1,7 +1,6 @@
-use super::{get_till_token_or_block, load, ConditionBlock, Node};
+use super::{load, ConditionBlock, Node};
 
-pub fn parser(program: &mut Vec<Node>, input: &Vec<String>, i: usize) -> usize {
-    let data = get_till_token_or_block("EOL", &input, i);
+pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>, bool)) -> usize {
     program.push(Node::new(
         None,
         None,
@@ -13,6 +12,7 @@ pub fn parser(program: &mut Vec<Node>, input: &Vec<String>, i: usize) -> usize {
             parameters: data.1,
             nodes: load(&data.2),
         }),
+        None,
         None,
         None,
     ));

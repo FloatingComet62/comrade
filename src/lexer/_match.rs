@@ -2,7 +2,6 @@ use super::{get_till_token_or_block, load, Match, MatchCase, Node};
 
 pub fn get_match_case(i: usize, input: &Vec<String>) -> (usize, MatchCase) {
     let case_data = get_till_token_or_block("=>", &input, i);
-    println!("{:?}", case_data);
     if case_data.3 {
         return (
             case_data.0,
@@ -23,8 +22,7 @@ pub fn get_match_case(i: usize, input: &Vec<String>) -> (usize, MatchCase) {
     }
 }
 
-pub fn parser(program: &mut Vec<Node>, input: &Vec<String>, i: usize) -> usize {
-    let data = get_till_token_or_block("EOL", &input, i);
+pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>, bool)) -> usize {
     let mut block = vec![];
     let mut j = 0;
     while j < data.2.len() {
@@ -32,6 +30,7 @@ pub fn parser(program: &mut Vec<Node>, input: &Vec<String>, i: usize) -> usize {
         block.push(x.1);
         j = x.0;
     }
+
     program.push(Node::new(
         None,
         None,
@@ -40,9 +39,10 @@ pub fn parser(program: &mut Vec<Node>, input: &Vec<String>, i: usize) -> usize {
         None,
         None,
         Some(Match {
-            condition: data.1,
+            condition: load(&data.1),
             block,
         }),
+        None,
         None,
     ));
     data.0 // skip to next and ignore the data

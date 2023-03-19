@@ -7,14 +7,14 @@ mod _while;
 mod fun;
 mod fun_call;
 mod include_n_return;
+mod math;
 
 #[derive(Debug)]
-pub enum NodeTypes {
-    STATEMENT,
-    FUNCTION,
-    FUNCTIONCALL,
-    VARIABLEASSIGNMENT,
-    EXPRESSION,
+pub enum Operations {
+    ADD,
+    SUB,
+    MUL,
+    DIV,
 }
 #[derive(Debug, Clone)]
 pub struct Argument {
@@ -50,7 +50,7 @@ pub struct VariableAssignment {
 }
 #[derive(Debug)]
 pub struct Expression {
-    pub expr: Vec<String>,
+    pub expr: Vec<String>, // maybe node? idk
 }
 #[derive(Debug)]
 pub struct ConditionBlock {
@@ -65,9 +65,16 @@ pub struct MatchCase {
 }
 #[derive(Debug)]
 pub struct Match {
-    pub condition: Vec<String>,
+    pub condition: Vec<Node>,
     pub block: Vec<MatchCase>,
 }
+#[derive(Debug)]
+pub struct Math {
+    pub lhs: Expression,
+    pub rhs: Expression,
+    pub operation: Operations,
+}
+//todo identifier ?
 pub struct NodeData {
     pub statement: Option<Statement>,
     pub function: Option<Function>,
@@ -77,6 +84,7 @@ pub struct NodeData {
     pub condition_block: Option<ConditionBlock>,
     pub _match: Option<Match>,
     pub literal: Option<Literal>,
+    pub math: Option<Math>,
 }
 impl Debug for NodeData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -103,6 +111,9 @@ impl Debug for NodeData {
         }
         if let Some(literal) = &self.literal {
             return f.write_str(&format!("{:?}", literal));
+        }
+        if let Some(m) = &self.math {
+            return f.write_str(&format!("{:?}", m));
         }
 
         f.write_str("{}")
@@ -134,6 +145,7 @@ impl Node {
         condition_block: Option<ConditionBlock>,
         _match: Option<Match>,
         literal: Option<Literal>,
+        m: Option<Math>,
     ) -> Self {
         Self {
             data: NodeData {
@@ -145,6 +157,7 @@ impl Node {
                 condition_block,
                 _match,
                 literal,
+                math: m,
             },
         }
     }
@@ -177,24 +190,29 @@ impl Lexer {
 */
 pub fn get_till_token_or_block(
     token: &str,
-    text: &Vec<String>,
+    input: &Vec<String>,
     i: usize,
 ) -> (usize, Vec<String>, Vec<String>, bool) {
     let mut output: Vec<String> = vec![];
     let mut block: Vec<String> = vec![];
     let mut got_block = false;
-    let mut getting_block = false;
+    let mut getting_block = 0;
+    let mut getting_function_call = false;
     let mut j = i + 1;
-    while j < text.len() {
-        let text = &text[j];
+    while j < input.len() {
+        let text = &input[j];
         // ! must be first
         if text == "{" {
-            getting_block = true;
+            getting_block += 1;
         }
-        if text == token && !getting_block {
+        if text == "(" && token != "(" {
+            // we are not getting the (, then get the entire function
+            getting_function_call = true;
+        }
+        if text == token && getting_block == 0 && !getting_function_call {
             break;
         }
-        if getting_block {
+        if getting_block > 0 {
             block.push(text.to_string());
         } else {
             output.push(text.to_string());
@@ -202,7 +220,10 @@ pub fn get_till_token_or_block(
         // ! must be last
         if text == "}" {
             got_block = true;
-            getting_block = false;
+            getting_block -= 1;
+        }
+        if text == ")" && token != ")" {
+            getting_function_call = false;
         }
 
         j += 1;
@@ -214,6 +235,7 @@ pub fn load(input: &Vec<String>) -> Vec<Node> {
     let mut i = 0;
     while i < input.len() {
         let data = get_till_token_or_block("EOL", input, i);
+        println!("{:?}", data);
         let text = &input[i];
 
         // skip EOLs
@@ -223,22 +245,82 @@ pub fn load(input: &Vec<String>) -> Vec<Node> {
         }
 
         if text == "include" || text == "return" {
-            i = include_n_return::parser(&mut program, text, input, i);
+            i = include_n_return::parser(&mut program, data, text);
         } else if text == "let" {
-            i = _let::parser(&mut program, input, i);
+            i = _let::parser(&mut program, data, input, i);
         } else if text == "while" {
-            i = _while::parser(&mut program, input, i);
+            i = _while::parser(&mut program, data);
         } else if text == "match" {
-            i = _match::parser(&mut program, input, i);
+            i = _match::parser(&mut program, data);
         } else if text == "fun" {
             i = fun::parser(&mut program, data);
-            // else if, because it's a function call when there is no "fun"
-            // quite literally
-        } else if data.1.contains(&"(".to_string()) && data.1.contains(&")".to_string()) {
-            i = fun_call::parser(&mut program, data, i);
+        } else if has(&data.1, vec!["(", ")"], Mode::AND) {
+            // also, it's a function call when there is no fun
+            i = fun_call::parser(&mut program, text, input, i);
+        } else if has(&data.1, vec!["+", "-", "*", "/"], Mode::OR) {
+            i = math::parser(&mut program, text, input, i);
+        } else if text.chars().next().unwrap_or('\0') == '\"' {
+            program.push(Node::new(
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some(Literal {
+                    literal: text.to_string(),
+                    l_type: Types::Str,
+                }),
+                None,
+            ));
+        } else if is_digit(text.chars().next().unwrap_or('\0')) {
+            program.push(Node::new(
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some(Literal {
+                    literal: text.to_string(),
+                    l_type: Types::I32, // * i32 is the default number
+                }),
+                None,
+            ));
         }
         i += 1;
     }
 
     program
+}
+
+fn is_digit(c: char) -> bool {
+    c >= '0' && c <= '9'
+}
+
+enum Mode {
+    OR,
+    AND,
+}
+fn has(data: &Vec<String>, things: Vec<&str>, mode: Mode) -> bool {
+    match mode {
+        Mode::AND => {
+            for thing in things {
+                if !data.contains(&thing.to_string()) {
+                    return false;
+                }
+            }
+            true
+        }
+        Mode::OR => {
+            for thing in things {
+                if data.contains(&thing.to_string()) {
+                    return true;
+                }
+            }
+            false
+        }
+    }
 }
