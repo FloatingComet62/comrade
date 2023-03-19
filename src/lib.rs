@@ -15,7 +15,7 @@ pub enum TokenTypes {
     EOF,          // End of File
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum Types {
     U4 = 1,
     U4List = 33,

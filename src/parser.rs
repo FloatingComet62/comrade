@@ -21,6 +21,7 @@ impl Parser {
                 String::from("{"),
                 String::from("}"),
                 String::from(","),
+                String::from("="),
             ],
             important_splits: vec![
                 String::from("("),
@@ -29,6 +30,8 @@ impl Parser {
                 String::from("}"),
                 String::from(","),
                 String::from("\r\n"),
+                String::from("="),
+                String::from("=>"),
             ],
         }
     }

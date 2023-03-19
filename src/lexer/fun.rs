@@ -2,7 +2,8 @@ use super::{load, Argument, Function, Node, Types};
 use crate::exit;
 use crate::type_from_str;
 
-pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>)) -> usize {
+pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>, bool)) -> usize {
+    // todo: maybe reimplement this with get_till_token_or_block ?
     let mut getting_args = false;
     let mut args = vec![];
     let mut identifier = vec![];
@@ -32,6 +33,11 @@ pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>)) 
             return_type,
             nodes,
         }),
+        None,
+        None,
+        None,
+        None,
+        None,
         None,
     ));
     data.0

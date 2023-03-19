@@ -1,61 +1,34 @@
-use super::{Argument, ArgumentLiteral, FunctionCall, Literal, Node, Types};
-use crate::exit;
-
-fn is_digit(c: char) -> bool {
-    (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
-}
+use super::{get_till_token_or_block, load, FunctionCall, Node};
 
 pub fn parser(
     program: &mut Vec<Node>,
-    data: (usize, Vec<String>, Vec<String>),
-    text: &String,
+    data: (usize, Vec<String>, Vec<String>, bool),
+    i: usize,
 ) -> usize {
-    let mut getting_args = false;
-    let mut args = vec![];
-    let mut identifier = vec![text.to_string()];
-    for cell in &data.1 {
-        if cell == "(" {
-            getting_args = true;
-        } else if cell == ")" {
-            break;
+    let raw_identifier = get_till_token_or_block("(", &data.1, i);
+    let raw_args = get_till_token_or_block(")", &data.1, raw_identifier.0);
+    let mut args: Vec<Vec<Node>> = vec![];
+    let mut arg: Vec<String> = vec![];
+    for item in &raw_args.1 {
+        if item == "," {
+            args.push(load(&arg));
+            arg = vec![];
+            continue;
         }
-        if getting_args {
-            if cell == "," || cell == ")" || cell == "(" {
-                continue;
-            }
-            let first_char = cell
-                .chars()
-                .next()
-                .unwrap_or_else(|| exit("Blank function call argument", None));
-            let d = is_digit(first_char);
-            if d || first_char == '\"' {
-                args.push(ArgumentLiteral {
-                    argument: None,
-                    literal: Some(Literal {
-                        l_type: if d { Types::I32 } else { Types::Str },
-                        literal: cell.to_string(),
-                    }),
-                })
-            } else {
-                args.push(ArgumentLiteral {
-                    argument: Some(Argument {
-                        identifier: cell.to_string(),
-                        a_type: Types::None, // figure out argument
-                    }),
-                    literal: None,
-                })
-            }
-        } else {
-            identifier.push(cell.to_string());
-        }
+        arg.push(item.to_string());
     }
     program.push(Node::new(
         None,
         None,
         Some(FunctionCall {
-            identifier,
+            identifier: raw_identifier.1,
             arguments: args,
         }),
+        None,
+        None,
+        None,
+        None,
+        None,
     ));
-    data.0
+    raw_args.0
 }

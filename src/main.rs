@@ -5,7 +5,7 @@ use comrade::{exit, parser::Parser};
 
 fn main() {
     let _args: Vec<_> = env::args().collect();
-    let raw_path = Some("examples/hello_world.txt".to_string()); //args.get(1);
+    let raw_path = Some("examples/calculator.txt".to_string()); //args.get(1);
     match raw_path {
         Some(path) => {
             let data = read_file(&path);
