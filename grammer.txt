@@ -15,6 +15,7 @@ let mutable_letiable = VALUE
 const immutable_letiable = VALUE
 
 const list = [ITEM1, ITEM2, ITEM3]
+const list2 = ITEM1, ITEM2, ITEM3
 const dictionary = {
   KEY1 => VALUE1
   KEY2 => VALUE2

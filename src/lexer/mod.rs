@@ -52,7 +52,7 @@ pub struct FunctionCall {
 #[derive(Debug)]
 pub struct VariableAssignment {
     pub identifier: Vec<String>,
-    pub value: Box<Node>,
+    pub value: Box<Vec<Node>>,
     pub immutability: Immutablity,
 }
 #[derive(Debug)]

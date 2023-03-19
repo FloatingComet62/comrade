@@ -12,8 +12,7 @@ v 0.1
 - [x] Match Statments
 - [x] Variables
 - [x] Constants
-- [ ] Lists
-- [ ] Dictionaries
+- [x] Lists
 - [ ] If, Else if, Else statements
 - [x] While loops
 - [ ] For loops
@@ -26,6 +25,7 @@ v 0.1
 
 v 0.2
 
+- [ ] Dictionaries
 - [ ] Macros
 - [ ] Traits
 - [ ] Implementations

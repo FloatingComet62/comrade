@@ -4,6 +4,7 @@ pub struct Parser {
     pub data: String,
     pub token_splits: Vec<String>,     // splits of token
     pub important_splits: Vec<String>, // split, but keep the splitter
+    pub types: Vec<String>,
 }
 
 impl Parser {
@@ -27,6 +28,8 @@ impl Parser {
                 String::from("-"),
                 String::from("*"),
                 String::from("/"),
+                String::from("["),
+                String::from("]"),
             ],
             important_splits: vec![
                 String::from("("),
@@ -41,18 +44,56 @@ impl Parser {
                 String::from("-"),
                 String::from("*"),
                 String::from("/"),
+                String::from("["),
+                String::from("]"),
+            ],
+            types: vec![
+                String::from("u4"),
+                String::from("u8"),
+                String::from("u16"),
+                String::from("u32"),
+                String::from("u64"),
+                String::from("u128"),
+                String::from("i4"),
+                String::from("i8"),
+                String::from("i16"),
+                String::from("i32"),
+                String::from("i64"),
+                String::from("i128"),
+                String::from("f4"),
+                String::from("f8"),
+                String::from("f16"),
+                String::from("f32"),
+                String::from("f64"),
+                String::from("f128"),
+                String::from("str"),
             ],
         }
     }
     fn is_split(
         self: &Parser,
         item_to_check: char,
+        current_item: &String,
         to_split_chars: &Vec<char>,
         i: usize,
     ) -> (bool, Option<String>) {
         for current_split in &self.token_splits {
             let chars: Vec<char> = current_split.chars().collect();
             if item_to_check == chars[0] {
+                // DON'T SPLIT "str[]" INTO "str" "[" "]"
+                let mut ci_chars = current_item.chars();
+                ci_chars.next_back();
+                if current_split == "[" {
+                    if self.types.contains(current_item) {
+                        return (false, None);
+                    }
+                }
+                if current_split == "]" {
+                    if self.types.contains(&ci_chars.as_str().to_string()) {
+                        return (false, None);
+                    }
+                }
+
                 if chars.len() == 1 {
                     return (true, Some(current_split.clone()));
                 }
@@ -83,7 +124,8 @@ impl Parser {
             if item_to_check == '"' {
                 getting_string = !getting_string;
             }
-            let (time_to_split, splitter) = self.is_split(item_to_check, &to_split_chars, i);
+            let (time_to_split, splitter) =
+                self.is_split(item_to_check, &current_item, &to_split_chars, i);
             if time_to_split {
                 if !getting_string && current_item.len() >= 1 {
                     output.push(current_item.clone());

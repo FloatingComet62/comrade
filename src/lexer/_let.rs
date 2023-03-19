@@ -8,8 +8,7 @@ pub fn parser(
 ) -> usize {
     let iden = get_till_token_or_block("=", &input, i);
     let raw_val = get_till_token_or_block("EOL", &input, iden.0);
-    let mut binding = load(&raw_val.1);
-    let val = binding.swap_remove(0);
+    let val = load(&raw_val.1);
     // TODO: handle block ig
     program.push(Node::new(
         None,
