@@ -1,6 +1,7 @@
 use crate::Types;
 use std::{fmt::Debug, ops::Deref};
 
+mod _const;
 mod _let;
 mod _match;
 mod _while;
@@ -15,6 +16,11 @@ pub enum Operations {
     SUB,
     MUL,
     DIV,
+}
+#[derive(Debug)]
+pub enum Immutablity {
+    True,
+    False,
 }
 #[derive(Debug, Clone)]
 pub struct Argument {
@@ -47,6 +53,7 @@ pub struct FunctionCall {
 pub struct VariableAssignment {
     pub identifier: Vec<String>,
     pub value: Box<Node>,
+    pub immutability: Immutablity,
 }
 #[derive(Debug)]
 pub struct Expression {
@@ -198,12 +205,19 @@ pub fn get_till_token_or_block(
     let mut got_block = false;
     let mut getting_block = 0;
     let mut getting_function_call = false;
+    let mut is_comment = false;
     let mut j = i + 1;
     while j < input.len() {
         let text = &input[j];
         // ! must be first
         if text == "{" {
             getting_block += 1;
+        }
+        if text == "#" {
+            is_comment = true;
+        }
+        if text == "EOL" {
+            is_comment = false;
         }
         if text == "(" && token != "(" {
             // we are not getting the (, then get the entire function
@@ -212,17 +226,19 @@ pub fn get_till_token_or_block(
         if text == token && getting_block == 0 && !getting_function_call {
             break;
         }
-        if getting_block > 0 {
-            block.push(text.to_string());
-        } else {
-            output.push(text.to_string());
+        if !is_comment {
+            if getting_block > 0 {
+                block.push(text.to_string());
+            } else {
+                output.push(text.to_string());
+            }
         }
         // ! must be last
         if text == "}" {
             got_block = true;
             getting_block -= 1;
         }
-        if text == ")" && token != ")" {
+        if text == ")" {
             getting_function_call = false;
         }
 
@@ -235,9 +251,12 @@ pub fn load(input: &Vec<String>) -> Vec<Node> {
     let mut i = 0;
     while i < input.len() {
         let data = get_till_token_or_block("EOL", input, i);
-        println!("{:?}", data);
         let text = &input[i];
 
+        if text == "#" {
+            i += data.0;
+            continue;
+        }
         // skip EOLs
         if text == "EOL" {
             i += 1;
@@ -248,6 +267,8 @@ pub fn load(input: &Vec<String>) -> Vec<Node> {
             i = include_n_return::parser(&mut program, data, text);
         } else if text == "let" {
             i = _let::parser(&mut program, data, input, i);
+        } else if text == "const" {
+            i = _const::parser(&mut program, data, input, i);
         } else if text == "while" {
             i = _while::parser(&mut program, data);
         } else if text == "match" {

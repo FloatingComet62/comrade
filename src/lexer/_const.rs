@@ -18,7 +18,7 @@ pub fn parser(
         Some(VariableAssignment {
             identifier: iden.1,
             value: Box::new(val),
-            immutability: Immutablity::False,
+            immutability: Immutablity::True,
         }),
         None,
         None,

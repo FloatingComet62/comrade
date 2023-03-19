@@ -1,8 +1,9 @@
 include std->io
 
+# this is a comment
 fun main(_argc -> i32, _argv -> str[]) => u8 {
   while true {
-    let operation = io->in<str>()
+    const operation = io->in<str>()
     let num1 = io->in<i32>()
     let num2 = io->in<i32>()
     io->out(match operation.lowercase() {

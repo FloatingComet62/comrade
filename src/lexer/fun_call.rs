@@ -12,6 +12,7 @@ pub fn parser(program: &mut Vec<Node>, text: &String, input: &Vec<String>, i: us
     // basically, join the block you found with the main content
     raw_args.append(&mut raw_raw_args.1);
     raw_args.append(&mut raw_raw_args.2);
+
     let mut args: Vec<Vec<Node>> = vec![];
     let mut arg: Vec<String> = vec![];
     for item in &raw_args {

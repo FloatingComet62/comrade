@@ -110,7 +110,6 @@ impl Parser {
     }
     pub fn parse(self: &Parser) -> Vec<Node> {
         let res = self.token_splitter(&self.data);
-        println!("{:?}", res);
         let mut lexer = Lexer::new(res);
         lexer.program = load(&lexer.splitted_text);
         return lexer.program;
