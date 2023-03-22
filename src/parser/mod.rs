@@ -11,7 +11,7 @@ mod _while;
 mod booleans;
 mod fun;
 mod fun_call;
-mod include_n_return;
+mod include_n_return_n_erase;
 mod math;
 
 #[derive(Debug)]
@@ -312,8 +312,8 @@ pub fn load(input: &Vec<String>) -> Vec<Node> {
             continue;
         }
 
-        if text == "include" || text == "return" {
-            i = include_n_return::parser(&mut program, data, text);
+        if text == "include" || text == "return" || text == "erase" {
+            i = include_n_return_n_erase::parser(&mut program, data, text);
         } else if text == "true" || text == "false" {
             i = booleans::parser(&mut program, data, text);
         } else if text == "let" {

@@ -1,5 +1,3 @@
-include std->io
-
 struct User {
     name -> str
     sex -> bool
