@@ -1,4 +1,4 @@
-use crate::lexer::{load, Lexer, Node};
+use crate::parser::{load, Lexer, Node};
 
 pub struct Parser {
     pub data: String,

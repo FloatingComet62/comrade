@@ -1,7 +1,7 @@
 use std::env;
 use std::fs;
 
-use comrade::{exit, parser::Parser};
+use comrade::{exit, lexer::Parser};
 
 fn main() {
     let args: Vec<_> = env::args().collect();

@@ -10,7 +10,6 @@ pub enum TokenTypes {
     TYPE,         // types
     SYMBOL,       // used for ( ) { } right now
     FUNCTIONCALL, // used to figure out if a function is being called
-    LITERAL,      // TODO
     EOL,          // End of Line
     EOF,          // End of File
 }
