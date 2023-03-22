@@ -1,23 +1,45 @@
 use super::{get_till_token_or_block, has, Expression, Math, Mode, Node, Operations};
 
-pub fn parser(program: &mut Vec<Node>, text: &String, input: &Vec<String>, i: usize) -> usize {
-    let mut operator = "+";
-    let mut operation = Operations::ADD;
-    if has(&input, vec!["+"], Mode::OR) {
+pub fn parser(
+    program: &mut Vec<Node>,
+    text: &String,
+    data: (usize, Vec<String>, Vec<String>, bool),
+    input: &Vec<String>,
+    i: usize,
+) -> usize {
+    let mut operator = "";
+    let mut operation = Operations::NULL;
+    if has(&data.1, vec!["+"], Mode::OR) {
         operator = "+";
         operation = Operations::ADD;
     }
-    if has(&input, vec!["-"], Mode::OR) {
+    if has(&data.1, vec!["-"], Mode::OR) {
         operator = "-";
         operation = Operations::SUB;
     }
-    if has(&input, vec!["*"], Mode::OR) {
+    if has(&data.1, vec!["*"], Mode::OR) {
         operator = "*";
         operation = Operations::MUL;
     }
-    if has(&input, vec!["/"], Mode::OR) {
+    if has(&data.1, vec!["/"], Mode::OR) {
         operator = "/";
         operation = Operations::DIV;
+    }
+    if has(&data.1, vec![">"], Mode::OR) {
+        operator = ">";
+        operation = Operations::GR;
+    }
+    if has(&data.1, vec!["<"], Mode::OR) {
+        operator = "<";
+        operation = Operations::LT;
+    }
+    if has(&data.1, vec![">="], Mode::OR) {
+        operator = ">=";
+        operation = Operations::EQGR;
+    }
+    if has(&data.1, vec!["<="], Mode::OR) {
+        operator = "<=";
+        operation = Operations::EQLT;
     }
 
     let mut lhs = vec![text.to_string()];

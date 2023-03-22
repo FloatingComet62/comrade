@@ -13,7 +13,7 @@ v 0.1
 - [x] Variables
 - [x] Constants
 - [x] Lists
-- [ ] If, Else if, Else statements
+- [x] If, Else if, Else statements
 - [x] While loops
 - [ ] For loops
 - [ ] Comments

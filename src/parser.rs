@@ -23,6 +23,10 @@ impl Parser {
                 String::from("{"),
                 String::from("}"),
                 String::from(","),
+                String::from(">="),
+                String::from("<="),
+                String::from(">"),
+                String::from("<"),
                 String::from("="),
                 String::from("+"),
                 String::from("-"),
@@ -38,6 +42,10 @@ impl Parser {
                 String::from("}"),
                 String::from(","),
                 String::from("\r\n"),
+                String::from(">="),
+                String::from("<="),
+                String::from(">"),
+                String::from("<"),
                 String::from("="),
                 String::from("=>"),
                 String::from("+"),
@@ -150,10 +158,16 @@ impl Parser {
         }
         return output;
     }
-    pub fn parse(self: &Parser) -> Vec<Node> {
+    pub fn parse(self: &Parser, print_tokens: bool, print_ast: bool) -> Vec<Node> {
         let res = self.token_splitter(&self.data);
+        if print_tokens {
+            println!("{:?}", res);
+        }
         let mut lexer = Lexer::new(res);
         lexer.program = load(&lexer.splitted_text);
+        if print_ast {
+            println!("{:?}", lexer.program);
+        }
         return lexer.program;
     }
 }

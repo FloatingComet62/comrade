@@ -4,13 +4,15 @@ use std::fs;
 use comrade::{exit, parser::Parser};
 
 fn main() {
-    let _args: Vec<_> = env::args().collect();
-    let raw_path = _args.get(1);
+    let args: Vec<_> = env::args().collect();
+    let raw_path = args.get(1);
+    let print_tokens = args.contains(&"-t".to_string());
+    let print_ast = args.contains(&"-a".to_string());
     match raw_path {
         Some(path) => {
             let data = read_file(&path);
             let parser = Parser::new(data);
-            println!("{:?}", parser.parse());
+            parser.parse(print_tokens, print_ast);
         }
         None => exit("No input files passes", None),
     }

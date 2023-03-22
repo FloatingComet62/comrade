@@ -2,9 +2,11 @@ use crate::Types;
 use std::{fmt::Debug, ops::Deref};
 
 mod _const;
+mod _if;
 mod _let;
 mod _match;
 mod _while;
+mod booleans;
 mod fun;
 mod fun_call;
 mod include_n_return;
@@ -12,10 +14,17 @@ mod math;
 
 #[derive(Debug)]
 pub enum Operations {
-    ADD,
-    SUB,
-    MUL,
-    DIV,
+    NULL,
+
+    ADD,  // addition
+    SUB,  // subtraction
+    MUL,  // multiplication
+    DIV,  // division
+    EQ,   // equal
+    EQGR, // equal or greater than
+    EQLT, // equal or less than
+    GR,   // greater than
+    LT,   // less than
 }
 #[derive(Debug)]
 pub enum Immutablity {
@@ -62,7 +71,7 @@ pub struct Expression {
 #[derive(Debug)]
 pub struct ConditionBlock {
     pub keyword: String,
-    pub parameters: Vec<String>, //todo Vec<Node>
+    pub parameters: Vec<Node>,
     pub nodes: Vec<Node>,
 }
 #[derive(Debug)]
@@ -168,6 +177,9 @@ impl Node {
             },
         }
     }
+    pub fn blank() -> Node {
+        Node::new(None, None, None, None, None, None, None, None, None)
+    }
 }
 
 pub struct Lexer {
@@ -236,6 +248,12 @@ pub fn get_till_token_or_block(
             if text == "}" {
                 got_block = true;
                 getting_block -= 1;
+                if getting_block == 0 {
+                    // got a random block?
+                    // IT PROBABLY WAS IMPORTANT OR SOMETHING, ISN'T IT
+                    // stop everything, just return
+                    break;
+                }
             }
             if text == ")" {
                 getting_function_call = false;
@@ -248,10 +266,13 @@ pub fn get_till_token_or_block(
 }
 pub fn load(input: &Vec<String>) -> Vec<Node> {
     let mut program = vec![];
+    let mut previous_text;
+    let mut text = &String::new();
     let mut i = 0;
     while i < input.len() {
         let data = get_till_token_or_block("EOL", input, i);
-        let text = &input[i];
+        previous_text = text.clone();
+        text = &input[i];
 
         if text == "#" {
             i += data.0;
@@ -265,10 +286,14 @@ pub fn load(input: &Vec<String>) -> Vec<Node> {
 
         if text == "include" || text == "return" {
             i = include_n_return::parser(&mut program, data, text);
+        } else if text == "true" || text == "false" {
+            i = booleans::parser(&mut program, data, text);
         } else if text == "let" {
             i = _let::parser(&mut program, data, input, i);
         } else if text == "const" {
             i = _const::parser(&mut program, data, input, i);
+        } else if text == "if" || text == "else" {
+            i = _if::parser(&mut program, data, text, &previous_text, input, i);
         } else if text == "while" {
             i = _while::parser(&mut program, data);
         } else if text == "match" {
@@ -278,8 +303,12 @@ pub fn load(input: &Vec<String>) -> Vec<Node> {
         } else if has(&data.1, vec!["(", ")"], Mode::AND) {
             // also, it's a function call when there is no fun
             i = fun_call::parser(&mut program, text, input, i);
-        } else if has(&data.1, vec!["+", "-", "*", "/"], Mode::OR) {
-            i = math::parser(&mut program, text, input, i);
+        } else if has(
+            &data.1,
+            vec!["+", "-", "*", "/", ">", "<", "<=", ">="],
+            Mode::OR,
+        ) {
+            i = math::parser(&mut program, text, data, input, i);
         } else if text.chars().next().unwrap_or('\0') == '\"' {
             program.push(Node::new(
                 None,

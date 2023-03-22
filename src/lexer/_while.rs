@@ -9,7 +9,7 @@ pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>, b
         None,
         Some(ConditionBlock {
             keyword: "while".to_string(),
-            parameters: data.1,
+            parameters: load(&data.1),
             nodes: load(&data.2),
         }),
         None,
