@@ -1,0 +1,5 @@
+include std->io
+
+public const TWO = 2
+
+fun main(_argc -> i32, _argv -> str[]) => u8 {}

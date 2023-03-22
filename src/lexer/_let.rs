@@ -1,10 +1,11 @@
-use super::{get_till_token_or_block, load, Immutablity, Node, VariableAssignment};
+use super::{get_till_token_or_block, load, Node, VariableAssignment};
 
 pub fn parser(
     program: &mut Vec<Node>,
     data: (usize, Vec<String>, Vec<String>, bool),
     input: &Vec<String>,
     i: usize,
+    previous_text: &String,
 ) -> usize {
     let iden = get_till_token_or_block("=", &input, i);
     let raw_val = get_till_token_or_block("EOL", &input, iden.0);
@@ -17,7 +18,8 @@ pub fn parser(
         Some(VariableAssignment {
             identifier: iden.1,
             value: Box::new(val),
-            immutability: Immutablity::False,
+            immutability: false,
+            publicity: previous_text == "public",
         }),
         None,
         None,

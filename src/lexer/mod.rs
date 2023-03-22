@@ -28,11 +28,6 @@ pub enum Operations {
     GR,   // greater than
     LT,   // less than
 }
-#[derive(Debug)]
-pub enum Immutablity {
-    True,
-    False,
-}
 #[derive(Debug, Clone)]
 pub struct Argument {
     pub identifier: String,
@@ -64,7 +59,8 @@ pub struct FunctionCall {
 pub struct VariableAssignment {
     pub identifier: Vec<String>,
     pub value: Box<Vec<Node>>,
-    pub immutability: Immutablity,
+    pub immutability: bool,
+    pub publicity: bool,
 }
 #[derive(Debug)]
 pub struct Expression {
@@ -321,9 +317,9 @@ pub fn load(input: &Vec<String>) -> Vec<Node> {
         } else if text == "true" || text == "false" {
             i = booleans::parser(&mut program, data, text);
         } else if text == "let" {
-            i = _let::parser(&mut program, data, input, i);
+            i = _let::parser(&mut program, data, input, i, &previous_text);
         } else if text == "const" {
-            i = _const::parser(&mut program, data, input, i);
+            i = _const::parser(&mut program, data, input, i, &previous_text);
         } else if text == "if" || text == "else" {
             i = _if::parser(&mut program, data, text, &previous_text, input, i);
         } else if text == "while" {
