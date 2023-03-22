@@ -27,7 +27,7 @@ v 0.1
 v 0.2
 | Lexer | Compiler | Feature |
 | ----- | -------- | ------- |
-| - [ ] | - [ ] | Dictionaries |
-| - [ ] | - [ ] | Macros |
-| - [ ] | - [ ] | Traits |
-| - [ ] | - [ ] | Implementations |
+| [ ] | [ ] | Dictionaries |
+| [ ] | [ ] | Macros |
+| [ ] | [ ] | Traits |
+| [ ] | [ ] | Implementations |
