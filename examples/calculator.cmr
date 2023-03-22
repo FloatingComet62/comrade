@@ -3,7 +3,7 @@ include std->io
 # this is a comment
 fun main(_argc -> i32, _argv -> str[]) => u8 {
   while true {
-    const operation = io->in<str>()
+    const operation = io->in<str>() # this is a comment
     let num1 = io->in<i32>()
     let num2 = io->in<i32>()
     io->out(match operation.lowercase() {

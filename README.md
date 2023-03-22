@@ -18,7 +18,7 @@ v 0.1
 - [ ] For loops
 - [ ] Comments
 - [ ] Structs
-- [ ] Including
+- [x] Including
 - [ ] Enums
 - [ ] Erasing identifiers
 - [ ] Public identifiers

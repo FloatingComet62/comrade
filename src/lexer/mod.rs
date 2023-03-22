@@ -210,36 +210,36 @@ pub fn get_till_token_or_block(
     while j < input.len() {
         let text = &input[j];
         // ! must be first
-        if text == "{" {
-            getting_block += 1;
-        }
         if text == "#" {
             is_comment = true;
         }
         if text == "EOL" {
             is_comment = false;
         }
-        if text == "(" && token != "(" {
-            // we are not getting the (, then get the entire function
-            getting_function_call = true;
-        }
-        if text == token && getting_block == 0 && !getting_function_call {
-            break;
-        }
         if !is_comment {
+            if text == "{" {
+                getting_block += 1;
+            }
+            if text == "(" && token != "(" {
+                // we are not getting the (, then get the entire function
+                getting_function_call = true;
+            }
+            if text == token && getting_block == 0 && !getting_function_call {
+                break;
+            }
             if getting_block > 0 {
                 block.push(text.to_string());
             } else {
                 output.push(text.to_string());
             }
-        }
-        // ! must be last
-        if text == "}" {
-            got_block = true;
-            getting_block -= 1;
-        }
-        if text == ")" {
-            getting_function_call = false;
+            // ! must be last
+            if text == "}" {
+                got_block = true;
+                getting_block -= 1;
+            }
+            if text == ")" {
+                getting_function_call = false;
+            }
         }
 
         j += 1;
