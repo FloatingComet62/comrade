@@ -1,0 +1,11 @@
+include std->io
+
+enum Emotions {
+    Good,
+    Neutral,
+    Awful,
+    WorstEver
+}
+
+fun main(_argc -> i32, _argv -> str[]) => u8 {
+}

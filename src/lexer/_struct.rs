@@ -47,6 +47,7 @@ pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>, b
             identifier: data.1,
             members: block,
         }),
+        None,
     ));
     data.0 // skip to next and ignore the data
 }

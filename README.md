@@ -19,7 +19,7 @@ v 0.1
 - [x] Comments
 - [x] Structs
 - [x] Including
-- [ ] Enums
+- [x] Enums
 - [ ] Erasing identifiers
 - [ ] Public identifiers
 
