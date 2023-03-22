@@ -16,8 +16,8 @@ v 0.1
 - [x] If, Else if, Else statements
 - [x] While loops
 - [ ] For loops
-- [ ] Comments
-- [ ] Structs
+- [x] Comments
+- [x] Structs
 - [x] Including
 - [ ] Enums
 - [ ] Erasing identifiers

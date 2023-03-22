@@ -5,6 +5,7 @@ mod _const;
 mod _if;
 mod _let;
 mod _match;
+mod _struct;
 mod _while;
 mod booleans;
 mod fun;
@@ -85,6 +86,16 @@ pub struct Match {
     pub block: Vec<MatchCase>,
 }
 #[derive(Debug)]
+pub struct StructMember {
+    pub identifier: Vec<String>,
+    pub t_mem: Types,
+}
+#[derive(Debug)]
+pub struct Struct {
+    pub identifier: Vec<String>,
+    pub members: Vec<StructMember>,
+}
+#[derive(Debug)]
 pub struct Math {
     pub lhs: Expression,
     pub rhs: Expression,
@@ -101,6 +112,7 @@ pub struct NodeData {
     pub _match: Option<Match>,
     pub literal: Option<Literal>,
     pub math: Option<Math>,
+    pub _struct: Option<Struct>,
 }
 impl Debug for NodeData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -130,6 +142,9 @@ impl Debug for NodeData {
         }
         if let Some(m) = &self.math {
             return f.write_str(&format!("{:?}", m));
+        }
+        if let Some(s) = &self._struct {
+            return f.write_str(&format!("{:?}", s));
         }
 
         f.write_str("{}")
@@ -162,6 +177,7 @@ impl Node {
         _match: Option<Match>,
         literal: Option<Literal>,
         m: Option<Math>,
+        s: Option<Struct>,
     ) -> Self {
         Self {
             data: NodeData {
@@ -174,11 +190,12 @@ impl Node {
                 _match,
                 literal,
                 math: m,
+                _struct: s,
             },
         }
     }
     pub fn blank() -> Node {
-        Node::new(None, None, None, None, None, None, None, None, None)
+        Node::new(None, None, None, None, None, None, None, None, None, None)
     }
 }
 
@@ -264,6 +281,7 @@ pub fn get_till_token_or_block(
     }
     return (j, output, block, got_block);
 }
+
 pub fn load(input: &Vec<String>) -> Vec<Node> {
     let mut program = vec![];
     let mut previous_text;
@@ -298,6 +316,8 @@ pub fn load(input: &Vec<String>) -> Vec<Node> {
             i = _while::parser(&mut program, data);
         } else if text == "match" {
             i = _match::parser(&mut program, data);
+        } else if text == "struct" {
+            i = _struct::parser(&mut program, data);
         } else if text == "fun" {
             i = fun::parser(&mut program, data);
         } else if has(&data.1, vec!["(", ")"], Mode::AND) {
@@ -323,6 +343,7 @@ pub fn load(input: &Vec<String>) -> Vec<Node> {
                     l_type: Types::Str,
                 }),
                 None,
+                None,
             ));
         } else if is_digit(text.chars().next().unwrap_or('\0')) {
             program.push(Node::new(
@@ -337,6 +358,7 @@ pub fn load(input: &Vec<String>) -> Vec<Node> {
                     literal: text.to_string(),
                     l_type: Types::I32, // * i32 is the default number
                 }),
+                None,
                 None,
             ));
         }

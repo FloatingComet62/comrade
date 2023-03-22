@@ -5,11 +5,14 @@ pub fn parser(
     data: (usize, Vec<String>, Vec<String>, bool),
     text: &String,
 ) -> usize {
+    let mut params = data.1.clone();
+    params.retain(|x| x != "->");
     program.push(Node::new(
         Some(Statement {
             action: text.to_string(),
-            parameters: data.1,
+            parameters: params,
         }),
+        None,
         None,
         None,
         None,

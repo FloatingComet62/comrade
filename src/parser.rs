@@ -42,6 +42,7 @@ impl Parser {
                 String::from("}"),
                 String::from(","),
                 String::from("\r\n"),
+                String::from("->"),
                 String::from(">="),
                 String::from("<="),
                 String::from(">"),

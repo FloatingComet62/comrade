@@ -1,0 +1,9 @@
+include std->io
+
+struct User {
+    name -> str
+    sex -> bool
+    age -> u8
+}
+
+fun main(_argc -> i32, _argv -> str[]) => u8 {}

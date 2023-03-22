@@ -15,7 +15,7 @@
           "kind": "bin"
         }
       },
-      "args": ["examples/calculator.cmr"],
+      "args": ["examples/structs.cmr", "-t", "-a"],
       "cwd": "${workspaceFolder}"
     }
   ]

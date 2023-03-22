@@ -8,6 +8,9 @@ pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>, b
     let mut args = vec![];
     let mut identifier = vec![];
     for cell in &data.1 {
+        if cell == "->" {
+            continue;
+        }
         if cell == "(" {
             getting_args = true;
         } else if cell == ")" {
@@ -33,6 +36,7 @@ pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>, b
             return_type,
             nodes,
         }),
+        None,
         None,
         None,
         None,

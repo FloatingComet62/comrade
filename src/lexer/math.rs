@@ -62,6 +62,7 @@ pub fn parser(
             rhs: Expression { expr: rhs.1 },
             operation,
         }),
+        None,
     ));
     rhs.0 // skip to next and ignore the data
 }
