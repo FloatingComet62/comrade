@@ -3,6 +3,7 @@ use std::{fmt::Debug, ops::Deref};
 
 mod _const;
 mod _enum;
+mod _for;
 mod _if;
 mod _let;
 mod _match;
@@ -18,15 +19,21 @@ mod math;
 pub enum Operations {
     NULL,
 
-    ADD,  // addition
-    SUB,  // subtraction
-    MUL,  // multiplication
-    DIV,  // division
-    EQ,   // equal
-    EQGR, // equal or greater than
-    EQLT, // equal or less than
-    GR,   // greater than
-    LT,   // less than
+    ADD,    // addition              "+"
+    SUB,    // subtraction           "-"
+    MUL,    // multiplication        "*"
+    DIV,    // division              "/"
+    EQ,     // equal                 "=="
+    EQGR,   // equal or greater than ">="
+    EQLT,   // equal or less than    "<="
+    GR,     // greater than          ">"
+    LT,     // less than             "<"
+    NEQ,    // not equal             "!="
+    EQT,    // equate to rhs         "="
+    ADDEQT, // add rhs to lhs        "+="
+    SUBEQT, // subtract rhs to lhs   "-="
+    MULEQT, // multiply rhs to lhs   "*="
+    DIVEQT, // divide rhs to lhs     "/="
 }
 #[derive(Debug, Clone)]
 pub struct Argument {
@@ -99,8 +106,8 @@ pub struct Enum {
 }
 #[derive(Debug)]
 pub struct Math {
-    pub lhs: Expression,
-    pub rhs: Expression,
+    pub lhs: Vec<Node>,
+    pub rhs: Vec<Node>,
     pub operation: Operations,
 }
 //todo identifier ?
@@ -119,39 +126,25 @@ pub struct NodeData {
 }
 impl Debug for NodeData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if let Some(statement) = &self.statement {
-            return f.write_str(&format!("{:?}", statement));
+        macro_rules! check {
+            ($x: expr) => {
+                if let Some(x) = $x {
+                    return f.write_str(&format!("{:?}", x));
+                }
+            };
         }
-        if let Some(function) = &self.function {
-            return f.write_str(&format!("{:?}", function));
-        }
-        if let Some(function_call) = &self.function_call {
-            return f.write_str(&format!("{:?}", function_call));
-        }
-        if let Some(variable_assignment) = &self.variable_assignment {
-            return f.write_str(&format!("{:?}", variable_assignment));
-        }
-        if let Some(expression) = &self.expression {
-            return f.write_str(&format!("{:?}", expression));
-        }
-        if let Some(condition_block) = &self.condition_block {
-            return f.write_str(&format!("{:?}", condition_block));
-        }
-        if let Some(_match) = &self._match {
-            return f.write_str(&format!("{:?}", _match));
-        }
-        if let Some(literal) = &self.literal {
-            return f.write_str(&format!("{:?}", literal));
-        }
-        if let Some(m) = &self.math {
-            return f.write_str(&format!("{:?}", m));
-        }
-        if let Some(s) = &self._struct {
-            return f.write_str(&format!("{:?}", s));
-        }
-        if let Some(e) = &self._enum {
-            return f.write_str(&format!("{:?}", e));
-        }
+
+        check!(&self.statement);
+        check!(&self.function);
+        check!(&self.function_call);
+        check!(&self.variable_assignment);
+        check!(&self.expression);
+        check!(&self.condition_block);
+        check!(&self._match);
+        check!(&self.literal);
+        check!(&self.math);
+        check!(&self._struct);
+        check!(&self._enum);
 
         f.write_str("{}")
     }
@@ -238,6 +231,7 @@ pub fn get_till_token_or_block(
     token: &str,
     input: &Vec<String>,
     i: usize,
+    back: bool,
 ) -> (usize, Vec<String>, Vec<String>, bool) {
     let mut output: Vec<String> = vec![];
     let mut block: Vec<String> = vec![];
@@ -245,7 +239,21 @@ pub fn get_till_token_or_block(
     let mut getting_block = 0;
     let mut getting_function_call = false;
     let mut is_comment = false;
-    let mut j = i + 1;
+    let mut j = i;
+    let mut oh_god_we_reached_the_start_while_going_back = false;
+    if back {
+        j = j.checked_sub(1).unwrap_or_else(|| {
+            oh_god_we_reached_the_start_while_going_back = true;
+            0
+        });
+    } else {
+        j += 1;
+    }
+
+    if oh_god_we_reached_the_start_while_going_back {
+        return (j, output, block, got_block);
+    }
+
     while j < input.len() {
         let text = &input[j];
         // ! must be first
@@ -287,18 +295,29 @@ pub fn get_till_token_or_block(
             }
         }
 
-        j += 1;
+        if back {
+            j = j.checked_sub(1).unwrap_or_else(|| {
+                oh_god_we_reached_the_start_while_going_back = true;
+                0
+            });
+        } else {
+            j += 1;
+        }
     }
     return (j, output, block, got_block);
 }
 
-pub fn load(input: &Vec<String>) -> Vec<Node> {
+pub fn load(
+    input: &Vec<String>,
+    mut identifiers: &mut Vec<Vec<String>>,
+    mut first_identifiers: &mut Vec<String>,
+) -> Vec<Node> {
     let mut program = vec![];
     let mut previous_text;
     let mut text = &String::new();
     let mut i = 0;
     while i < input.len() {
-        let data = get_till_token_or_block("EOL", input, i);
+        let data = get_till_token_or_block("EOL", input, i, false);
         previous_text = text.clone();
         text = &input[i];
 
@@ -312,35 +331,67 @@ pub fn load(input: &Vec<String>) -> Vec<Node> {
             continue;
         }
 
-        if text == "include" || text == "return" || text == "erase" {
-            i = include_n_return_n_erase::parser(&mut program, data, text);
-        } else if text == "true" || text == "false" {
-            i = booleans::parser(&mut program, data, text);
-        } else if text == "let" {
-            i = _let::parser(&mut program, data, input, i, &previous_text);
-        } else if text == "const" {
-            i = _const::parser(&mut program, data, input, i, &previous_text);
-        } else if text == "if" || text == "else" {
-            i = _if::parser(&mut program, data, text, &previous_text, input, i);
-        } else if text == "while" {
-            i = _while::parser(&mut program, data);
-        } else if text == "match" {
-            i = _match::parser(&mut program, data);
-        } else if text == "struct" {
-            i = _struct::parser(&mut program, data);
-        } else if text == "enum" {
-            i = _enum::parser(&mut program, data);
-        } else if text == "fun" {
-            i = fun::parser(&mut program, data);
-        } else if has(&data.1, vec!["(", ")"], Mode::AND) {
-            // also, it's a function call when there is no fun
-            i = fun_call::parser(&mut program, text, input, i);
-        } else if has(
+        // no check if math
+        if !has(
             &data.1,
-            vec!["+", "-", "*", "/", ">", "<", "<=", ">="],
+            vec![
+                "+", "-", "*", "/", "==", "=", ">", "<", "<=", ">=", "!=", "+=", "-=", "*=", "/=",
+            ],
             Mode::OR,
         ) {
-            i = math::parser(&mut program, text, data, input, i);
+            // identifier check
+            for j in 0..first_identifiers.len() {
+                if text == first_identifiers[j].as_str() {
+                    let mut identifer = true;
+                    for k in 0..identifiers[j].len() {
+                        if &input[i + k] != identifiers[j][k].as_str() {
+                            identifer = false;
+                        }
+                    }
+                    if identifer {
+                        program.push(Node::new(
+                            None,
+                            None,
+                            None,
+                            None,
+                            Some(Expression {
+                                expr: identifiers[j].clone(),
+                            }),
+                            None,
+                            None,
+                            None,
+                            None,
+                            None,
+                            None,
+                        ));
+                        i += identifiers[j].len();
+                        continue;
+                    }
+                }
+            }
+        }
+
+        // ! let -> math -> literal -> others
+        if text == "let" {
+            i = _let::parser(
+                &mut program,
+                data,
+                input,
+                i,
+                &previous_text,
+                &mut identifiers,
+                &mut first_identifiers,
+            );
+        } else if text == "const" {
+            i = _const::parser(
+                &mut program,
+                data,
+                input,
+                i,
+                &previous_text,
+                &mut identifiers,
+                &mut first_identifiers,
+            );
         } else if text.chars().next().unwrap_or('\0') == '\"' {
             program.push(Node::new(
                 None,
@@ -375,6 +426,59 @@ pub fn load(input: &Vec<String>) -> Vec<Node> {
                 None,
                 None,
             ));
+        } else if text == "include" || text == "return" || text == "erase" {
+            i = include_n_return_n_erase::parser(&mut program, data, text);
+        } else if text == "true" || text == "false" {
+            i = booleans::parser(&mut program, data, text);
+        } else if text == "if" || text == "else" {
+            i = _if::parser(
+                &mut program,
+                data,
+                text,
+                &previous_text,
+                input,
+                i,
+                &mut identifiers,
+                &mut first_identifiers,
+            );
+        } else if text == "while" {
+            i = _while::parser(&mut program, data, &mut identifiers, &mut first_identifiers);
+        } else if text == "for" {
+            i = _for::parser(&mut program, data, &mut identifiers, &mut first_identifiers);
+        } else if text == "struct" {
+            i = _struct::parser(&mut program, data);
+        } else if text == "enum" {
+            i = _enum::parser(&mut program, data);
+        } else if text == "fun" {
+            i = fun::parser(&mut program, data, &mut identifiers, &mut first_identifiers);
+        } else if has(
+            &data.1,
+            vec![
+                "+", "-", "*", "/", "==", "=", ">", "<", "<=", ">=", "!=", "+=", "-=", "*=", "/=",
+            ],
+            Mode::OR,
+        ) {
+            i = math::parser(
+                &mut program,
+                text,
+                data,
+                input,
+                i,
+                &mut identifiers,
+                &mut first_identifiers,
+            );
+        } else if text == "match" {
+            i = _match::parser(&mut program, data, &mut identifiers, &mut first_identifiers);
+        } else if has(&data.1, vec!["(", ")"], Mode::AND) {
+            // also, it's a function call when there is no fun
+            i = fun_call::parser(
+                &mut program,
+                text,
+                input,
+                i,
+                &mut identifiers,
+                &mut first_identifiers,
+            );
         }
         i += 1;
     }

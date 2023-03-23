@@ -1,0 +1,19 @@
+include std->io
+
+fun main(_argc -> i32, _argv -> str[]) => u8 {
+    let a = 5
+    a += 2
+    if io->in(i32) > 5 {
+        a += 10
+    } else {
+        a -= 1
+    }
+    io->out(a)
+
+    a = 5
+
+    a -= io->in(i32)
+    io->out(a)
+
+    return 0
+}

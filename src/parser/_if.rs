@@ -8,6 +8,8 @@ pub fn parser(
     previous_text: &String,
     input: &Vec<String>,
     i: usize,
+    mut identifiers: &mut Vec<Vec<String>>,
+    mut first_identifiers: &mut Vec<String>,
 ) -> usize {
     if text == "if" {
         if previous_text == "else" {
@@ -23,8 +25,8 @@ pub fn parser(
                 None,
                 Some(ConditionBlock {
                     keyword: "else if".to_string(),
-                    parameters: load(&data.1),
-                    nodes: load(&data.2),
+                    parameters: load(&data.1, &mut identifiers, &mut first_identifiers),
+                    nodes: load(&data.2, &mut identifiers, &mut first_identifiers),
                 }),
                 None,
                 None,
@@ -42,8 +44,8 @@ pub fn parser(
             None,
             Some(ConditionBlock {
                 keyword: "if".to_string(),
-                parameters: load(&data.1),
-                nodes: load(&data.2),
+                parameters: load(&data.1, &mut identifiers, &mut first_identifiers),
+                nodes: load(&data.2, &mut identifiers, &mut first_identifiers),
             }),
             None,
             None,
@@ -73,7 +75,7 @@ pub fn parser(
             Some(ConditionBlock {
                 keyword: "else".to_string(),
                 parameters: vec![],
-                nodes: load(&data.2),
+                nodes: load(&data.2, &mut identifiers, &mut first_identifiers),
             }),
             None,
             None,
@@ -92,7 +94,12 @@ pub fn parser(
 */
 fn is_last_an_if(program: &Vec<Node>) -> u8 {
     let blank = Node::blank();
-    let last_node = program.get(program.len() - 1).unwrap_or(&blank);
+    let last_node;
+    if program.len() == 0 {
+        last_node = &blank;
+    } else {
+        last_node = program.get(program.len() - 1).unwrap_or(&blank);
+    }
     if let Some(condition_node) = &last_node.condition_block {
         if condition_node.keyword == "if" {
             return 1;

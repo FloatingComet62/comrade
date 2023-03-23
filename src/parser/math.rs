@@ -1,4 +1,5 @@
-use super::{get_till_token_or_block, has, Expression, Math, Mode, Node, Operations};
+use super::{get_till_token_or_block, has, Math, Mode, Node, Operations};
+use crate::parser::load;
 
 pub fn parser(
     program: &mut Vec<Node>,
@@ -6,47 +7,38 @@ pub fn parser(
     data: (usize, Vec<String>, Vec<String>, bool),
     input: &Vec<String>,
     i: usize,
+    mut identifiers: &mut Vec<Vec<String>>,
+    mut first_identifiers: &mut Vec<String>,
 ) -> usize {
     let mut operator = "";
     let mut operation = Operations::NULL;
-    if has(&data.1, vec!["+"], Mode::OR) {
-        operator = "+";
-        operation = Operations::ADD;
+    macro_rules! check {
+        ($item: expr, $op: expr) => {
+            if has(&data.1, vec![$item], Mode::OR) {
+                operator = $item;
+                operation = $op;
+            }
+        };
     }
-    if has(&data.1, vec!["-"], Mode::OR) {
-        operator = "-";
-        operation = Operations::SUB;
-    }
-    if has(&data.1, vec!["*"], Mode::OR) {
-        operator = "*";
-        operation = Operations::MUL;
-    }
-    if has(&data.1, vec!["/"], Mode::OR) {
-        operator = "/";
-        operation = Operations::DIV;
-    }
-    if has(&data.1, vec![">"], Mode::OR) {
-        operator = ">";
-        operation = Operations::GR;
-    }
-    if has(&data.1, vec!["<"], Mode::OR) {
-        operator = "<";
-        operation = Operations::LT;
-    }
-    if has(&data.1, vec![">="], Mode::OR) {
-        operator = ">=";
-        operation = Operations::EQGR;
-    }
-    if has(&data.1, vec!["<="], Mode::OR) {
-        operator = "<=";
-        operation = Operations::EQLT;
-    }
+    check!("+", Operations::ADD);
+    check!("-", Operations::SUB);
+    check!("*", Operations::MUL);
+    check!("/", Operations::DIV);
+    check!("==", Operations::EQ);
+    check!(">=", Operations::EQGR);
+    check!("<=", Operations::EQLT);
+    check!(">", Operations::GR);
+    check!("<", Operations::LT);
+    check!("!=", Operations::NEQ);
+    check!("=", Operations::EQT);
+    check!("+=", Operations::ADDEQT);
+    check!("-=", Operations::SUBEQT);
+    check!("*=", Operations::MULEQT);
+    check!("/=", Operations::DIVEQT);
 
     let mut lhs = vec![text.to_string()];
-
-    let mut raw_lhs = get_till_token_or_block(operator, &input, i);
-    let rhs = get_till_token_or_block("EOL", &input, raw_lhs.0);
-
+    let mut raw_lhs = get_till_token_or_block(operator, &input, i, false);
+    let rhs = get_till_token_or_block("EOL", &input, raw_lhs.0, false);
     lhs.append(&mut raw_lhs.1);
     program.push(Node::new(
         None,
@@ -58,8 +50,8 @@ pub fn parser(
         None,
         None,
         Some(Math {
-            lhs: Expression { expr: lhs },
-            rhs: Expression { expr: rhs.1 },
+            lhs: load(&lhs, &mut identifiers, &mut first_identifiers),
+            rhs: load(&rhs.1, &mut identifiers, &mut first_identifiers),
             operation,
         }),
         None,

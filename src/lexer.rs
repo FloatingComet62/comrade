@@ -14,6 +14,7 @@ impl Parser {
             token_splits: vec![
                 String::from(" "),
                 String::from("\r\n"),
+                String::from("\n"),
                 String::from("\t"),
                 String::from("->"),
                 String::from("."),
@@ -25,6 +26,12 @@ impl Parser {
                 String::from(","),
                 String::from(">="),
                 String::from("<="),
+                String::from("=="),
+                String::from("+="),
+                String::from("-="),
+                String::from("*="),
+                String::from("/="),
+                String::from("!="),
                 String::from(">"),
                 String::from("<"),
                 String::from("="),
@@ -42,9 +49,16 @@ impl Parser {
                 String::from("}"),
                 String::from(","),
                 String::from("\r\n"),
+                String::from("\n"),
                 String::from("->"),
                 String::from(">="),
                 String::from("<="),
+                String::from("=="),
+                String::from("+="),
+                String::from("-="),
+                String::from("*="),
+                String::from("/="),
+                String::from("!="),
                 String::from(">"),
                 String::from("<"),
                 String::from("="),
@@ -119,6 +133,9 @@ impl Parser {
         if string == "\r\n" {
             return String::from("EOL");
         }
+        if string == "\n" {
+            return String::from("EOL");
+        }
         return string.to_string();
     }
     fn token_splitter(self: &Parser, to_split: &String) -> Vec<String> {
@@ -165,7 +182,13 @@ impl Parser {
             println!("{:?}", res);
         }
         let mut lexer = Lexer::new(res);
-        lexer.program = load(&lexer.splitted_text);
+        let mut identifiers: Vec<Vec<String>> = vec![];
+        let mut first_identifiers: Vec<String> = vec![];
+        lexer.program = load(
+            &lexer.splitted_text,
+            &mut identifiers,
+            &mut first_identifiers,
+        );
         if print_ast {
             println!("{:?}", lexer.program);
         }

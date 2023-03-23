@@ -1,7 +1,12 @@
 use super::{get_till_token_or_block, load, Match, MatchCase, Node};
 
-pub fn get_match_case(i: usize, input: &Vec<String>) -> (usize, Option<MatchCase>) {
-    let case_data = get_till_token_or_block("=>", &input, i);
+pub fn get_match_case(
+    i: usize,
+    input: &Vec<String>,
+    mut identifiers: &mut Vec<Vec<String>>,
+    mut first_identifiers: &mut Vec<String>,
+) -> (usize, Option<MatchCase>) {
+    let case_data = get_till_token_or_block("=>", &input, i, false);
     if case_data.3 {
         if case_data.2.len() == 0 {
             return (case_data.0, None);
@@ -9,30 +14,35 @@ pub fn get_match_case(i: usize, input: &Vec<String>) -> (usize, Option<MatchCase
         return (
             case_data.0,
             Some(MatchCase {
-                block: load(&case_data.2),
+                block: load(&case_data.2, &mut identifiers, &mut first_identifiers),
                 case: case_data.1,
             }),
         );
     } else {
-        let expr_data = get_till_token_or_block("EOL", &input, case_data.0);
+        let expr_data = get_till_token_or_block("EOL", &input, case_data.0, false);
         if case_data.1.len() == 0 {
             return (case_data.0, None);
         }
         return (
             expr_data.0,
             Some(MatchCase {
-                block: load(&expr_data.1),
+                block: load(&expr_data.1, &mut identifiers, &mut first_identifiers),
                 case: case_data.1,
             }),
         );
     }
 }
 
-pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>, bool)) -> usize {
+pub fn parser(
+    program: &mut Vec<Node>,
+    data: (usize, Vec<String>, Vec<String>, bool),
+    mut identifiers: &mut Vec<Vec<String>>,
+    mut first_identifiers: &mut Vec<String>,
+) -> usize {
     let mut block = vec![];
     let mut j = 0;
     while j < data.2.len() {
-        let x = get_match_case(j, &data.2);
+        let x = get_match_case(j, &data.2, &mut identifiers, &mut first_identifiers);
         if let Some(y) = x.1 {
             block.push(y);
         }
@@ -47,7 +57,7 @@ pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>, b
         None,
         None,
         Some(Match {
-            condition: load(&data.1),
+            condition: load(&data.1, &mut identifiers, &mut first_identifiers),
             block,
         }),
         None,

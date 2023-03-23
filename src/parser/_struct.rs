@@ -3,8 +3,8 @@ use crate::type_from_str;
 use super::{get_till_token_or_block, Node, Struct, StructMember};
 
 pub fn get_struct_member(i: usize, input: &Vec<String>) -> (usize, Option<StructMember>) {
-    let mut case_data = get_till_token_or_block("->", &input, i);
-    let mut type_data = get_till_token_or_block("EOL", &input, case_data.0);
+    let mut case_data = get_till_token_or_block("->", &input, i, false);
+    let mut type_data = get_till_token_or_block("EOL", &input, case_data.0, false);
 
     case_data.1.retain(|x| x != "EOL");
     type_data.1.retain(|x| x != "EOL");

@@ -6,10 +6,14 @@ pub fn parser(
     input: &Vec<String>,
     i: usize,
     previous_text: &String,
+    mut identifiers: &mut Vec<Vec<String>>,
+    mut first_identifiers: &mut Vec<String>,
 ) -> usize {
-    let iden = get_till_token_or_block("=", &input, i);
-    let raw_val = get_till_token_or_block("EOL", &input, iden.0);
-    let val = load(&raw_val.1);
+    let iden = get_till_token_or_block("=", &input, i, false);
+    let raw_val = get_till_token_or_block("EOL", &input, iden.0, false);
+    let val = load(&raw_val.1, &mut identifiers, &mut first_identifiers);
+    identifiers.push(iden.1.clone());
+    first_identifiers.push(iden.1[0].clone());
     // TODO: handle block ig
     program.push(Node::new(
         None,

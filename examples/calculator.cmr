@@ -4,8 +4,8 @@ include std->io
 fun main(_argc -> i32, _argv -> str[]) => u8 {
   while true {
     const operation = io->in<str>() # this is a comment
-    let num1 = io->in<i32>()
-    let num2 = io->in<i32>()
+    let num1 = io->in(i32)
+    let num2 = io->in(i32)
     io->out(match operation.lowercase() {
       "addition"       or "add"      or "a" => num1 + num2
       "subtraction"    or "subtract" or "s" => num1 - num2

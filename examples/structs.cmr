@@ -4,4 +4,6 @@ struct User {
     age -> u8
 }
 
-fun main(_argc -> i32, _argv -> str[]) => u8 {}
+fun main(_argc -> i32, _argv -> str[]) => u8 {
+    return 0
+}
