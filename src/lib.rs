@@ -2,6 +2,7 @@ use std::fmt::Debug;
 use std::ops::{Deref, DerefMut};
 use std::process;
 
+pub mod compiler;
 pub mod lexer;
 pub mod parser;
 
@@ -250,6 +251,10 @@ pub struct Math {
     pub rhs: Vec<Node>,
     pub operation: Operations,
 }
+#[derive(Debug, PartialEq)]
+pub struct ExternC {
+    pub block: String,
+}
 #[derive(PartialEq)]
 pub struct NodeData {
     pub statement: Option<Statement>,
@@ -263,6 +268,7 @@ pub struct NodeData {
     pub math: Option<Math>,
     pub _struct: Option<Struct>,
     pub _enum: Option<Enum>,
+    pub extern_c: Option<ExternC>,
 }
 impl Debug for NodeData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -285,6 +291,7 @@ impl Debug for NodeData {
         check!(&self.math);
         check!(&self._struct);
         check!(&self._enum);
+        check!(&self.extern_c);
 
         f.write_str("{}")
     }

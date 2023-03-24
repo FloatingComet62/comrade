@@ -2,6 +2,7 @@ use crate::node;
 
 use super::{load, ConditionBlock, Node};
 
+#[allow(dead_code)]
 pub fn parser(
     program: &mut Vec<Node>,
     data: (usize, Vec<String>, Vec<String>, bool),

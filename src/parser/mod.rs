@@ -1,7 +1,7 @@
 use crate::{
     node, str_list_to_string_list, type_from_str, Argument, ConditionBlock, Enum, Expression,
-    Function, FunctionCall, Literal, Match, MatchCase, Math, Node, NodeData, Statement, Struct,
-    StructMember, Types, VariableAssignment,
+    ExternC, Function, FunctionCall, Literal, Match, MatchCase, Math, Node, NodeData, Statement,
+    Struct, StructMember, Types, VariableAssignment,
 };
 use std::fmt::Debug;
 
@@ -14,6 +14,7 @@ mod _match;
 mod _struct;
 mod _while;
 mod booleans;
+mod extern_c;
 mod fun;
 mod fun_call;
 mod include_n_return_n_erase;
@@ -38,6 +39,7 @@ impl Node {
         m: Option<Math>,
         s: Option<Struct>,
         e: Option<Enum>,
+        e_c: Option<ExternC>,
     ) -> Self {
         Self {
             data: NodeData {
@@ -52,12 +54,13 @@ impl Node {
                 math: m,
                 _struct: s,
                 _enum: e,
+                extern_c: e_c,
             },
         }
     }
     pub fn blank() -> Node {
         Node::new(
-            None, None, None, None, None, None, None, None, None, None, None,
+            None, None, None, None, None, None, None, None, None, None, None, None,
         )
     }
 }
@@ -229,8 +232,10 @@ pub fn load(
             }
         }
 
-        // ! let -> math -> literal -> others
-        if text == "let" {
+        // ! externC -> let -> math -> literal -> others
+        if text == "externC" {
+            i = extern_c::parser(&mut program, data);
+        } else if text == "let" {
             i = _let::parser(
                 &mut program,
                 data,

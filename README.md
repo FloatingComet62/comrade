@@ -16,18 +16,19 @@ v 0.1
 | [x] | [ ] | Lists |
 | [x] | [ ] | If, Else if, Else statements |
 | [x] | [ ] | While loops |
-| [ ] | [ ] | For loops |
 | [x] | [ ] | Comments |
 | [x] | [ ] | Structs |
 | [x] | [ ] | Including |
 | [x] | [ ] | Enums |
-| [ ] | [ ] | Erasing identifiers |
+| [x] | [ ] | Math |
+| [x] | [ ] | Erasing identifiers |
 | [x] | [ ] | Public identifiers |
 
 v 0.2
 | Lexer | Compiler | Feature |
 | ----- | -------- | ------- |
 | [ ] | [ ] | Dictionaries |
+| [ ] | [ ] | For loops |
 | [ ] | [ ] | Macros |
 | [ ] | [ ] | Traits |
 | [ ] | [ ] | Implementations |
