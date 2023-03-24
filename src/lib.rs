@@ -1,20 +1,11 @@
+use std::fmt::Debug;
+use std::ops::{Deref, DerefMut};
 use std::process;
 
 pub mod lexer;
 pub mod parser;
 
-#[derive(PartialEq, Clone, Debug)]
-pub enum TokenTypes {
-    KEYWORD,      // fun, match, include
-    IDENTIFIER,   // x, y, z, i, j ,k
-    TYPE,         // types
-    SYMBOL,       // used for ( ) { } right now
-    FUNCTIONCALL, // used to figure out if a function is being called
-    EOL,          // End of Line
-    EOF,          // End of File
-}
-
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Types {
     U4 = 1,
     U4List = 33,
@@ -57,6 +48,8 @@ pub enum Types {
     Bool = 21,
     BoolList = 52,
     None = 22,
+
+    Type = 23,
 }
 
 pub fn exit(msg: &str, code: Option<i32>) -> ! {
@@ -65,142 +58,251 @@ pub fn exit(msg: &str, code: Option<i32>) -> ! {
 }
 
 pub fn type_from_str(string: &str) -> Types {
-    if string == "u4" {
-        return Types::U4;
+    match string {
+        "u4" => Types::U4,
+        "u8" => Types::U8,
+        "u16" => Types::U16,
+        "u32" => Types::U32,
+        "u64" => Types::U64,
+        "u128" => Types::U128,
+        "i4" => Types::I4,
+        "i8" => Types::I8,
+        "i16" => Types::I16,
+        "i32" => Types::I32,
+        "i64" => Types::I64,
+        "i128" => Types::I128,
+        "f4" => Types::F4,
+        "f8" => Types::F8,
+        "f16" => Types::F16,
+        "f32" => Types::F32,
+        "f64" => Types::F64,
+        "f128" => Types::F128,
+        "str" => Types::Str,
+        "bool" => Types::Bool,
+        "u4[]" => Types::U4List,
+        "u8[]" => Types::U8List,
+        "u16[]" => Types::U16List,
+        "u32[]" => Types::U32List,
+        "u64[]" => Types::U64List,
+        "u128[]" => Types::U128List,
+        "i4[]" => Types::I4List,
+        "i8[]" => Types::I8List,
+        "i16[]" => Types::I16List,
+        "i32[]" => Types::I32List,
+        "i64[]" => Types::I64List,
+        "i128[]" => Types::I128List,
+        "f4[]" => Types::F4List,
+        "f8[]" => Types::F8List,
+        "f16[]" => Types::F16List,
+        "f32[]" => Types::F32List,
+        "f64[]" => Types::F64List,
+        "f128[]" => Types::F128List,
+        "str[]" => Types::StrList,
+        "bool[]" => Types::BoolList,
+        _ => Types::None,
     }
-    if string == "u8" {
-        return Types::U8;
-    }
-    if string == "u16" {
-        return Types::U16;
-    }
-    if string == "u32" {
-        return Types::U32;
-    }
-    if string == "u64" {
-        return Types::U64;
-    }
-    if string == "u128" {
-        return Types::U128;
-    }
-    if string == "i4" {
-        return Types::I4;
-    }
-    if string == "i8" {
-        return Types::I8;
-    }
-    if string == "i16" {
-        return Types::I16;
-    }
-    if string == "i32" {
-        return Types::I32;
-    }
-    if string == "i64" {
-        return Types::I64;
-    }
-    if string == "i128" {
-        return Types::I128;
-    }
-    if string == "f4" {
-        return Types::F4;
-    }
-    if string == "f8" {
-        return Types::F8;
-    }
-    if string == "f16" {
-        return Types::F16;
-    }
-    if string == "f32" {
-        return Types::F32;
-    }
-    if string == "f64" {
-        return Types::F64;
-    }
-    if string == "f128" {
-        return Types::F128;
-    }
-    if string == "str" {
-        return Types::Str;
-    }
-    if string == "bool" {
-        return Types::Bool;
-    }
-
-    if string == "u4[]" {
-        return Types::U4List;
-    };
-    if string == "u8[]" {
-        return Types::U8List;
-    };
-    if string == "u16[]" {
-        return Types::U16List;
-    };
-    if string == "u32[]" {
-        return Types::U32List;
-    };
-    if string == "u64[]" {
-        return Types::U64List;
-    };
-    if string == "u128[]" {
-        return Types::U128List;
-    };
-    if string == "i4[]" {
-        return Types::I4List;
-    };
-    if string == "i8[]" {
-        return Types::I8List;
-    };
-    if string == "i16[]" {
-        return Types::I16List;
-    };
-    if string == "i32[]" {
-        return Types::I32List;
-    };
-    if string == "i64[]" {
-        return Types::I64List;
-    };
-    if string == "i128[]" {
-        return Types::I128List;
-    };
-    if string == "f4[]" {
-        return Types::F4List;
-    };
-    if string == "f8[]" {
-        return Types::F8List;
-    };
-    if string == "f16[]" {
-        return Types::F16List;
-    };
-    if string == "f32[]" {
-        return Types::F32List;
-    };
-    if string == "f64[]" {
-        return Types::F64List;
-    };
-    if string == "f128[]" {
-        return Types::F128List;
-    };
-    if string == "str[]" {
-        return Types::StrList;
-    };
-    if string == "bool[]" {
-        return Types::BoolList;
-    };
-
-    return Types::None;
 }
 
-// #[derive(Clone, Debug)]
-// pub struct Token {
-//   t_type: TokenTypes,
-//   token_string: String,
-//   line: i32,
-//   column: i32
-// }
+pub fn str_list_to_string_list(input: Vec<&str>) -> Vec<String> {
+    let mut output = vec![];
 
-// impl PartialEq for Token {
-//   // basically, don't compare line and column
-//   fn eq(&self, other: &Self) -> bool {
-//     (self.t_type == other.t_type) && (self.token_string == other.token_string)
-//   }
-// }
+    for item in input {
+        output.push(item.to_string());
+    }
+
+    output
+}
+
+#[macro_export]
+macro_rules! node {
+    ($x: ident , $y: expr) => {{
+        let mut n = Node::blank();
+        n.$x = Some($y);
+        n
+    }};
+}
+
+#[derive(Debug, PartialEq)]
+pub enum Operations {
+    NULL,
+
+    /// "+"
+    /// addition
+    ADD,
+    /// "-"
+    /// subtraction
+    SUB,
+    /// "*"
+    /// multiplication
+    MUL,
+    /// "/"
+    /// division
+    DIV,
+    /// "="
+    /// equal
+    EQ,
+    /// ">="
+    /// equal or greater thsn
+    EQGR,
+    /// "<="
+    /// equal or less than
+    EQLT,
+    /// ">"
+    /// greater than
+    GR,
+    /// "<"
+    /// less than
+    LT,
+    /// "!="
+    /// not equal
+    NEQ,
+    /// "="
+    /// equate to rhs
+    EQT,
+    /// "+="
+    /// add rhs to lhs
+    ADDEQT,
+    /// "-="
+    /// subtract rhs to lhs
+    SUBEQT,
+    /// "*="
+    /// multiply rhs to lhs"
+    MULEQT,
+    /// "/="
+    /// divide rhs to lhs
+    DIVEQT,
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct Argument {
+    pub identifier: String,
+    pub a_type: Types,
+}
+#[derive(Debug, PartialEq)]
+pub struct Literal {
+    pub literal: String,
+    pub l_type: Types,
+}
+#[derive(Debug, PartialEq)]
+pub struct Statement {
+    pub action: String,
+    pub parameters: Vec<Node>,
+}
+//f `Into<Option<Statement>>` for `Option<VariableAssignment>`
+//f `TryFrom<Option<VariableAssignment>>` for `Option<Statement>`
+//f `TryInto<Option<Statement>>` for `Option<VariableAssignment>`
+#[derive(Debug, PartialEq)]
+pub struct Function {
+    pub identifier: Vec<String>,
+    pub return_type: Types,
+    pub arguments: Vec<Argument>,
+    pub nodes: Vec<Node>,
+}
+#[derive(Debug, PartialEq)]
+pub struct FunctionCall {
+    pub identifier: Vec<String>,
+    pub arguments: Vec<Vec<Node>>,
+}
+#[derive(Debug, PartialEq)]
+pub struct VariableAssignment {
+    pub identifier: Vec<String>,
+    pub value: Box<Vec<Node>>,
+    pub immutability: bool,
+    pub publicity: bool,
+}
+#[derive(Debug, PartialEq)]
+pub struct Expression {
+    pub expr: Vec<String>, // maybe node? idk
+}
+#[derive(Debug, PartialEq)]
+pub struct ConditionBlock {
+    pub keyword: String,
+    pub parameters: Vec<Node>,
+    pub nodes: Vec<Node>,
+}
+#[derive(Debug, PartialEq)]
+pub struct MatchCase {
+    pub case: Vec<Node>,
+    pub block: Vec<Node>,
+}
+#[derive(Debug, PartialEq)]
+pub struct Match {
+    pub condition: Vec<Node>,
+    pub block: Vec<MatchCase>,
+}
+#[derive(Debug, PartialEq)]
+pub struct StructMember {
+    pub identifier: Vec<String>,
+    pub t_mem: Types,
+}
+#[derive(Debug, PartialEq)]
+pub struct Struct {
+    pub identifier: Vec<String>,
+    pub members: Vec<StructMember>,
+}
+#[derive(Debug, PartialEq)]
+pub struct Enum {
+    pub identifier: Vec<String>,
+    pub members: Vec<String>,
+}
+#[derive(Debug, PartialEq)]
+pub struct Math {
+    pub lhs: Vec<Node>,
+    pub rhs: Vec<Node>,
+    pub operation: Operations,
+}
+#[derive(PartialEq)]
+pub struct NodeData {
+    pub statement: Option<Statement>,
+    pub function: Option<Function>,
+    pub function_call: Option<FunctionCall>,
+    pub variable_assignment: Option<VariableAssignment>,
+    pub expression: Option<Expression>,
+    pub condition_block: Option<ConditionBlock>,
+    pub _match: Option<Match>,
+    pub literal: Option<Literal>,
+    pub math: Option<Math>,
+    pub _struct: Option<Struct>,
+    pub _enum: Option<Enum>,
+}
+impl Debug for NodeData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        macro_rules! check {
+            ($x: expr) => {
+                if let Some(x) = $x {
+                    return f.write_str(&format!("{:?}", x));
+                }
+            };
+        }
+
+        check!(&self.statement);
+        check!(&self.function);
+        check!(&self.function_call);
+        check!(&self.variable_assignment);
+        check!(&self.expression);
+        check!(&self.condition_block);
+        check!(&self._match);
+        check!(&self.literal);
+        check!(&self.math);
+        check!(&self._struct);
+        check!(&self._enum);
+
+        f.write_str("{}")
+    }
+}
+// todo: if by the end of the parser, all node has is "data", just make Node NodeData
+#[derive(PartialEq)]
+pub struct Node {
+    pub data: NodeData,
+}
+
+impl Deref for Node {
+    type Target = NodeData;
+    fn deref(&self) -> &Self::Target {
+        &self.data
+    }
+}
+impl DerefMut for Node {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.data
+    }
+}

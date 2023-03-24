@@ -1,3 +1,5 @@
+use crate::node;
+
 use super::{load, ConditionBlock, Node};
 
 pub fn parser(
@@ -14,22 +16,13 @@ pub fn parser(
         }
         raw_params.push(thingy.to_string());
     }
-    program.push(Node::new(
-        None,
-        None,
-        None,
-        None,
-        None,
-        Some(ConditionBlock {
+    program.push(node!(
+        condition_block,
+        ConditionBlock {
             keyword: "function".to_string(),
             parameters: load(&raw_params, &mut identifiers, &mut first_identifiers),
             nodes: load(&data.2, &mut identifiers, &mut first_identifiers),
-        }),
-        None,
-        None,
-        None,
-        None,
-        None,
+        }
     ));
     data.0
 }

@@ -15,7 +15,7 @@
           "kind": "bin"
         }
       },
-      "args": ["examples/for.cmr", "-t", "-a"],
+      "args": ["test.cmr", "-t", "-a"],
       "cwd": "${workspaceFolder}"
     }
   ]

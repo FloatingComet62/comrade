@@ -1,16 +1,15 @@
 include std->io
 
-# this is a comment
 fun main(_argc -> i32, _argv -> str[]) => u8 {
   while true {
     const operation = io->in<str>() # this is a comment
     let num1 = io->in(i32)
     let num2 = io->in(i32)
     io->out(match operation.lowercase() {
-      "addition"       or "add"      or "a" => num1 + num2
-      "subtraction"    or "subtract" or "s" => num1 - num2
-      "multiplication" or "multiply" or "m" => num1 * num2
-      "division"       or "divide"   or "d" => num1 / num2
+      "a" => num1 + num2
+      "s" => num1 - num2
+      "m" => num1 * num2
+      "d" => num1 / num2
       
       default => "Unknown Operation"
     })

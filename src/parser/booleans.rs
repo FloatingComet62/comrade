@@ -1,3 +1,5 @@
+use crate::node;
+
 use super::{Literal, Node, Types};
 
 pub fn parser(
@@ -5,21 +7,12 @@ pub fn parser(
     data: (usize, Vec<String>, Vec<String>, bool),
     text: &String,
 ) -> usize {
-    program.push(Node::new(
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        Some(Literal {
+    program.push(node!(
+        literal,
+        Literal {
             literal: text.to_string(),
             l_type: Types::Bool,
-        }),
-        None,
-        None,
-        None,
+        }
     ));
     data.0 // skip to next and ignore the data
 }

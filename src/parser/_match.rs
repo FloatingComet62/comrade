@@ -1,3 +1,5 @@
+use crate::node;
+
 use super::{get_till_token_or_block, load, Match, MatchCase, Node};
 
 pub fn get_match_case(
@@ -7,30 +9,38 @@ pub fn get_match_case(
     mut first_identifiers: &mut Vec<String>,
 ) -> (usize, Option<MatchCase>) {
     let case_data = get_till_token_or_block("=>", &input, i, false);
+    let expr_data = get_till_token_or_block("EOL", &input, case_data.0, false);
+    let case_target;
     if case_data.3 {
         if case_data.2.len() == 0 {
             return (case_data.0, None);
         }
-        return (
-            case_data.0,
-            Some(MatchCase {
-                block: load(&case_data.2, &mut identifiers, &mut first_identifiers),
-                case: case_data.1,
-            }),
-        );
+        case_target = case_data.2;
     } else {
-        let expr_data = get_till_token_or_block("EOL", &input, case_data.0, false);
         if case_data.1.len() == 0 {
             return (case_data.0, None);
         }
-        return (
-            expr_data.0,
-            Some(MatchCase {
-                block: load(&expr_data.1, &mut identifiers, &mut first_identifiers),
-                case: case_data.1,
-            }),
-        );
+        case_target = case_data.1
     }
+    let expr_target;
+    if expr_data.3 {
+        if expr_data.2.len() == 0 {
+            return (case_data.0, None);
+        }
+        expr_target = expr_data.2;
+    } else {
+        if expr_data.1.len() == 0 {
+            return (case_data.0, None);
+        }
+        expr_target = expr_data.1
+    }
+    return (
+        expr_data.0,
+        Some(MatchCase {
+            block: load(&expr_target, &mut identifiers, &mut first_identifiers),
+            case: load(&case_target, &mut identifiers, &mut first_identifiers),
+        }),
+    );
 }
 
 pub fn parser(
@@ -49,21 +59,12 @@ pub fn parser(
         j = x.0;
     }
 
-    program.push(Node::new(
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        Some(Match {
+    program.push(node!(
+        _match,
+        Match {
             condition: load(&data.1, &mut identifiers, &mut first_identifiers),
             block,
-        }),
-        None,
-        None,
-        None,
-        None,
+        }
     ));
     data.0 // skip to next and ignore the data
 }

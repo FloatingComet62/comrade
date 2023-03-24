@@ -1,3 +1,5 @@
+use crate::node;
+
 use super::{load, ConditionBlock, Node};
 
 pub fn parser(
@@ -6,22 +8,13 @@ pub fn parser(
     mut identifiers: &mut Vec<Vec<String>>,
     mut first_identifiers: &mut Vec<String>,
 ) -> usize {
-    program.push(Node::new(
-        None,
-        None,
-        None,
-        None,
-        None,
-        Some(ConditionBlock {
+    program.push(node!(
+        condition_block,
+        ConditionBlock {
             keyword: "while".to_string(),
             parameters: load(&data.1, &mut identifiers, &mut first_identifiers),
             nodes: load(&data.2, &mut identifiers, &mut first_identifiers),
-        }),
-        None,
-        None,
-        None,
-        None,
-        None,
+        }
     ));
     data.0 // skip to next and ignore the data
 }

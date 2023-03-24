@@ -1,3 +1,5 @@
+use crate::node;
+
 use super::{get_till_token_or_block, load, Node, VariableAssignment};
 
 pub fn parser(
@@ -15,23 +17,14 @@ pub fn parser(
     identifiers.push(iden.1.clone());
     first_identifiers.push(iden.1[0].clone());
     // TODO: handle block ig
-    program.push(Node::new(
-        None,
-        None,
-        None,
-        Some(VariableAssignment {
+    program.push(node!(
+        variable_assignment,
+        VariableAssignment {
             identifier: iden.1,
             value: Box::new(val),
             immutability: false,
             publicity: previous_text == "public",
-        }),
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
+        }
     ));
     data.0 // skip to next and ignore the data
 }

@@ -1,4 +1,4 @@
-use crate::type_from_str;
+use crate::{node, type_from_str};
 
 use super::{get_till_token_or_block, Node, Struct, StructMember};
 
@@ -33,21 +33,12 @@ pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>, b
         j = x.0;
     }
 
-    program.push(Node::new(
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        Some(Struct {
+    program.push(node!(
+        _struct,
+        Struct {
             identifier: data.1,
             members: block,
-        }),
-        None,
+        }
     ));
     data.0 // skip to next and ignore the data
 }

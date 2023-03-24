@@ -1,5 +1,5 @@
 use super::{load, ConditionBlock, Node};
-use crate::exit;
+use crate::{exit, node};
 
 pub fn parser(
     program: &mut Vec<Node>,
@@ -17,41 +17,23 @@ pub fn parser(
             if last_data == 0 {
                 exit("Missing if part for else if", None);
             }
-            program.push(Node::new(
-                None,
-                None,
-                None,
-                None,
-                None,
-                Some(ConditionBlock {
+            program.push(node!(
+                condition_block,
+                ConditionBlock {
                     keyword: "else if".to_string(),
                     parameters: load(&data.1, &mut identifiers, &mut first_identifiers),
                     nodes: load(&data.2, &mut identifiers, &mut first_identifiers),
-                }),
-                None,
-                None,
-                None,
-                None,
-                None,
+                }
             ));
             return data.0;
         }
-        program.push(Node::new(
-            None,
-            None,
-            None,
-            None,
-            None,
-            Some(ConditionBlock {
+        program.push(node!(
+            condition_block,
+            ConditionBlock {
                 keyword: "if".to_string(),
                 parameters: load(&data.1, &mut identifiers, &mut first_identifiers),
                 nodes: load(&data.2, &mut identifiers, &mut first_identifiers),
-            }),
-            None,
-            None,
-            None,
-            None,
-            None,
+            }
         ));
     }
     if text == "else" {
@@ -66,22 +48,13 @@ pub fn parser(
         if last_node == 0 {
             exit("Missing if part for else", None);
         }
-        program.push(Node::new(
-            None,
-            None,
-            None,
-            None,
-            None,
-            Some(ConditionBlock {
+        program.push(node!(
+            condition_block,
+            ConditionBlock {
                 keyword: "else".to_string(),
                 parameters: vec![],
                 nodes: load(&data.2, &mut identifiers, &mut first_identifiers),
-            }),
-            None,
-            None,
-            None,
-            None,
-            None,
+            }
         ));
     }
     data.0 // skip to next and ignore the data

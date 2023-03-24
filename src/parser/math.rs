@@ -1,5 +1,6 @@
-use super::{get_till_token_or_block, has, Math, Mode, Node, Operations};
-use crate::parser::load;
+use crate::node;
+
+use super::{super::Operations, get_till_token_or_block, has, load, Math, Mode, Node};
 
 pub fn parser(
     program: &mut Vec<Node>,
@@ -24,7 +25,7 @@ pub fn parser(
     check!("-", Operations::SUB);
     check!("*", Operations::MUL);
     check!("/", Operations::DIV);
-    check!("==", Operations::EQ);
+    check!("==", Operations::EQT);
     check!(">=", Operations::EQGR);
     check!("<=", Operations::EQLT);
     check!(">", Operations::GR);
@@ -40,22 +41,13 @@ pub fn parser(
     let mut raw_lhs = get_till_token_or_block(operator, &input, i, false);
     let rhs = get_till_token_or_block("EOL", &input, raw_lhs.0, false);
     lhs.append(&mut raw_lhs.1);
-    program.push(Node::new(
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        Some(Math {
+    program.push(node!(
+        math,
+        Math {
             lhs: load(&lhs, &mut identifiers, &mut first_identifiers),
             rhs: load(&rhs.1, &mut identifiers, &mut first_identifiers),
             operation,
-        }),
-        None,
-        None,
+        }
     ));
     rhs.0 // skip to next and ignore the data
 }

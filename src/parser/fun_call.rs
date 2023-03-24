@@ -1,3 +1,5 @@
+use crate::node;
+
 use super::{get_till_token_or_block, load, FunctionCall, Node};
 
 pub fn parser(
@@ -14,7 +16,7 @@ pub fn parser(
     identifier.append(&mut raw_identifier.1);
 
     let mut raw_args = vec![];
-    let mut raw_raw_args = get_till_token_or_block(")", &input, raw_identifier.0, false);
+    let mut raw_raw_args = get_till_token_or_block(")", &input, raw_identifier.0 - 1, false);
 
     // basically, join the block you found with the main content
     raw_args.append(&mut raw_raw_args.1);
@@ -35,21 +37,12 @@ pub fn parser(
     if arg.len() > 0 {
         args.push(load(&arg, &mut identifiers, &mut first_identifiers));
     }
-    program.push(Node::new(
-        None,
-        None,
-        Some(FunctionCall {
+    program.push(node!(
+        function_call,
+        FunctionCall {
             identifier,
             arguments: args,
-        }),
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
+        }
     ));
     raw_raw_args.0
 }

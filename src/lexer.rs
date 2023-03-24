@@ -1,4 +1,9 @@
-use crate::parser::{load, Lexer, Node};
+use crate::str_list_to_string_list;
+
+use super::{
+    parser::{load, Lexer},
+    Node,
+};
 
 pub struct Parser {
     pub data: String,
@@ -11,86 +16,18 @@ impl Parser {
     pub fn new(data: String) -> Self {
         Self {
             data,
-            token_splits: vec![
-                String::from(" "),
-                String::from("\r\n"),
-                String::from("\n"),
-                String::from("\t"),
-                String::from("->"),
-                String::from("."),
-                String::from("=>"),
-                String::from("("),
-                String::from(")"),
-                String::from("{"),
-                String::from("}"),
-                String::from(","),
-                String::from(">="),
-                String::from("<="),
-                String::from("=="),
-                String::from("+="),
-                String::from("-="),
-                String::from("*="),
-                String::from("/="),
-                String::from("!="),
-                String::from(">"),
-                String::from("<"),
-                String::from("="),
-                String::from("+"),
-                String::from("-"),
-                String::from("*"),
-                String::from("/"),
-                String::from("["),
-                String::from("]"),
-            ],
-            important_splits: vec![
-                String::from("("),
-                String::from(")"),
-                String::from("{"),
-                String::from("}"),
-                String::from(","),
-                String::from("\r\n"),
-                String::from("\n"),
-                String::from("->"),
-                String::from(">="),
-                String::from("<="),
-                String::from("=="),
-                String::from("+="),
-                String::from("-="),
-                String::from("*="),
-                String::from("/="),
-                String::from("!="),
-                String::from(">"),
-                String::from("<"),
-                String::from("="),
-                String::from("=>"),
-                String::from("+"),
-                String::from("-"),
-                String::from("*"),
-                String::from("/"),
-                String::from("["),
-                String::from("]"),
-            ],
-            types: vec![
-                String::from("u4"),
-                String::from("u8"),
-                String::from("u16"),
-                String::from("u32"),
-                String::from("u64"),
-                String::from("u128"),
-                String::from("i4"),
-                String::from("i8"),
-                String::from("i16"),
-                String::from("i32"),
-                String::from("i64"),
-                String::from("i128"),
-                String::from("f4"),
-                String::from("f8"),
-                String::from("f16"),
-                String::from("f32"),
-                String::from("f64"),
-                String::from("f128"),
-                String::from("str"),
-            ],
+            token_splits: str_list_to_string_list(vec![
+                " ", "\r\n", "\n", "\t", "->", ".", "=>", "(", ")", "{", "}", ",", ">=", "<=",
+                "==", "+=", "-=", "*=", "/=", "!=", ">", "<", "=", "+", "-", "*", "/", "[", "]",
+            ]),
+            important_splits: str_list_to_string_list(vec![
+                "(", ")", "{", "}", ",", "\r\n", "\n", "->", ">=", "<=", "==", "+=", "-=", "*=",
+                "/=", "!=", ">", "<", "=", "=>", "+", "-", "*", "/", "[", "]",
+            ]),
+            types: str_list_to_string_list(vec![
+                "u4", "u8", "u16", "u32", "u64", "u128", "i4", "i8", "i16", "i32", "i64", "i128",
+                "f4", "f8", "f16", "f32", "f64", "f128", "str",
+            ]),
         }
     }
     fn is_split(
@@ -174,6 +111,7 @@ impl Parser {
             current_item += &item_to_check.to_string();
             i += 1;
         }
+        output.push(current_item);
         return output;
     }
     pub fn parse(self: &Parser, print_tokens: bool, print_ast: bool) -> Vec<Node> {
@@ -182,8 +120,16 @@ impl Parser {
             println!("{:?}", res);
         }
         let mut lexer = Lexer::new(res);
-        let mut identifiers: Vec<Vec<String>> = vec![];
-        let mut first_identifiers: Vec<String> = vec![];
+        // adding libs here so that they get recognized as identifiers
+        // maybe if I make a no std version, I can just make identifiers
+        let mut identifiers: Vec<Vec<String>> = lexer.libs.clone();
+        let mut first_identifiers: Vec<String> = get_first(&lexer.libs);
+
+        identifiers.append(&mut lexer.keywords.clone());
+        for item in get_first(&lexer.keywords) {
+            first_identifiers.push(item);
+        }
+
         lexer.program = load(
             &lexer.splitted_text,
             &mut identifiers,
@@ -194,4 +140,14 @@ impl Parser {
         }
         return lexer.program;
     }
+}
+
+pub fn get_first(input: &Vec<Vec<String>>) -> Vec<String> {
+    let mut output = vec![];
+
+    for item in input {
+        output.push(item[0].clone());
+    }
+
+    output
 }

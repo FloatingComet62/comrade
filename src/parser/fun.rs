@@ -1,5 +1,7 @@
 use super::{load, Argument, Function, Node, Types};
 use crate::exit;
+use crate::lexer::get_first;
+use crate::node;
 use crate::type_from_str;
 
 pub fn parser(
@@ -32,26 +34,53 @@ pub fn parser(
         }
     }
     let return_type = type_from_str(&data.1[data.1.len() - 1]);
+
+    // update identifiers
+    let arg_identifiers = arg_to_identifier(&args);
+    identifiers.append(&mut arg_identifiers.clone());
+    let first_arg_identifiers = get_first(&arg_identifiers);
+    first_identifiers.append(&mut first_arg_identifiers.clone());
+
     let nodes = load(&data.2, &mut identifiers, &mut first_identifiers);
-    program.push(Node::new(
-        None,
-        Some(Function {
+
+    // remove identifiers
+    for i in 0..identifiers.len() {
+        let iden = &identifiers.clone()[i];
+        for arg_iden in arg_identifiers.iter() {
+            if iden == arg_iden {
+                identifiers.remove(i);
+            }
+        }
+    }
+    for i in 0..first_identifiers.len() {
+        let iden = &first_identifiers.clone()[i];
+        for arg_iden in first_arg_identifiers.iter() {
+            if iden == arg_iden {
+                first_identifiers.remove(i);
+            }
+        }
+    }
+
+    program.push(node!(
+        function,
+        Function {
             identifier,
             arguments: args,
             return_type,
             nodes,
-        }),
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
+        }
     ));
     data.0
+}
+
+fn arg_to_identifier(args: &Vec<Argument>) -> Vec<Vec<String>> {
+    let mut output = vec![];
+
+    for arg in args {
+        output.push(vec![arg.identifier.clone()]);
+    }
+
+    output
 }
 
 fn handle_a_type(args: Vec<Argument>, cell: &String, a_type: Types) -> Vec<Argument> {
