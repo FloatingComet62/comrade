@@ -8,11 +8,12 @@ fn main() {
     let raw_path = args.get(1);
     let print_tokens = args.contains(&"-t".to_string());
     let print_ast = args.contains(&"-a".to_string());
+    let print_c_code = args.contains(&"-c".to_string());
     match raw_path {
         Some(path) => {
             let data = read_file(&path);
             let parser = Parser::new(data);
-            parser.parse(print_tokens, print_ast);
+            parser.parse(print_tokens, print_ast, print_c_code);
         }
         None => exit("No input files passes", None),
     }

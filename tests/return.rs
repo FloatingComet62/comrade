@@ -6,7 +6,7 @@ use comrade::{
 #[test]
 fn test() {
     let lexer = Parser::new("return 2".to_string());
-    let program = lexer.parse(false, false);
+    let program = lexer.parse(false, false, false);
     assert_eq!(
         program,
         vec![node!(
@@ -31,7 +31,7 @@ return a
 "
         .to_string(),
     );
-    let program = lexer.parse(false, false);
+    let program = lexer.parse(false, false, false);
     assert_eq!(
         program,
         vec![

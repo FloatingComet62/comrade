@@ -1,4 +1,4 @@
-use crate::str_list_to_string_list;
+use crate::{compiler, str_list_to_string_list};
 
 use super::{
     parser::{load, Lexer},
@@ -139,7 +139,12 @@ impl Parser {
         output.push(current_item);
         return output;
     }
-    pub fn parse(self: &Parser, print_tokens: bool, print_ast: bool) -> Vec<Node> {
+    pub fn parse(
+        self: &Parser,
+        print_tokens: bool,
+        print_ast: bool,
+        print_c_code: bool,
+    ) -> Vec<Node> {
         let res = self.token_splitter(&self.data);
         if print_tokens {
             println!("{:?}", res);
@@ -163,6 +168,12 @@ impl Parser {
         if print_ast {
             println!("{:?}", lexer.program);
         }
+
+        let c_code = compiler::compiler(&lexer.program);
+        if print_c_code {
+            println!("{:?}", c_code);
+        }
+
         return lexer.program;
     }
 }

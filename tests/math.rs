@@ -3,7 +3,7 @@ use comrade::{lexer::Parser, node, Literal, Math, Node, Operations, Types};
 #[test]
 fn test() {
     let lexer = Parser::new("5 == 5".to_string());
-    let program = lexer.parse(false, false);
+    let program = lexer.parse(false, false, false);
     assert_eq!(
         program,
         vec![node!(
@@ -29,7 +29,7 @@ fn test() {
     );
 
     let lexer = Parser::new("5 > 5".to_string());
-    let program = lexer.parse(false, false);
+    let program = lexer.parse(false, false, false);
     assert_eq!(
         program,
         vec![node!(
@@ -55,7 +55,7 @@ fn test() {
     );
 
     let lexer = Parser::new("5 < 5".to_string());
-    let program = lexer.parse(false, false);
+    let program = lexer.parse(false, false, false);
     assert_eq!(
         program,
         vec![node!(
@@ -81,7 +81,7 @@ fn test() {
     );
 
     let lexer = Parser::new("5 >= 5".to_string());
-    let program = lexer.parse(false, false);
+    let program = lexer.parse(false, false, false);
     assert_eq!(
         program,
         vec![node!(
@@ -107,7 +107,7 @@ fn test() {
     );
 
     let lexer = Parser::new("5 <= 5".to_string());
-    let program = lexer.parse(false, false);
+    let program = lexer.parse(false, false, false);
     assert_eq!(
         program,
         vec![node!(
@@ -133,7 +133,7 @@ fn test() {
     );
 
     let lexer = Parser::new("5 != 5".to_string());
-    let program = lexer.parse(false, false);
+    let program = lexer.parse(false, false, false);
     assert_eq!(
         program,
         vec![node!(
