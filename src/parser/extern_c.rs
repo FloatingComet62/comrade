@@ -5,21 +5,8 @@ pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>, b
     program.push(node!(
         extern_c,
         ExternC {
-            block: join(&data.2)
+            block: data.1[0].clone()
         }
     ));
     data.0 // skip to next and ignore the data
-}
-
-fn join(input: &Vec<String>) -> String {
-    let mut output = String::new();
-
-    for item in input {
-        if item == "EOL" {
-            continue;
-        }
-        output += item;
-    }
-
-    output
 }

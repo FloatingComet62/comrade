@@ -1,0 +1,11 @@
+fun __init__() {
+    externC {
+        #include <stdio.h>
+    }
+}
+
+fun out(message -> str) {
+    externC {
+        printf(message);
+    }
+}

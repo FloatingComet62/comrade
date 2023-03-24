@@ -100,6 +100,7 @@ pub fn type_from_str(string: &str) -> Types {
         "f128[]" => Types::F128List,
         "str[]" => Types::StrList,
         "bool[]" => Types::BoolList,
+        "type" => Types::Type,
         _ => Types::None,
     }
 }

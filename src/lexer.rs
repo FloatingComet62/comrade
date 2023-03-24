@@ -79,6 +79,7 @@ impl Parser {
         let mut output: Vec<String> = vec![];
         let mut current_item = String::new();
         let mut getting_string = false;
+        let mut getting_exter_c = 0;
         let to_split_chars: Vec<char> = to_split.chars().collect();
 
         let mut i = 0;
@@ -87,10 +88,34 @@ impl Parser {
             if item_to_check == '"' {
                 getting_string = !getting_string;
             }
+            if getting_exter_c == -1 || getting_exter_c > 0 {
+                let mut should_add = true;
+                if item_to_check == '{' {
+                    if getting_exter_c == -1 {
+                        getting_exter_c = 0;
+                        should_add = false;
+                    }
+                    getting_exter_c += 1;
+                }
+                if item_to_check == '}' {
+                    getting_exter_c -= 1;
+                    if getting_exter_c == 0 {
+                        should_add = false;
+                    }
+                }
+                if should_add {
+                    current_item += &item_to_check.to_string();
+                }
+                i += 1;
+                continue;
+            }
             let (time_to_split, splitter) =
                 self.is_split(item_to_check, &current_item, &to_split_chars, i);
             if time_to_split {
                 if !getting_string && current_item.len() >= 1 {
+                    if current_item == "externC" {
+                        getting_exter_c = -1; // -1 to indicate that it's a new start
+                    }
                     output.push(current_item.clone());
                 }
                 if let Some(valid_split) = &splitter {
