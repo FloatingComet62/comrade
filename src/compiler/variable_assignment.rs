@@ -7,12 +7,14 @@ pub fn compile(input: &VariableAssignment) -> String {
     let blank = String::new();
     let type_data = &types(input).unwrap_or((blank.as_str(), false));
     output += type_data.0;
+    output += " ";
     output += &input.identifier.join("_");
     if type_data.1 {
         output += "[]"
     }
     output += " = ";
     output += &value(input).unwrap_or(blank.clone());
+    output += ";";
     output
 }
 

@@ -1,7 +1,10 @@
 use crate::{Node, Types};
 
+mod _match;
+mod condition_block;
 mod function;
 mod function_call;
+mod math;
 mod statement;
 mod variable_assignment;
 
@@ -19,8 +22,8 @@ pub fn compiler(program: &mut Vec<Node>, is_inside_function_call: bool) -> Strin
             // // printf("%d\n", sum({1, 2, 3, 4, 5}));
             // // int x[] = (int[]){1, 2, 3, 4, 5};
             //
-            //printf("%d\n", sum((int[]){1, 2, 3, 4, 5}));
-            //return 0;
+            // printf("%d\n", sum((int[]){1, 2, 3, 4, 5}));
+            // return 0;
             if let Some(l) = &item.literal {
                 output += &l.literal;
             }
@@ -43,6 +46,18 @@ pub fn compiler(program: &mut Vec<Node>, is_inside_function_call: bool) -> Strin
         }
         if let Some(fc) = &item.function_call {
             output += &function_call::compile(fc);
+        }
+        if let Some(cb) = &mut item.condition_block {
+            output += &condition_block::compile(cb);
+        }
+        if let Some(m) = &mut item.math {
+            output += &math::compile(m);
+        }
+        if let Some(m) = &mut item._match {
+            output += &_match::compile(m);
+        }
+        if let Some(expr) = &item.expression {
+            output += &expr.expr.join(" ");
         }
     }
 

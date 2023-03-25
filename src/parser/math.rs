@@ -31,7 +31,6 @@ pub fn parser(
     check!(">", Operations::GR);
     check!("<", Operations::LT);
     check!("!=", Operations::NEQ);
-    check!("=", Operations::EQT);
     check!("+=", Operations::ADDEQT);
     check!("-=", Operations::SUBEQT);
     check!("*=", Operations::MULEQT);

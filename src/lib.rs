@@ -156,9 +156,6 @@ pub enum Operations {
     /// "/"
     /// division
     DIV,
-    /// "="
-    /// equal
-    EQ,
     /// ">="
     /// equal or greater thsn
     EQGR,
@@ -174,7 +171,7 @@ pub enum Operations {
     /// "!="
     /// not equal
     NEQ,
-    /// "="
+    /// "=="
     /// equate to rhs
     EQT,
     /// "+="
