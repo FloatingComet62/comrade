@@ -141,10 +141,11 @@ impl Parser {
     }
     pub fn parse(
         self: &Parser,
+        compile: bool,
         print_tokens: bool,
         print_ast: bool,
         print_c_code: bool,
-    ) -> Vec<Node> {
+    ) -> (Vec<Node>, String) {
         let res = self.token_splitter(&self.data);
         if print_tokens {
             println!("{:?}", res);
@@ -169,12 +170,16 @@ impl Parser {
             println!("{:?}", lexer.program);
         }
 
-        let c_code = compiler::compiler(&lexer.program);
+        if !compile {
+            return (lexer.program, String::new());
+        }
+
+        let c_code = compiler::compiler(&mut lexer.program, false);
         if print_c_code {
             println!("{:?}", c_code);
         }
 
-        return lexer.program;
+        return (lexer.program, c_code);
     }
 }
 

@@ -12,9 +12,9 @@ struct User {
 "
         .to_string(),
     );
-    let program = lexer.parse(false, false, false);
+    let program = lexer.parse(false, false, false, false);
     assert_eq!(
-        program,
+        program.0,
         vec![node!(
             _struct,
             Struct {

@@ -1,1 +1,6 @@
-let a = true
+include std->io
+
+fun main() => i32 {
+    io->out("Hello World")
+    return 0
+}

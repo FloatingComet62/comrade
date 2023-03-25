@@ -1,4 +1,5 @@
 use std::fmt::Debug;
+use std::fs;
 use std::ops::{Deref, DerefMut};
 use std::process;
 
@@ -51,6 +52,21 @@ pub enum Types {
     None = 22,
 
     Type = 23,
+}
+
+pub fn read_file(path: &String) -> String {
+    let contents = fs::read_to_string(path);
+    match contents {
+        Ok(data) => data,
+        Err(e) => exit(
+            &format!("Unable to read {}\nError Trace:\n{}", path, e),
+            None,
+        ),
+    }
+}
+
+pub fn write_file(path: &str, code: String) -> Result<(), std::io::Error> {
+    fs::write(path, code)
 }
 
 pub fn exit(msg: &str, code: Option<i32>) -> ! {
@@ -124,7 +140,7 @@ macro_rules! node {
     }};
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Operations {
     NULL,
 
@@ -179,84 +195,82 @@ pub struct Argument {
     pub identifier: String,
     pub a_type: Types,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Literal {
     pub literal: String,
     pub l_type: Types,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Statement {
     pub action: String,
     pub parameters: Vec<Node>,
 }
-//f `Into<Option<Statement>>` for `Option<VariableAssignment>`
-//f `TryFrom<Option<VariableAssignment>>` for `Option<Statement>`
-//f `TryInto<Option<Statement>>` for `Option<VariableAssignment>`
-#[derive(Debug, PartialEq)]
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct Function {
     pub identifier: Vec<String>,
     pub return_type: Types,
     pub arguments: Vec<Argument>,
     pub nodes: Vec<Node>,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct FunctionCall {
     pub identifier: Vec<String>,
     pub arguments: Vec<Vec<Node>>,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct VariableAssignment {
     pub identifier: Vec<String>,
     pub value: Box<Vec<Node>>,
     pub immutability: bool,
     pub publicity: bool,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Expression {
     pub expr: Vec<String>, // maybe node? idk
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ConditionBlock {
     pub keyword: String,
     pub parameters: Vec<Node>,
     pub nodes: Vec<Node>,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct MatchCase {
     pub case: Vec<Node>,
     pub block: Vec<Node>,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Match {
     pub condition: Vec<Node>,
     pub block: Vec<MatchCase>,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct StructMember {
     pub identifier: Vec<String>,
     pub t_mem: Types,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Struct {
     pub identifier: Vec<String>,
     pub members: Vec<StructMember>,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Enum {
     pub identifier: Vec<String>,
     pub members: Vec<String>,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Math {
     pub lhs: Vec<Node>,
     pub rhs: Vec<Node>,
     pub operation: Operations,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ExternC {
     pub block: String,
 }
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub struct NodeData {
     pub statement: Option<Statement>,
     pub function: Option<Function>,
@@ -298,7 +312,7 @@ impl Debug for NodeData {
     }
 }
 // todo: if by the end of the parser, all node has is "data", just make Node NodeData
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub struct Node {
     pub data: NodeData,
 }

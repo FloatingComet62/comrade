@@ -1,7 +1,6 @@
 use std::env;
-use std::fs;
 
-use comrade::{exit, lexer::Parser};
+use comrade::{exit, lexer::Parser, read_file, write_file};
 
 fn main() {
     let args: Vec<_> = env::args().collect();
@@ -9,23 +8,20 @@ fn main() {
     let print_tokens = args.contains(&"-t".to_string());
     let print_ast = args.contains(&"-a".to_string());
     let print_c_code = args.contains(&"-c".to_string());
+
+    let out_path = "out.c";
     match raw_path {
         Some(path) => {
             let data = read_file(&path);
             let parser = Parser::new(data);
-            parser.parse(print_tokens, print_ast, print_c_code);
+            let (_program, c_code) = parser.parse(true, print_tokens, print_ast, print_c_code);
+            if let Err(e) = write_file(out_path, c_code) {
+                exit(
+                    &format!("Failed to write to {}\nError Trace:\n{}", out_path, e),
+                    None,
+                )
+            }
         }
         None => exit("No input files passes", None),
-    }
-}
-
-fn read_file(path: &String) -> String {
-    let contents = fs::read_to_string(path);
-    match contents {
-        Ok(data) => data,
-        Err(e) => exit(
-            &format!("Unable to read {}\nError Trace:\n{}", path, e),
-            None,
-        ),
     }
 }

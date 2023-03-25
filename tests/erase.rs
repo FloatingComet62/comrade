@@ -9,9 +9,9 @@ erase a
 "
         .to_string(),
     );
-    let program = lexer.parse(false, false, false);
+    let program = lexer.parse(false, false, false, false);
     assert_eq!(
-        program[1],
+        program.0[1],
         node!(
             statement,
             Statement {

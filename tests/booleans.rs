@@ -3,9 +3,9 @@ use comrade::{lexer::Parser, node, Literal, Node, Types};
 #[test]
 fn test() {
     let lexer = Parser::new("true".to_string());
-    let program = lexer.parse(false, false, false);
+    let program = lexer.parse(false, false, false, false);
     assert_eq!(
-        program,
+        program.0,
         vec![node!(
             literal,
             Literal {
@@ -15,9 +15,9 @@ fn test() {
         )]
     );
     let lexer = Parser::new("false".to_string());
-    let program = lexer.parse(false, false, false);
+    let program = lexer.parse(false, false, false, false);
     assert_eq!(
-        program,
+        program.0,
         vec![node!(
             literal,
             Literal {

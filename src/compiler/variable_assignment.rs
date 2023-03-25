@@ -1,10 +1,16 @@
-use crate::{Types, VariableAssignment};
+use crate::VariableAssignment;
 
-pub fn parser(input: &VariableAssignment) -> String {
+use super::type_to_c_type;
+
+pub fn compile(input: &VariableAssignment) -> String {
     let mut output = String::new();
     let blank = String::new();
-    output += &types(input).unwrap_or(blank.clone());
+    let type_data = &types(input).unwrap_or((blank.as_str(), false));
+    output += type_data.0;
     output += &input.identifier.join("_");
+    if type_data.1 {
+        output += "[]"
+    }
     output += " = ";
     output += &value(input).unwrap_or(blank.clone());
     output
@@ -17,16 +23,9 @@ fn value(input: &VariableAssignment) -> Result<String, ()> {
     Err(())
 }
 
-fn types(input: &VariableAssignment) -> Result<String, ()> {
+fn types(input: &VariableAssignment) -> Result<(&str, bool), ()> {
     if let Some(l) = &input.value[0].literal {
-        return Ok(match l.l_type {
-            Types::Bool => "bool",
-            Types::I32 => "int",
-            Types::Str => "char*",
-            _ => "",
-        }
-        .to_owned()
-            + " ");
+        return Ok(type_to_c_type(&l.l_type));
     }
     Err(())
 }

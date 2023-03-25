@@ -15,9 +15,9 @@ someRandomFunction(a, \"Hello World\", 35, {
     "
         .to_string(),
     );
-    let program = lexer.parse(false, false, false);
+    let program = lexer.parse(false, false, false, false);
     assert_eq!(
-        program[1], // not checking the let statement
+        program.0[1], // not checking the let statement
         node!(
             function_call,
             FunctionCall {
