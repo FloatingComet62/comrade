@@ -1,5 +1,6 @@
 use crate::{Node, Types};
 
+mod _enum;
 mod _match;
 mod condition_block;
 mod function;
@@ -12,6 +13,13 @@ pub fn compiler(program: &mut Vec<Node>, is_inside_function_call: bool) -> Strin
     let mut output = String::new();
     for i in 0..program.len() {
         let item = &mut program.clone()[i];
+        // macro_rules! node_type_check {
+        //     ($x: ident, $data: ident) => {
+        //         if let Some(x) = &item.$x {
+        //             output += &$data;
+        //         }
+        //     };
+        // }
         if is_inside_function_call {
             // passing lists inside function calls
             // issue:
@@ -25,13 +33,19 @@ pub fn compiler(program: &mut Vec<Node>, is_inside_function_call: bool) -> Strin
             // printf("%d\n", sum((int[]){1, 2, 3, 4, 5}));
             // return 0;
             if let Some(l) = &item.literal {
-                output += &l.literal;
+                if l.literal.contains("_") {
+                    let enum_vals: Vec<&str> = l.literal.split("_").collect();
+                    output += &enum_vals[1];
+                } else {
+                    output += &l.literal;
+                }
             }
         } else {
             if let Some(l) = &item.literal {
                 output += &l.literal;
             }
         }
+        // node_type_check!(extern_c, e_c.block);
         if let Some(e_c) = &item.extern_c {
             output += &e_c.block;
         }
@@ -58,6 +72,9 @@ pub fn compiler(program: &mut Vec<Node>, is_inside_function_call: bool) -> Strin
         }
         if let Some(expr) = &item.expression {
             output += &expr.expr.join(" ");
+        }
+        if let Some(e) = &item._enum {
+            output += &_enum::compile(e);
         }
     }
 

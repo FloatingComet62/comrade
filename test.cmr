@@ -1,15 +1,12 @@
 include std->io
 
-fun main() => i32 {
-    let a = 7
-    match a {
-        1 => io->out("1"),
-        2 => io->out("2"),
-        3 => io->out("3"),
-        4 => io->out("4"),
-        5 => io->out("5")
+enum Days {
+    Monday Tuesday Wednesday
+    Thursday Friday Saturday Sunday
+}
 
-        default => io->out("idk")
-    }
+fun main() => i32 {
+    let day = Days->Monday
+    io->out(day)
     return 0
 }

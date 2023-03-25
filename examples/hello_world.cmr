@@ -1,6 +1,6 @@
 include std->io
 
 fun main(_argc -> i32, _argv -> str[]) => u8 {
-  io->out("Hello World\n")
+  io->out("Hello World")
   return 0
 }

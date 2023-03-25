@@ -7,6 +7,7 @@ pub fn get_match_case(
     input: &Vec<String>,
     mut identifiers: &mut Vec<Vec<String>>,
     mut first_identifiers: &mut Vec<String>,
+    mut enum_values: &mut Vec<Vec<String>>,
 ) -> (usize, Option<MatchCase>) {
     let case_data = get_till_token_or_block("=>", &input, i, false);
     let expr_data = get_till_token_or_block("EOL", &input, case_data.0, false);
@@ -37,8 +38,18 @@ pub fn get_match_case(
     return (
         expr_data.0,
         Some(MatchCase {
-            block: load(&expr_target, &mut identifiers, &mut first_identifiers),
-            case: load(&case_target, &mut identifiers, &mut first_identifiers),
+            block: load(
+                &expr_target,
+                &mut identifiers,
+                &mut first_identifiers,
+                &mut enum_values,
+            ),
+            case: load(
+                &case_target,
+                &mut identifiers,
+                &mut first_identifiers,
+                &mut enum_values,
+            ),
         }),
     );
 }
@@ -48,11 +59,18 @@ pub fn parser(
     data: (usize, Vec<String>, Vec<String>, bool),
     mut identifiers: &mut Vec<Vec<String>>,
     mut first_identifiers: &mut Vec<String>,
+    mut enum_values: &mut Vec<Vec<String>>,
 ) -> usize {
     let mut block = vec![];
     let mut j = 0;
     while j < data.2.len() {
-        let x = get_match_case(j, &data.2, &mut identifiers, &mut first_identifiers);
+        let x = get_match_case(
+            j,
+            &data.2,
+            &mut identifiers,
+            &mut first_identifiers,
+            &mut enum_values,
+        );
         if let Some(y) = x.1 {
             block.push(y);
         }
@@ -62,7 +80,12 @@ pub fn parser(
     program.push(node!(
         _match,
         Match {
-            condition: load(&data.1, &mut identifiers, &mut first_identifiers),
+            condition: load(
+                &data.1,
+                &mut identifiers,
+                &mut first_identifiers,
+                &mut enum_values
+            ),
             block,
         }
     ));

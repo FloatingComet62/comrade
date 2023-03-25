@@ -10,6 +10,7 @@ pub fn parser(
     i: usize,
     mut identifiers: &mut Vec<Vec<String>>,
     mut first_identifiers: &mut Vec<String>,
+    mut enum_values: &mut Vec<Vec<String>>,
 ) -> usize {
     let mut operator = "";
     let mut operation = Operations::NULL;
@@ -43,8 +44,18 @@ pub fn parser(
     program.push(node!(
         math,
         Math {
-            lhs: load(&lhs, &mut identifiers, &mut first_identifiers),
-            rhs: load(&rhs.1, &mut identifiers, &mut first_identifiers),
+            lhs: load(
+                &lhs,
+                &mut identifiers,
+                &mut first_identifiers,
+                &mut enum_values
+            ),
+            rhs: load(
+                &rhs.1,
+                &mut identifiers,
+                &mut first_identifiers,
+                &mut enum_values
+            ),
             operation,
         }
     ));

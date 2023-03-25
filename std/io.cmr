@@ -1,11 +1,12 @@
 fun __init__() {
     externC {
-        #include <stdio.h>
-    }
+#include <stdio.h>
+void io___out___in(int x) {
+    printf("%d\n", x);
 }
-
-fun out(message -> str) {
-    externC {
-        printf(message);
+void io___out___str(char* x) {
+    printf("%s\n", x);
+}
+#define io___out(x) _Generic(x, int: io___out___in, char*: io___out___str)(x)
     }
 }

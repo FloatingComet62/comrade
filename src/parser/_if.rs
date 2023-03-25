@@ -10,6 +10,7 @@ pub fn parser(
     i: usize,
     mut identifiers: &mut Vec<Vec<String>>,
     mut first_identifiers: &mut Vec<String>,
+    mut enum_values: &mut Vec<Vec<String>>,
 ) -> usize {
     if text == "if" {
         if previous_text == "else" {
@@ -21,8 +22,18 @@ pub fn parser(
                 condition_block,
                 ConditionBlock {
                     keyword: "else if".to_string(),
-                    parameters: load(&data.1, &mut identifiers, &mut first_identifiers),
-                    nodes: load(&data.2, &mut identifiers, &mut first_identifiers),
+                    parameters: load(
+                        &data.1,
+                        &mut identifiers,
+                        &mut first_identifiers,
+                        &mut enum_values
+                    ),
+                    nodes: load(
+                        &data.2,
+                        &mut identifiers,
+                        &mut first_identifiers,
+                        &mut enum_values
+                    ),
                 }
             ));
             return data.0;
@@ -31,8 +42,18 @@ pub fn parser(
             condition_block,
             ConditionBlock {
                 keyword: "if".to_string(),
-                parameters: load(&data.1, &mut identifiers, &mut first_identifiers),
-                nodes: load(&data.2, &mut identifiers, &mut first_identifiers),
+                parameters: load(
+                    &data.1,
+                    &mut identifiers,
+                    &mut first_identifiers,
+                    &mut enum_values
+                ),
+                nodes: load(
+                    &data.2,
+                    &mut identifiers,
+                    &mut first_identifiers,
+                    &mut enum_values
+                ),
             }
         ));
     }
@@ -53,7 +74,12 @@ pub fn parser(
             ConditionBlock {
                 keyword: "else".to_string(),
                 parameters: vec![],
-                nodes: load(&data.2, &mut identifiers, &mut first_identifiers),
+                nodes: load(
+                    &data.2,
+                    &mut identifiers,
+                    &mut first_identifiers,
+                    &mut enum_values
+                ),
             }
         ));
     }

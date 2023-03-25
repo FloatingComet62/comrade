@@ -4,11 +4,11 @@ fun main(_argc -> i32, _argv -> str[]) => u8 {
     io->out("Enter age: ")
     const input = io->in(i32)
     if input >= 18 {
-        io->out("Here is your beer\n")
+        io->out("Here is your beer")
     } else if input >= 13 {
-        io->out("Here is your pepsi\n")
+        io->out("Here is your pepsi")
     } else {
-        io->out("Here is your orange juice\n")
+        io->out("Here is your orange juice")
     }
     return 0
 }

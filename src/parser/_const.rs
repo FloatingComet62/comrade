@@ -10,10 +10,16 @@ pub fn parser(
     previous_text: &String,
     mut identifiers: &mut Vec<Vec<String>>,
     mut first_identifiers: &mut Vec<String>,
+    mut enum_values: &mut Vec<Vec<String>>,
 ) -> usize {
     let iden = get_till_token_or_block("=", &input, i, false);
     let raw_val = get_till_token_or_block("EOL", &input, iden.0, false);
-    let val = load(&raw_val.1, &mut identifiers, &mut first_identifiers);
+    let val = load(
+        &raw_val.1,
+        &mut identifiers,
+        &mut first_identifiers,
+        &mut enum_values,
+    );
     identifiers.push(iden.1.clone());
     first_identifiers.push(iden.1[0].clone());
     // TODO: handle block ig

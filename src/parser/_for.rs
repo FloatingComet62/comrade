@@ -8,6 +8,7 @@ pub fn parser(
     data: (usize, Vec<String>, Vec<String>, bool),
     mut identifiers: &mut Vec<Vec<String>>,
     mut first_identifiers: &mut Vec<String>,
+    mut enum_values: &mut Vec<Vec<String>>,
 ) -> usize {
     let mut raw_params = vec![];
     for thingy in data.1.iter() {
@@ -21,8 +22,18 @@ pub fn parser(
         condition_block,
         ConditionBlock {
             keyword: "function".to_string(),
-            parameters: load(&raw_params, &mut identifiers, &mut first_identifiers),
-            nodes: load(&data.2, &mut identifiers, &mut first_identifiers),
+            parameters: load(
+                &raw_params,
+                &mut identifiers,
+                &mut first_identifiers,
+                &mut enum_values
+            ),
+            nodes: load(
+                &data.2,
+                &mut identifiers,
+                &mut first_identifiers,
+                &mut enum_values
+            ),
         }
     ));
     data.0

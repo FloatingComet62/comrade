@@ -175,6 +175,7 @@ pub fn load(
     input: &Vec<String>,
     mut identifiers: &mut Vec<Vec<String>>,
     mut first_identifiers: &mut Vec<String>,
+    mut enum_values: &mut Vec<Vec<String>>,
 ) -> Vec<Node> {
     let mut program = vec![];
     let mut previous_text;
@@ -230,6 +231,22 @@ pub fn load(
                     }
                 }
             }
+            // enum values
+            for _enum in enum_values.iter() {
+                if text == &_enum[0] {
+                    for (j, val) in _enum.iter().enumerate() {
+                        if &input[i + j] == val {
+                            program.push(node!(
+                                literal,
+                                Literal {
+                                    literal: _enum.join("_"),
+                                    l_type: Types::I32
+                                }
+                            ))
+                        }
+                    }
+                }
+            }
         }
 
         // ! externC -> let -> math -> literal -> others
@@ -244,6 +261,7 @@ pub fn load(
                 &previous_text,
                 &mut identifiers,
                 &mut first_identifiers,
+                &mut enum_values,
             );
         } else if text == "const" {
             i = _const::parser(
@@ -254,6 +272,7 @@ pub fn load(
                 &previous_text,
                 &mut identifiers,
                 &mut first_identifiers,
+                &mut enum_values,
             );
         } else if text == "include" || text == "return" || text == "erase" {
             i = include_n_return_n_erase::parser(
@@ -262,6 +281,7 @@ pub fn load(
                 text,
                 identifiers,
                 first_identifiers,
+                &mut enum_values,
             );
         } else if text == "true" || text == "false" {
             i = booleans::parser(&mut program, data, text);
@@ -275,17 +295,36 @@ pub fn load(
                 i,
                 &mut identifiers,
                 &mut first_identifiers,
+                &mut enum_values,
             );
         } else if text == "while" {
-            i = _while::parser(&mut program, data, &mut identifiers, &mut first_identifiers);
+            i = _while::parser(
+                &mut program,
+                data,
+                &mut identifiers,
+                &mut first_identifiers,
+                &mut enum_values,
+            );
         // } else if text == "for" {
         // i = _for::parser(&mut program, data, &mut identifiers, &mut first_identifiers);
         } else if text == "struct" {
             i = _struct::parser(&mut program, data);
         } else if text == "enum" {
-            i = _enum::parser(&mut program, data);
+            i = _enum::parser(
+                &mut program,
+                data,
+                &mut identifiers,
+                &mut first_identifiers,
+                &mut enum_values,
+            );
         } else if text == "fun" {
-            i = fun::parser(&mut program, data, &mut identifiers, &mut first_identifiers);
+            i = fun::parser(
+                &mut program,
+                data,
+                &mut identifiers,
+                &mut first_identifiers,
+                &mut enum_values,
+            );
         } else if has(
             &data.1,
             vec![
@@ -302,6 +341,7 @@ pub fn load(
                 i,
                 &mut identifiers,
                 &mut first_identifiers,
+                &mut enum_values,
             );
         } else if text.chars().next().unwrap_or('\0') == '\"' {
             program.push(node!(
@@ -328,7 +368,13 @@ pub fn load(
                 }
             ));
         } else if text == "match" {
-            i = _match::parser(&mut program, data, &mut identifiers, &mut first_identifiers);
+            i = _match::parser(
+                &mut program,
+                data,
+                &mut identifiers,
+                &mut first_identifiers,
+                &mut enum_values,
+            );
         } else if has(&data.1, vec!["(", ")"], Mode::AND) {
             // also, it's a function call when there is no fun
             i = fun_call::parser(
@@ -338,6 +384,7 @@ pub fn load(
                 i,
                 &mut identifiers,
                 &mut first_identifiers,
+                &mut enum_values,
             );
         }
         i += 1;

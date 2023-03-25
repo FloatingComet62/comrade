@@ -156,6 +156,8 @@ impl Parser {
         let mut identifiers: Vec<Vec<String>> = lexer.libs.clone();
         let mut first_identifiers: Vec<String> = get_first(&lexer.libs);
 
+        let mut enum_values: Vec<Vec<String>> = vec![];
+
         identifiers.append(&mut lexer.keywords.clone());
         for item in get_first(&lexer.keywords) {
             first_identifiers.push(item);
@@ -165,6 +167,7 @@ impl Parser {
             &lexer.splitted_text,
             &mut identifiers,
             &mut first_identifiers,
+            &mut enum_values,
         );
         if print_ast {
             println!("{:?}", lexer.program);

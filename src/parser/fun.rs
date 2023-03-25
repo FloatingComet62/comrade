@@ -9,6 +9,7 @@ pub fn parser(
     data: (usize, Vec<String>, Vec<String>, bool),
     mut identifiers: &mut Vec<Vec<String>>,
     mut first_identifiers: &mut Vec<String>,
+    mut enum_values: &mut Vec<Vec<String>>,
 ) -> usize {
     // todo: maybe reimplement this with get_till_token_or_block ?
     let mut getting_args = false;
@@ -41,7 +42,12 @@ pub fn parser(
     let first_arg_identifiers = get_first(&arg_identifiers);
     first_identifiers.append(&mut first_arg_identifiers.clone());
 
-    let nodes = load(&data.2, &mut identifiers, &mut first_identifiers);
+    let nodes = load(
+        &data.2,
+        &mut identifiers,
+        &mut first_identifiers,
+        &mut enum_values,
+    );
 
     // remove identifiers
     identifiers.retain(|iden| {

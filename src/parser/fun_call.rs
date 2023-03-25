@@ -9,6 +9,7 @@ pub fn parser(
     i: usize,
     mut identifiers: &mut Vec<Vec<String>>,
     mut first_identifiers: &mut Vec<String>,
+    mut enum_values: &mut Vec<Vec<String>>,
 ) -> usize {
     let mut identifier = vec![text.to_string()];
     let mut raw_identifier = get_till_token_or_block("(", &input, i, false);
@@ -27,7 +28,12 @@ pub fn parser(
     for item in &raw_args {
         if item == "," {
             if arg.len() > 0 {
-                args.push(load(&arg, &mut identifiers, &mut first_identifiers));
+                args.push(load(
+                    &arg,
+                    &mut identifiers,
+                    &mut first_identifiers,
+                    &mut enum_values,
+                ));
             }
             arg = vec![];
             continue;
@@ -35,7 +41,12 @@ pub fn parser(
         arg.push(item.to_string());
     }
     if arg.len() > 0 {
-        args.push(load(&arg, &mut identifiers, &mut first_identifiers));
+        args.push(load(
+            &arg,
+            &mut identifiers,
+            &mut first_identifiers,
+            &mut enum_values,
+        ));
     }
     program.push(node!(
         function_call,
