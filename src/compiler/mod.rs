@@ -73,6 +73,7 @@ pub fn type_to_c_type(t: &Types) -> (&str, bool) {
         Types::U128List => ("int", true),
         Types::I128List => ("int", true),
         Types::Str => ("char*", false),
+        Types::StrList => ("char*", true),
         _ => ("void", false),
     }
 }

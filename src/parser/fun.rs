@@ -44,22 +44,22 @@ pub fn parser(
     let nodes = load(&data.2, &mut identifiers, &mut first_identifiers);
 
     // remove identifiers
-    for i in 0..identifiers.len() {
-        let iden = &identifiers.clone()[i];
+    identifiers.retain(|iden| {
         for arg_iden in arg_identifiers.iter() {
             if iden == arg_iden {
-                identifiers.remove(i);
+                return false;
             }
         }
-    }
-    for i in 0..first_identifiers.len() {
-        let iden = &first_identifiers.clone()[i];
+        true
+    });
+    first_identifiers.retain(|iden| {
         for arg_iden in first_arg_identifiers.iter() {
             if iden == arg_iden {
-                first_identifiers.remove(i);
+                return false;
             }
         }
-    }
+        true
+    });
 
     program.push(node!(
         function,
