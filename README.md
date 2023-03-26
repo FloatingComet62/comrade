@@ -16,7 +16,6 @@ v 0.1
 | [x] | [x] | Lists |
 | [x] | [x] | If, Else if, Else statements |
 | [x] | [x] | While loops |
-| [ ] | [ ] | Comments |
 | [x] | [x] | Structs |
 | [x] | [x] | Including |
 | [x] | [x] | Enums |
@@ -27,6 +26,7 @@ v 0.1
 v 0.2
 | Lexer | Compiler | Feature |
 | ----- | -------- | ------- |
+| [ ] | [ ] | Comments |
 | [ ] | [ ] | Dictionaries |
 | [ ] | [ ] | For loops |
 | [ ] | [ ] | Macros |
