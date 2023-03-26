@@ -93,17 +93,18 @@ impl Lexer {
     content till token
     block found
 */
-pub fn get_till_token_or_block(
+pub fn get_till_token_or_block_and_math_block(
     token: &str,
     input: &Vec<String>,
     i: usize,
     back: bool,
-) -> (usize, Vec<String>, Vec<String>, bool) {
+) -> (usize, Vec<String>, Vec<String>, bool, Vec<String>) {
     let mut output: Vec<String> = vec![];
     let mut block: Vec<String> = vec![];
+    let mut math_block = vec![];
     let mut got_block = false;
     let mut getting_block = 0;
-    let mut getting_function_call = false;
+    let mut getting_function_call = 0;
     let mut is_comment = false;
     let mut j = i;
     let mut oh_god_we_reached_the_start_while_going_back = false;
@@ -117,7 +118,7 @@ pub fn get_till_token_or_block(
     }
 
     if oh_god_we_reached_the_start_while_going_back {
-        return (j, output, block, got_block);
+        return (j, output, block, got_block, math_block);
     }
 
     while j < input.len() {
@@ -130,17 +131,22 @@ pub fn get_till_token_or_block(
             is_comment = false;
         }
         if !is_comment {
+            let operator = is_math(text.to_string());
+            if let Ok(_) = &operator {
+                math_block.push(text.to_string());
+            }
+
             if text == "{" {
                 getting_block += 1;
             }
             if text == "(" && token != "(" {
                 // we are not getting the (, then get the entire function
-                getting_function_call = true;
+                getting_function_call += 1;
             }
             if text == ")" {
-                getting_function_call = false;
+                getting_function_call -= 1;
             }
-            if text == token && getting_block == 0 && !getting_function_call {
+            if text == token && getting_block == 0 && getting_function_call == 0 {
                 break;
             }
             if getting_block > 0 {
@@ -152,7 +158,7 @@ pub fn get_till_token_or_block(
             if text == "}" {
                 got_block = true;
                 getting_block -= 1;
-                if getting_block == 0 && !getting_function_call {
+                if getting_block == 0 && getting_function_call == 0 {
                     // got a random block?
                     // IT PROBABLY WAS IMPORTANT OR SOMETHING, ISN'T IT
                     // stop everything, just return
@@ -170,7 +176,47 @@ pub fn get_till_token_or_block(
             j += 1;
         }
     }
-    return (j, output, block, got_block);
+    return (j, output, block, got_block, math_block);
+}
+
+fn is_math(token: String) -> Result<(), ()> {
+    if token == "+".to_string() {
+        return Ok(());
+    } else if token == "-".to_string() {
+        return Ok(());
+    } else if token == "*".to_string() {
+        return Ok(());
+    } else if token == "/".to_string() {
+        return Ok(());
+    } else if token == "+=".to_string() {
+        return Ok(());
+    } else if token == "-=".to_string() {
+        return Ok(());
+    } else if token == "*=".to_string() {
+        return Ok(());
+    } else if token == "/=".to_string() {
+        return Ok(());
+    } else if token == "=".to_string() {
+        return Ok(());
+    } else if token == "==".to_string() {
+        return Ok(());
+    } else if token == "!=".to_string() {
+        return Ok(());
+    } else if token == ">".to_string() {
+        return Ok(());
+    } else if token == "<".to_string() {
+        return Ok(());
+    } else if token == ">=".to_string() {
+        return Ok(());
+    } else if token == "<=".to_string() {
+        return Ok(());
+    } else if token == "(".to_string() {
+        return Ok(());
+    } else if token == ")".to_string() {
+        return Ok(());
+    } else {
+        return Err(());
+    }
 }
 
 pub fn load(
@@ -184,7 +230,7 @@ pub fn load(
     let mut text = &String::new();
     let mut i = 0;
     while i < input.len() {
-        let data = get_till_token_or_block("EOL", input, i, false);
+        let data = get_till_token_or_block_and_math_block("EOL", input, i, false);
         previous_text = text.clone();
         text = &input[i];
 
@@ -193,7 +239,7 @@ pub fn load(
             continue;
         }
         // skip EOLs
-        if text == "EOL" {
+        if text == "EOL" || text == "(" || text == ")" {
             i += 1;
             continue;
         }
@@ -353,6 +399,25 @@ pub fn load(
             ],
             Mode::OR,
         ) && !has(&data.1, vec!["let", "const"], Mode::OR)
+            && {
+                //checking if the math found is inside a block
+                // eg. fib(x-1)
+                // it's a function call, not a math
+                let mut unblocked_op = vec![];
+                let mut blocked = 0;
+                for cell in data.4.iter() {
+                    if cell == "(" {
+                        blocked += 1;
+                    }
+                    if blocked == 0 {
+                        unblocked_op.push(cell);
+                    }
+                    if cell == ")" {
+                        blocked -= 1;
+                    }
+                }
+                unblocked_op.len() != 0
+            }
         {
             i = math::parser(
                 &mut program,

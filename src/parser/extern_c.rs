@@ -1,7 +1,10 @@
 use super::Node;
 use crate::{node, ExternC};
 
-pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>, bool)) -> usize {
+pub fn parser(
+    program: &mut Vec<Node>,
+    data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
+) -> usize {
     program.push(node!(
         extern_c,
         ExternC {

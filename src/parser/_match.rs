@@ -1,6 +1,6 @@
 use crate::node;
 
-use super::{get_till_token_or_block, load, Match, MatchCase, Node};
+use super::{get_till_token_or_block_and_math_block, load, Match, MatchCase, Node};
 
 pub fn get_match_case(
     i: usize,
@@ -9,8 +9,8 @@ pub fn get_match_case(
     mut enum_values: &mut Vec<Vec<String>>,
     mut struct_data: &mut Vec<Vec<String>>,
 ) -> (usize, Option<MatchCase>) {
-    let case_data = get_till_token_or_block("=>", &input, i, false);
-    let expr_data = get_till_token_or_block("EOL", &input, case_data.0, false);
+    let case_data = get_till_token_or_block_and_math_block("=>", &input, i, false);
+    let expr_data = get_till_token_or_block_and_math_block("EOL", &input, case_data.0, false);
     let case_target;
     if case_data.3 {
         if case_data.2.len() == 0 {
@@ -56,7 +56,7 @@ pub fn get_match_case(
 
 pub fn parser(
     program: &mut Vec<Node>,
-    data: (usize, Vec<String>, Vec<String>, bool),
+    data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
     mut identifiers: &mut Vec<Vec<String>>,
     mut enum_values: &mut Vec<Vec<String>>,
     mut struct_data: &mut Vec<Vec<String>>,

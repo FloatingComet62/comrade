@@ -178,6 +178,7 @@ impl Parser {
 #include <stdbool.h>
         "
             .to_string(),
+            true,
             false,
         );
         if print_c_code {

@@ -4,7 +4,7 @@ use super::{Literal, Node, Types};
 
 pub fn parser(
     program: &mut Vec<Node>,
-    data: (usize, Vec<String>, Vec<String>, bool),
+    data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
     text: &String,
 ) -> usize {
     program.push(node!(

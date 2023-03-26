@@ -4,7 +4,7 @@ use super::{Enum, Node};
 
 pub fn parser(
     program: &mut Vec<Node>,
-    data: (usize, Vec<String>, Vec<String>, bool),
+    data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
     _identifiers: &mut Vec<Vec<String>>,
     enum_values: &mut Vec<Vec<String>>,
     _struct_data: &mut Vec<Vec<String>>,

@@ -14,6 +14,7 @@ mod variable_assignment;
 pub fn compiler(
     program: &mut Vec<Node>,
     init_code: String,
+    semi_colon_needed: bool,
     is_inside_function_call: bool,
 ) -> String {
     let mut output = init_code.clone();
@@ -61,7 +62,7 @@ pub fn compiler(
             output += &statement::compile(program, x);
         }
         if let Some(x) = &item.function_call {
-            output += &function_call::compile(x);
+            output += &function_call::compile(x, semi_colon_needed);
         }
         if let Some(x) = &mut item.condition_block {
             output += &condition_block::compile(x);
@@ -70,7 +71,7 @@ pub fn compiler(
             output += &math::compile(!is_inside_function_call, x);
         }
         if let Some(x) = &mut item._match {
-            output += &_match::compile(x);
+            output += &_match::compile(x, semi_colon_needed);
         }
         if let Some(x) = &item.expression {
             output += &expression::compile(x);

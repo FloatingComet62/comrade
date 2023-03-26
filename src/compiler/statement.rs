@@ -47,7 +47,7 @@ pub fn compile(_program: &mut Vec<Node>, input: &mut Statement) -> String {
             if let Some(func) = &mut lib_token.function {
                 if func.identifier == vec!["__init__"] {
                     // __init__ is embedded directly and the function is removed
-                    output += &compiler(&mut func.nodes, String::new(), false);
+                    output += &compiler(&mut func.nodes, String::new(), true, false);
                 } else {
                     // normal function, add the path->function_name
                     //todo maybe with variables
@@ -58,11 +58,11 @@ pub fn compile(_program: &mut Vec<Node>, input: &mut Statement) -> String {
                 }
             }
         }
-        output += &compiler(&mut lib_tokens_to_parse, String::new(), false);
+        output += &compiler(&mut lib_tokens_to_parse, String::new(), true, false);
     } else {
         output += &input.action;
         output += " ";
-        output += &compiler(&mut input.parameters, String::new(), false);
+        output += &compiler(&mut input.parameters, String::new(), true, false);
         output += ";";
     }
     output

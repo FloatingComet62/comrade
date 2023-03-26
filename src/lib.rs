@@ -173,8 +173,11 @@ pub enum Operations {
     /// not equal
     NEQ,
     /// "=="
-    /// equate to rhs
+    /// compare rhs
     EQT,
+    /// "="
+    /// equate to rhs
+    EQ,
     /// "+="
     /// add rhs to lhs
     ADDEQT,

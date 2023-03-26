@@ -32,10 +32,19 @@ macro_rules! math_test {
 
 #[test]
 fn test() {
-    math_test!("==", Operations::EQT);
+    math_test!("+", Operations::ADD);
+    math_test!("-", Operations::SUB);
+    math_test!("*", Operations::MUL);
+    math_test!("/", Operations::DIV);
+    math_test!("+=", Operations::ADDEQT);
+    math_test!("-=", Operations::SUBEQT);
+    math_test!("*=", Operations::MULEQT);
+    math_test!("/=", Operations::DIVEQT);
     math_test!(">", Operations::GR);
     math_test!("<", Operations::LT);
     math_test!(">=", Operations::EQGR);
     math_test!("<=", Operations::EQLT);
+    math_test!("=", Operations::EQ);
+    math_test!("==", Operations::EQT);
     math_test!("!=", Operations::NEQ);
 }

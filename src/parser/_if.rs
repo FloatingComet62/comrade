@@ -3,7 +3,7 @@ use crate::{exit, node};
 
 pub fn parser(
     program: &mut Vec<Node>,
-    data: (usize, Vec<String>, Vec<String>, bool),
+    data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
     text: &String,
     previous_text: &String,
     input: &Vec<String>,

@@ -4,7 +4,7 @@ use super::compiler;
 
 pub fn compile(semi_colon_needed: bool, input: &mut Math) -> String {
     let mut output = String::new();
-    output += &compiler(&mut input.lhs, String::new(), false);
+    output += &compiler(&mut input.lhs, String::new(), false, false);
     output += match input.operation {
         Operations::ADD => "+",
         Operations::ADDEQT => "+=",
@@ -21,8 +21,9 @@ pub fn compile(semi_colon_needed: bool, input: &mut Math) -> String {
         Operations::GR => ">",
         Operations::LT => "<",
         Operations::EQT => "==",
+        Operations::EQ => "=",
     };
-    output += &compiler(&mut input.rhs, String::new(), false);
+    output += &compiler(&mut input.rhs, String::new(), false, false);
     if semi_colon_needed {
         output += ";";
     }

@@ -1,9 +1,9 @@
-use super::{get_till_token_or_block, Node, Struct, StructMember};
+use super::{get_till_token_or_block_and_math_block, Node, Struct, StructMember};
 use crate::{node, type_from_str};
 
 pub fn get_struct_member(i: usize, input: &Vec<String>) -> (usize, Option<StructMember>) {
-    let mut case_data = get_till_token_or_block("->", &input, i, false);
-    let mut type_data = get_till_token_or_block("EOL", &input, case_data.0, false);
+    let mut case_data = get_till_token_or_block_and_math_block("->", &input, i, false);
+    let mut type_data = get_till_token_or_block_and_math_block("EOL", &input, case_data.0, false);
 
     case_data.1.retain(|x| x != "EOL");
     type_data.1.retain(|x| x != "EOL");
@@ -23,7 +23,7 @@ pub fn get_struct_member(i: usize, input: &Vec<String>) -> (usize, Option<Struct
 
 pub fn parser(
     program: &mut Vec<Node>,
-    data: (usize, Vec<String>, Vec<String>, bool),
+    data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
     _identifiers: &mut Vec<Vec<String>>,
     _enum_values: &mut Vec<Vec<String>>,
     struct_data: &mut Vec<Vec<String>>,
