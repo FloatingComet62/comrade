@@ -13,14 +13,14 @@ v 0.1
 | [x] | [x] | Match Statments |
 | [x] | [x] | Variables |
 | [x] | [x] | Constants |
-| [x] | [ ] | Lists |
+| [x] | [x] | Lists |
 | [x] | [x] | If, Else if, Else statements |
 | [x] | [x] | While loops |
-| [x] | [ ] | Comments |
+| [ ] | [ ] | Comments |
 | [x] | [x] | Structs |
 | [x] | [x] | Including |
 | [x] | [x] | Enums |
-| [x] | [ ] | Math |
+| [x] | [x] | Math |
 | [x] | [ ] | Erasing identifiers |
 | [x] | [ ] | Public identifiers |
 

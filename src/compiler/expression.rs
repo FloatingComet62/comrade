@@ -11,10 +11,11 @@ pub fn compile(input: &Expression) -> String {
         }
 
         output += item;
-        if !list_indexing {
+        if !list_indexing && i != input.expr.len() - 1 {
             output += ".";
         }
         if item == "]" {
+            //todo maybe next will also work?
             list_indexing = false;
         }
     }

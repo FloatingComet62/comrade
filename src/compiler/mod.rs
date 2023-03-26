@@ -67,7 +67,7 @@ pub fn compiler(
             output += &condition_block::compile(x);
         }
         if let Some(x) = &mut item.math {
-            output += &math::compile(x);
+            output += &math::compile(!is_inside_function_call, x);
         }
         if let Some(x) = &mut item._match {
             output += &_match::compile(x);
