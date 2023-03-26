@@ -1,12 +1,17 @@
 include std->io
 
-enum Days {
-    Monday Tuesday Wednesday
-    Thursday Friday Saturday Sunday
+struct Account {
+    principal_amount -> i32,
+    interest_rate -> i32,
+    duration_in_years -> i32
 }
 
-fun main() => i32 {
-    let day = Days->Monday
-    io->out(day)
+fun main(_argc -> i32, _argv -> str[]) => u8 {
+    let user -> Account = {
+        20000,
+        7,
+        10
+    }
+    io->out(user.principal_amount)
     return 0
 }

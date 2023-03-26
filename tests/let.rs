@@ -12,6 +12,7 @@ fn test() {
                 identifier: vec!["a".to_string()],
                 immutability: false,
                 publicity: false,
+                type_data: String::new(),
                 value: Box::new(vec![node!(
                     literal,
                     Literal {

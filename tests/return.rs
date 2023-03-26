@@ -41,6 +41,7 @@ return a
                     identifier: str_list_to_string_list(vec!["a"]),
                     immutability: false,
                     publicity: false,
+                    type_data: String::new(),
                     value: Box::new(vec![node!(
                         literal,
                         Literal {

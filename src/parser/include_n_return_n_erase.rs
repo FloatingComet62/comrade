@@ -7,8 +7,8 @@ pub fn parser(
     data: (usize, Vec<String>, Vec<String>, bool),
     text: &String,
     mut identifiers: &mut Vec<Vec<String>>,
-    mut first_identifiers: &mut Vec<String>,
     mut enum_values: &mut Vec<Vec<String>>,
+    mut struct_data: &mut Vec<Vec<String>>,
 ) -> usize {
     let mut params = data.1.clone();
     params.retain(|x| x != "->");
@@ -19,8 +19,8 @@ pub fn parser(
             parameters: load(
                 &params,
                 &mut identifiers,
-                &mut first_identifiers,
-                &mut enum_values
+                &mut enum_values,
+                &mut struct_data
             ),
         }
     ));

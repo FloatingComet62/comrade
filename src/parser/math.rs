@@ -9,8 +9,8 @@ pub fn parser(
     input: &Vec<String>,
     i: usize,
     mut identifiers: &mut Vec<Vec<String>>,
-    mut first_identifiers: &mut Vec<String>,
     mut enum_values: &mut Vec<Vec<String>>,
+    mut struct_data: &mut Vec<Vec<String>>,
 ) -> usize {
     let mut operator = "";
     let mut operation = Operations::NULL;
@@ -44,18 +44,8 @@ pub fn parser(
     program.push(node!(
         math,
         Math {
-            lhs: load(
-                &lhs,
-                &mut identifiers,
-                &mut first_identifiers,
-                &mut enum_values
-            ),
-            rhs: load(
-                &rhs.1,
-                &mut identifiers,
-                &mut first_identifiers,
-                &mut enum_values
-            ),
+            lhs: load(&lhs, &mut identifiers, &mut enum_values, &mut struct_data),
+            rhs: load(&rhs.1, &mut identifiers, &mut enum_values, &mut struct_data),
             operation,
         }
     ));

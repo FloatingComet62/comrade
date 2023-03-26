@@ -2,6 +2,7 @@ use crate::{Node, Types};
 
 mod _enum;
 mod _match;
+mod _struct;
 mod condition_block;
 mod function;
 mod function_call;
@@ -9,8 +10,12 @@ mod math;
 mod statement;
 mod variable_assignment;
 
-pub fn compiler(program: &mut Vec<Node>, is_inside_function_call: bool) -> String {
-    let mut output = String::new();
+pub fn compiler(
+    program: &mut Vec<Node>,
+    init_code: String,
+    is_inside_function_call: bool,
+) -> String {
+    let mut output = init_code.clone();
     for i in 0..program.len() {
         let item = &mut program.clone()[i];
         // macro_rules! node_type_check {
@@ -32,49 +37,48 @@ pub fn compiler(program: &mut Vec<Node>, is_inside_function_call: bool) -> Strin
             //
             // printf("%d\n", sum((int[]){1, 2, 3, 4, 5}));
             // return 0;
-            if let Some(l) = &item.literal {
-                if l.literal.contains("_") {
-                    let enum_vals: Vec<&str> = l.literal.split("_").collect();
-                    output += &enum_vals[1];
-                } else {
-                    output += &l.literal;
-                }
-            }
         } else {
-            if let Some(l) = &item.literal {
+        }
+        if let Some(l) = &item.literal {
+            if l.literal.contains("_") {
+                let enum_vals: Vec<&str> = l.literal.split("_").collect();
+                output += &enum_vals[1];
+            } else {
                 output += &l.literal;
             }
         }
-        // node_type_check!(extern_c, e_c.block);
-        if let Some(e_c) = &item.extern_c {
-            output += &e_c.block;
+        if let Some(x) = &item.extern_c {
+            output += &x.block;
         }
-        if let Some(va) = &item.variable_assignment {
-            output += &variable_assignment::compile(va);
+        if let Some(x) = &item.variable_assignment {
+            output += &variable_assignment::compile(x);
         }
-        if let Some(fun) = &mut item.function {
-            output += &function::compile(fun);
+        if let Some(x) = &mut item.function {
+            output += &function::compile(x);
         }
-        if let Some(s) = &mut item.statement {
-            output += &statement::compile(program, s);
+        if let Some(x) = &mut item.statement {
+            output += &statement::compile(program, x);
         }
-        if let Some(fc) = &item.function_call {
-            output += &function_call::compile(fc);
+        if let Some(x) = &item.function_call {
+            output += &function_call::compile(x);
         }
-        if let Some(cb) = &mut item.condition_block {
-            output += &condition_block::compile(cb);
+        if let Some(x) = &mut item.condition_block {
+            output += &condition_block::compile(x);
         }
-        if let Some(m) = &mut item.math {
-            output += &math::compile(m);
+        if let Some(x) = &mut item.math {
+            output += &math::compile(x);
         }
-        if let Some(m) = &mut item._match {
-            output += &_match::compile(m);
+        if let Some(x) = &mut item._match {
+            output += &_match::compile(x);
         }
-        if let Some(expr) = &item.expression {
-            output += &expr.expr.join(" ");
+        if let Some(x) = &item.expression {
+            output += &x.expr.join(".");
         }
-        if let Some(e) = &item._enum {
-            output += &_enum::compile(e);
+        if let Some(x) = &item._enum {
+            output += &_enum::compile(x);
+        }
+        if let Some(x) = &item._struct {
+            output += &_struct::compile(x);
         }
     }
 

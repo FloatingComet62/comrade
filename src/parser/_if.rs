@@ -9,8 +9,8 @@ pub fn parser(
     input: &Vec<String>,
     i: usize,
     mut identifiers: &mut Vec<Vec<String>>,
-    mut first_identifiers: &mut Vec<String>,
     mut enum_values: &mut Vec<Vec<String>>,
+    mut struct_data: &mut Vec<Vec<String>>,
 ) -> usize {
     if text == "if" {
         if previous_text == "else" {
@@ -25,14 +25,14 @@ pub fn parser(
                     parameters: load(
                         &data.1,
                         &mut identifiers,
-                        &mut first_identifiers,
-                        &mut enum_values
+                        &mut enum_values,
+                        &mut struct_data
                     ),
                     nodes: load(
                         &data.2,
                         &mut identifiers,
-                        &mut first_identifiers,
-                        &mut enum_values
+                        &mut enum_values,
+                        &mut struct_data
                     ),
                 }
             ));
@@ -45,14 +45,14 @@ pub fn parser(
                 parameters: load(
                     &data.1,
                     &mut identifiers,
-                    &mut first_identifiers,
-                    &mut enum_values
+                    &mut enum_values,
+                    &mut struct_data
                 ),
                 nodes: load(
                     &data.2,
                     &mut identifiers,
-                    &mut first_identifiers,
-                    &mut enum_values
+                    &mut enum_values,
+                    &mut struct_data
                 ),
             }
         ));
@@ -77,8 +77,8 @@ pub fn parser(
                 nodes: load(
                     &data.2,
                     &mut identifiers,
-                    &mut first_identifiers,
-                    &mut enum_values
+                    &mut enum_values,
+                    &mut struct_data
                 ),
             }
         ));

@@ -25,6 +25,7 @@ while i != 5 {
                     identifier: vec!["i".to_string()],
                     immutability: false,
                     publicity: false,
+                    type_data: String::new(),
                     value: Box::new(vec![node!(
                         literal,
                         Literal {

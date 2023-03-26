@@ -5,5 +5,10 @@ struct User {
 }
 
 fun main(_argc -> i32, _argv -> str[]) => u8 {
+    let user -> User = {
+        "Comet",
+        false,
+        16
+    }
     return 0
 }

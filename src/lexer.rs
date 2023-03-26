@@ -154,20 +154,15 @@ impl Parser {
         // adding libs here so that they get recognized as identifiers
         // maybe if I make a no std version, I can just make identifiers
         let mut identifiers: Vec<Vec<String>> = lexer.libs.clone();
-        let mut first_identifiers: Vec<String> = get_first(&lexer.libs);
-
         let mut enum_values: Vec<Vec<String>> = vec![];
-
+        let mut struct_data: Vec<Vec<String>> = vec![];
         identifiers.append(&mut lexer.keywords.clone());
-        for item in get_first(&lexer.keywords) {
-            first_identifiers.push(item);
-        }
 
         lexer.program = load(
             &lexer.splitted_text,
             &mut identifiers,
-            &mut first_identifiers,
             &mut enum_values,
+            &mut struct_data,
         );
         if print_ast {
             println!("{:?}", lexer.program);
@@ -177,7 +172,14 @@ impl Parser {
             return (lexer.program, String::new());
         }
 
-        let c_code = compiler::compiler(&mut lexer.program, false);
+        let c_code = compiler::compiler(
+            &mut lexer.program,
+            "
+#include <stdbool.h>
+        "
+            .to_string(),
+            false,
+        );
         if print_c_code {
             println!("{:?}", c_code);
         }

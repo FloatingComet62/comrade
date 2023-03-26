@@ -1,7 +1,7 @@
 use crate::{
     node, str_list_to_string_list, type_from_str, Argument, ConditionBlock, Enum, Expression,
     ExternC, Function, FunctionCall, Literal, Match, MatchCase, Math, Node, NodeData, Statement,
-    Struct, StructMember, Types, VariableAssignment,
+    Struct, StructMember, StructValue, Types, VariableAssignment,
 };
 use std::fmt::Debug;
 
@@ -40,6 +40,7 @@ impl Node {
         s: Option<Struct>,
         e: Option<Enum>,
         e_c: Option<ExternC>,
+        struct_value: Option<StructValue>,
     ) -> Self {
         Self {
             data: NodeData {
@@ -55,12 +56,13 @@ impl Node {
                 _struct: s,
                 _enum: e,
                 extern_c: e_c,
+                struct_value,
             },
         }
     }
     pub fn blank() -> Node {
         Node::new(
-            None, None, None, None, None, None, None, None, None, None, None, None,
+            None, None, None, None, None, None, None, None, None, None, None, None, None,
         )
     }
 }
@@ -174,8 +176,8 @@ pub fn get_till_token_or_block(
 pub fn load(
     input: &Vec<String>,
     mut identifiers: &mut Vec<Vec<String>>,
-    mut first_identifiers: &mut Vec<String>,
     mut enum_values: &mut Vec<Vec<String>>,
+    mut struct_data: &mut Vec<Vec<String>>,
 ) -> Vec<Node> {
     let mut program = vec![];
     let mut previous_text;
@@ -205,8 +207,8 @@ pub fn load(
             Mode::OR,
         ) {
             // identifier check
-            for j in 0..first_identifiers.len() {
-                if text == first_identifiers[j].as_str() {
+            for j in 0..identifiers.len() {
+                if text == identifiers[j][0].as_str() {
                     let mut identifer = true;
                     for k in 0..identifiers[j].len() {
                         let item = input.get(i + k);
@@ -260,8 +262,8 @@ pub fn load(
                 i,
                 &previous_text,
                 &mut identifiers,
-                &mut first_identifiers,
                 &mut enum_values,
+                &mut struct_data,
             );
         } else if text == "const" {
             i = _const::parser(
@@ -271,8 +273,8 @@ pub fn load(
                 i,
                 &previous_text,
                 &mut identifiers,
-                &mut first_identifiers,
                 &mut enum_values,
+                &mut struct_data,
             );
         } else if text == "include" || text == "return" || text == "erase" {
             i = include_n_return_n_erase::parser(
@@ -280,8 +282,8 @@ pub fn load(
                 data,
                 text,
                 identifiers,
-                first_identifiers,
                 &mut enum_values,
+                &mut struct_data,
             );
         } else if text == "true" || text == "false" {
             i = booleans::parser(&mut program, data, text);
@@ -294,36 +296,42 @@ pub fn load(
                 input,
                 i,
                 &mut identifiers,
-                &mut first_identifiers,
                 &mut enum_values,
+                &mut struct_data,
             );
         } else if text == "while" {
             i = _while::parser(
                 &mut program,
                 data,
                 &mut identifiers,
-                &mut first_identifiers,
                 &mut enum_values,
+                &mut struct_data,
             );
         // } else if text == "for" {
-        // i = _for::parser(&mut program, data, &mut identifiers, &mut first_identifiers);
+        // i = _for::parser(&mut program, data, &mut identifiers);
         } else if text == "struct" {
-            i = _struct::parser(&mut program, data);
+            i = _struct::parser(
+                &mut program,
+                data,
+                &mut identifiers,
+                &mut enum_values,
+                &mut struct_data,
+            );
         } else if text == "enum" {
             i = _enum::parser(
                 &mut program,
                 data,
                 &mut identifiers,
-                &mut first_identifiers,
                 &mut enum_values,
+                &mut struct_data,
             );
         } else if text == "fun" {
             i = fun::parser(
                 &mut program,
                 data,
                 &mut identifiers,
-                &mut first_identifiers,
                 &mut enum_values,
+                &mut struct_data,
             );
         } else if has(
             &data.1,
@@ -340,8 +348,8 @@ pub fn load(
                 input,
                 i,
                 &mut identifiers,
-                &mut first_identifiers,
                 &mut enum_values,
+                &mut struct_data,
             );
         } else if text.chars().next().unwrap_or('\0') == '\"' {
             program.push(node!(
@@ -372,8 +380,8 @@ pub fn load(
                 &mut program,
                 data,
                 &mut identifiers,
-                &mut first_identifiers,
                 &mut enum_values,
+                &mut struct_data,
             );
         } else if has(&data.1, vec!["(", ")"], Mode::AND) {
             // also, it's a function call when there is no fun
@@ -383,8 +391,8 @@ pub fn load(
                 input,
                 i,
                 &mut identifiers,
-                &mut first_identifiers,
                 &mut enum_values,
+                &mut struct_data,
             );
         }
         i += 1;

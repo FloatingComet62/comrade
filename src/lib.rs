@@ -52,6 +52,7 @@ pub enum Types {
     None = 22,
 
     Type = 23,
+    Object = 24,
 }
 
 pub fn read_file(path: &String) -> String {
@@ -221,6 +222,7 @@ pub struct VariableAssignment {
     pub value: Box<Vec<Node>>,
     pub immutability: bool,
     pub publicity: bool,
+    pub type_data: String,
 }
 #[derive(Debug, PartialEq, Clone)]
 pub struct Expression {
@@ -253,6 +255,11 @@ pub struct Struct {
     pub members: Vec<StructMember>,
 }
 #[derive(Debug, PartialEq, Clone)]
+pub struct StructValue {
+    pub identifier: Vec<String>,
+    pub values: Vec<Node>,
+}
+#[derive(Debug, PartialEq, Clone)]
 pub struct Enum {
     pub identifier: Vec<String>,
     pub members: Vec<String>,
@@ -281,6 +288,7 @@ pub struct NodeData {
     pub _struct: Option<Struct>,
     pub _enum: Option<Enum>,
     pub extern_c: Option<ExternC>,
+    pub struct_value: Option<StructValue>,
 }
 impl Debug for NodeData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -304,6 +312,7 @@ impl Debug for NodeData {
         check!(&self._struct);
         check!(&self._enum);
         check!(&self.extern_c);
+        check!(&self.struct_value);
 
         f.write_str("{}")
     }

@@ -17,7 +17,7 @@ pub fn compile(input: &FunctionCall) -> String {
     }
     output += "(";
     for item in &input.arguments {
-        output += &compiler(&mut item.clone(), true);
+        output += &compiler(&mut item.clone(), String::new(), true);
     }
     output += ");";
     output

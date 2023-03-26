@@ -1,6 +1,5 @@
-use crate::{node, type_from_str};
-
 use super::{get_till_token_or_block, Node, Struct, StructMember};
+use crate::{node, type_from_str};
 
 pub fn get_struct_member(i: usize, input: &Vec<String>) -> (usize, Option<StructMember>) {
     let mut case_data = get_till_token_or_block("->", &input, i, false);
@@ -22,16 +21,26 @@ pub fn get_struct_member(i: usize, input: &Vec<String>) -> (usize, Option<Struct
     );
 }
 
-pub fn parser(program: &mut Vec<Node>, data: (usize, Vec<String>, Vec<String>, bool)) -> usize {
+pub fn parser(
+    program: &mut Vec<Node>,
+    data: (usize, Vec<String>, Vec<String>, bool),
+    _identifiers: &mut Vec<Vec<String>>,
+    _enum_values: &mut Vec<Vec<String>>,
+    struct_data: &mut Vec<Vec<String>>,
+) -> usize {
     let mut block = vec![];
+    let mut self_data = vec![data.1.join("_")];
     let mut j = 0;
     while j < data.2.len() {
         let x = get_struct_member(j, &data.2);
         if let Some(y) = x.1 {
+            self_data.push(y.identifier.join("_"));
             block.push(y);
         }
         j = x.0;
     }
+
+    struct_data.push(self_data);
 
     program.push(node!(
         _struct,

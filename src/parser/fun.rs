@@ -1,6 +1,5 @@
 use super::{load, Argument, Function, Node, Types};
 use crate::exit;
-use crate::lexer::get_first;
 use crate::node;
 use crate::type_from_str;
 
@@ -8,8 +7,8 @@ pub fn parser(
     program: &mut Vec<Node>,
     data: (usize, Vec<String>, Vec<String>, bool),
     mut identifiers: &mut Vec<Vec<String>>,
-    mut first_identifiers: &mut Vec<String>,
     mut enum_values: &mut Vec<Vec<String>>,
+    mut struct_data: &mut Vec<Vec<String>>,
 ) -> usize {
     // todo: maybe reimplement this with get_till_token_or_block ?
     let mut getting_args = false;
@@ -39,27 +38,17 @@ pub fn parser(
     // update identifiers
     let arg_identifiers = arg_to_identifier(&args);
     identifiers.append(&mut arg_identifiers.clone());
-    let first_arg_identifiers = get_first(&arg_identifiers);
-    first_identifiers.append(&mut first_arg_identifiers.clone());
 
     let nodes = load(
         &data.2,
         &mut identifiers,
-        &mut first_identifiers,
         &mut enum_values,
+        &mut struct_data,
     );
 
     // remove identifiers
     identifiers.retain(|iden| {
         for arg_iden in arg_identifiers.iter() {
-            if iden == arg_iden {
-                return false;
-            }
-        }
-        true
-    });
-    first_identifiers.retain(|iden| {
-        for arg_iden in first_arg_identifiers.iter() {
             if iden == arg_iden {
                 return false;
             }

@@ -8,8 +8,8 @@ pub fn parser(
     input: &Vec<String>,
     i: usize,
     mut identifiers: &mut Vec<Vec<String>>,
-    mut first_identifiers: &mut Vec<String>,
     mut enum_values: &mut Vec<Vec<String>>,
+    mut struct_data: &mut Vec<Vec<String>>,
 ) -> usize {
     let mut identifier = vec![text.to_string()];
     let mut raw_identifier = get_till_token_or_block("(", &input, i, false);
@@ -31,8 +31,8 @@ pub fn parser(
                 args.push(load(
                     &arg,
                     &mut identifiers,
-                    &mut first_identifiers,
                     &mut enum_values,
+                    &mut struct_data,
                 ));
             }
             arg = vec![];
@@ -44,8 +44,8 @@ pub fn parser(
         args.push(load(
             &arg,
             &mut identifiers,
-            &mut first_identifiers,
             &mut enum_values,
+            &mut struct_data,
         ));
     }
     program.push(node!(

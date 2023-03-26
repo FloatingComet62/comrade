@@ -25,7 +25,7 @@ pub fn compile(input: &mut Function) -> String {
         }
     }
     output += ") {\n";
-    output += &compiler(&mut input.nodes, false);
+    output += &compiler(&mut input.nodes, String::new(), false);
     output += "}";
     output
 }
