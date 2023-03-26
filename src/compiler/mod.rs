@@ -4,6 +4,7 @@ mod _enum;
 mod _match;
 mod _struct;
 mod condition_block;
+mod expression;
 mod function;
 mod function_call;
 mod math;
@@ -72,7 +73,7 @@ pub fn compiler(
             output += &_match::compile(x);
         }
         if let Some(x) = &item.expression {
-            output += &x.expr.join(".");
+            output += &expression::compile(x);
         }
         if let Some(x) = &item._enum {
             output += &_enum::compile(x);

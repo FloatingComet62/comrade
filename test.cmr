@@ -1,8 +1,7 @@
 include std->io
 
 fun main(_argc -> i32, _argv -> str[]) => u8 {
-    while true {
-        io->out("Hello World")
-    }
+    let list -> i32[] = 1 2 3 4 5 6 7
+    io->out(list[0])
     return 0
 }

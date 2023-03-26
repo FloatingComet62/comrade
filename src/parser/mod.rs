@@ -211,8 +211,7 @@ pub fn load(
                 if text == identifiers[j][0].as_str() {
                     let mut identifer = true;
                     for k in 0..identifiers[j].len() {
-                        let item = input.get(i + k);
-                        if let Some(to_check) = item {
+                        if let Some(to_check) = input.get(i + k) {
                             if to_check != identifiers[j][k].as_str() {
                                 identifer = false;
                             }
@@ -222,12 +221,26 @@ pub fn load(
                         }
                     }
                     if identifer {
-                        program.push(node!(
-                            expression,
-                            Expression {
-                                expr: identifiers[j].clone(),
+                        let mut idenf = identifiers[j].clone();
+                        if let Some(first) = input.get(i + 1) {
+                            if first == "[" {
+                                if let Some(second) = input.get(i + 3) {
+                                    if second == "]" {
+                                        if let Some(middle) = input.get(i + 2) {
+                                            let chars: Vec<char> = middle.chars().collect();
+                                            if is_digit(chars[0]) {
+                                                // it is a list indexing
+                                                idenf.append(&mut str_list_to_string_list(vec![
+                                                    "[", middle, "]",
+                                                ]));
+                                                i += 3;
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                        ));
+                        }
+                        program.push(node!(expression, Expression { expr: idenf }));
                         i += identifiers[j].len();
                         break;
                     }

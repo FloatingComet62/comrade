@@ -1,4 +1,4 @@
-use crate::VariableAssignment;
+use crate::{type_from_str, Types, VariableAssignment};
 
 use super::type_to_c_type;
 
@@ -46,9 +46,15 @@ fn types(input: &VariableAssignment) -> Result<(String, bool), ()> {
             return Ok((res.0.to_string(), res.1));
         }
     } else {
-        let mut output = "struct ".to_string();
-        output += &input.type_data;
-        return Ok((output, false));
+        let type_check = type_from_str(&input.type_data);
+        if type_check == Types::None {
+            let mut output = "struct ".to_string();
+            output += &input.type_data;
+            return Ok((output, false));
+        } else {
+            // it's a list
+            return Ok((type_to_c_type(&type_check).0.to_string(), true));
+        }
     }
     Err(())
 }
