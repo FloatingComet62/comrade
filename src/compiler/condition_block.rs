@@ -23,5 +23,12 @@ pub fn compile(input: &mut ConditionBlock) -> String {
         output += &compiler(&mut input.nodes, String::new(), false);
         output += "}";
     }
+    if input.keyword == "while" {
+        output += "while (";
+        output += &compiler(&mut input.parameters, String::new(), false);
+        output += ") {";
+        output += &compiler(&mut input.nodes, String::new(), false);
+        output += "}";
+    }
     output
 }

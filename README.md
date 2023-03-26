@@ -9,17 +9,17 @@ Take a look at [this](/grammer.txt) file to understand the grammar I am going fo
 v 0.1
 | Lexer | Compiler | Feature |
 | ----- | -------- | ------- |
-| [x] | [ ] | Functions |
-| [x] | [ ] | Match Statments |
-| [x] | [ ] | Variables |
-| [x] | [ ] | Constants |
+| [x] | [x] | Functions |
+| [x] | [x] | Match Statments |
+| [x] | [x] | Variables |
+| [x] | [x] | Constants |
 | [x] | [ ] | Lists |
-| [x] | [ ] | If, Else if, Else statements |
-| [x] | [ ] | While loops |
+| [x] | [x] | If, Else if, Else statements |
+| [x] | [x] | While loops |
 | [x] | [ ] | Comments |
-| [x] | [ ] | Structs |
-| [x] | [ ] | Including |
-| [x] | [ ] | Enums |
+| [x] | [x] | Structs |
+| [x] | [x] | Including |
+| [x] | [x] | Enums |
 | [x] | [ ] | Math |
 | [x] | [ ] | Erasing identifiers |
 | [x] | [ ] | Public identifiers |

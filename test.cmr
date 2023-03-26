@@ -1,17 +1,8 @@
 include std->io
 
-struct Account {
-    principal_amount -> i32,
-    interest_rate -> i32,
-    duration_in_years -> i32
-}
-
 fun main(_argc -> i32, _argv -> str[]) => u8 {
-    let user -> Account = {
-        20000,
-        7,
-        10
+    while true {
+        io->out("Hello World")
     }
-    io->out(user.principal_amount)
     return 0
 }
