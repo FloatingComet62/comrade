@@ -10,7 +10,7 @@ v 0.1
 | Lexer | Compiler | Feature |
 | ----- | -------- | ------- |
 | [x] | [x] | Functions |
-| [x] | [x] | Match Statments |
+| [x] | [x] | Match Statements |
 | [x] | [x] | Variables |
 | [x] | [x] | Constants |
 | [x] | [x] | Lists |

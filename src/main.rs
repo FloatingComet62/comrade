@@ -25,7 +25,7 @@ fn main() {
                 )
             }
         }
-        None => exit("No input files passes", None),
+        None => exit("No input files passed", None),
     }
 }
 
