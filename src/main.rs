@@ -20,7 +20,32 @@ fn main() {
     match raw_path {
         Some(path) => {
             if path == "report" {
-                handle_open("https://github.com/FloatingComet62/comrade/issues/new?assignees=&labels=&template=bug_report.md&title=")
+                handle_open("https://github.com/FloatingComet62/comrade/issues/new?assignees=&labels=&template=bug_report.md&title=");
+                exit("", Some(0));
+            }
+            if path == "help" {
+                println!(
+                    "
+comrade test.cmr -t
+Print the tokens
+
+comrade test.cmr -a
+Print the AST generated
+
+comrade test.cmr -c
+Print the c code generated
+
+comrade test.cmr -clang
+Use clang to compile instead of gcc
+
+comrade report
+To report a bug
+
+comrade help
+To print this message
+                "
+                );
+                exit("", Some(0));
             }
             let data = read_file(&path);
             let parser = Parser::new(data);
@@ -36,10 +61,6 @@ fn main() {
                 .arg("-o main.exe")
                 .spawn()
                 .expect("Failed to compile C code");
-            // Command::new("del")
-            //     .arg(out_path)
-            //     .spawn()
-            //     .expect("Failed to delete C file");
         }
         None => exit("No input files passed", None),
     }
