@@ -1,6 +1,6 @@
 use comrade::{exit, lexer::Parser, read_file, write_file};
 use open::that;
-use std::env;
+use std::{env, process::Command};
 
 fn main() {
     let args: Vec<_> = env::args().collect();
@@ -8,7 +8,14 @@ fn main() {
     let print_tokens = args.contains(&"-t".to_string());
     let print_ast = args.contains(&"-a".to_string());
     let print_c_code = args.contains(&"-c".to_string());
+    let clang = args.contains(&"-clang".to_string());
 
+    let compiler;
+    if clang {
+        compiler = "clang";
+    } else {
+        compiler = "gcc";
+    }
     let out_path = "out.c";
     match raw_path {
         Some(path) => {
@@ -24,6 +31,15 @@ fn main() {
                     None,
                 )
             }
+            Command::new(compiler)
+                .arg(out_path)
+                .arg("-o main.exe")
+                .spawn()
+                .expect("Failed to compile C code");
+            // Command::new("del")
+            //     .arg(out_path)
+            //     .spawn()
+            //     .expect("Failed to delete C file");
         }
         None => exit("No input files passed", None),
     }
