@@ -27,6 +27,7 @@ pub fn parser(
             if temp_operation != Operations::NULL {
                 operation = temp_operation;
                 operator = cell;
+                break;
             }
         }
 

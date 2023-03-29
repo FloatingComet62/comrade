@@ -1,6 +1,10 @@
 use crate::Expression;
 
 pub fn compile(input: &Expression) -> String {
+    if input.expr == vec!["NULL".to_string()] {
+        return "NULL".to_string();
+    }
+
     let mut output = String::new();
     let mut list_indexing = false;
     for (i, item) in input.expr.iter().enumerate() {

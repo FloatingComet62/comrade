@@ -6,7 +6,7 @@ use crate::type_from_str;
 pub fn parser(
     program: &mut Vec<Node>,
     data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
-    mut identifiers: &mut Vec<Vec<String>>,
+    identifiers: &mut Vec<Vec<String>>,
     mut enum_values: &mut Vec<Vec<String>>,
     mut struct_data: &mut Vec<Vec<String>>,
 ) -> usize {
@@ -37,24 +37,18 @@ pub fn parser(
 
     // update identifiers
     let arg_identifiers = arg_to_identifier(&args);
-    identifiers.append(&mut arg_identifiers.clone());
+    let mut fun_identifiers = identifiers.clone();
+    fun_identifiers.append(&mut arg_identifiers.clone());
 
     let nodes = load(
         &data.2,
-        &mut identifiers,
+        &mut fun_identifiers,
         &mut enum_values,
         &mut struct_data,
     );
 
-    // remove identifiers
-    identifiers.retain(|iden| {
-        for arg_iden in arg_identifiers.iter() {
-            if iden == arg_iden {
-                return false;
-            }
-        }
-        true
-    });
+    // original identifiers is untouched and all the variables are inside fun_identifiers
+    // which is gonna die after this function call ends
 
     program.push(node!(
         function,

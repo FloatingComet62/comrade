@@ -78,7 +78,7 @@ impl Lexer {
         Self {
             splitted_text,
             program: vec![],
-            keywords: vec![str_list_to_string_list(vec!["default"])],
+            keywords: vec![vec!["default".to_string()], vec!["NULL".to_string()]],
             libs: vec![
                 str_list_to_string_list(vec!["std", "io"]),
                 str_list_to_string_list(vec!["std", "math"]),
