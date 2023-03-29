@@ -1,5 +1,0 @@
-fun main(_argc -> i32, _argv -> str[]) => u8 {
-    const thingy = 73
-    erase thingy
-    return 0
-}

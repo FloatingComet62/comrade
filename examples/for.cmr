@@ -1,8 +1,0 @@
-include std->io
-
-fun main(_agrc -> i32, _argv -> str[]) => u8 {
-    for let i = 0 / i != 5 / i = i + 1 {
-        io->out(i)
-    }
-    return 0
-}

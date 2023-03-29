@@ -3,7 +3,9 @@ include std->io
 fun main(_argc -> i32, _argv -> str[]) => u8 {
     let a = 5
     a += 2
-    if io->in(i32) > 5 {
+    let res = 0
+    io->in(res)
+    if res > 5 {
         a += 10
     } else {
         a -= 1
@@ -12,7 +14,10 @@ fun main(_argc -> i32, _argv -> str[]) => u8 {
 
     a = 5
 
-    a -= io->in(i32)
+    let sub = 0
+    io->in(sub)
+    a -= sub
+    
     io->out(a)
 
     return 0

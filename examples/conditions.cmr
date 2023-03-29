@@ -2,7 +2,8 @@ include std->io
 
 fun main(_argc -> i32, _argv -> str[]) => u8 {
     io->out("Enter age: ")
-    const input = io->in(i32)
+    let input = 0
+    io->in(input)
     if input >= 18 {
         io->out("Here is your beer")
     } else if input >= 13 {

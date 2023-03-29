@@ -1,21 +1,14 @@
 
-fun y() => i32 {
-    return y()
+fun x() => i32 {
+    return 0
 }
 
 externC {
     #include <stdio.h>
 
-    int x() {
-        return y();
-    }
-  
     int main() {
-        // prints hello world
         printf("Hello World");
     
         return x();
     }
 }
-
-public const THREE = 3

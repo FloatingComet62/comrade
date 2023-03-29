@@ -1,3 +1,5 @@
+include std->io
+
 struct User {
     name -> str
     sex -> bool
@@ -10,5 +12,6 @@ fun main(_argc -> i32, _argv -> str[]) => u8 {
         false,
         16
     }
+    io->out(user.name)
     return 0
 }
