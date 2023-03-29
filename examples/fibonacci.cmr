@@ -1,0 +1,19 @@
+include std->io
+
+fun fib(x -> i32) => i32 {
+    if x <= 0 {
+        return 0
+    }
+    match x {
+        1 => return 0
+        2 => return 1
+        default => return fib(x-1) + fib(x-2)
+    }
+}
+
+fun main() => i32 {
+    io->out("Enter number: ")
+    let x -> i32 = 0
+    io->in(x)
+    io->out(fib(x))
+}
