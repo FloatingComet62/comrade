@@ -17,7 +17,7 @@ pub fn compiler(
     semi_colon_needed: bool,
     is_inside_function_call: bool,
 ) -> String {
-    let mut output = init_code.clone();
+    let mut output = init_code;
     for i in 0..program.len() {
         let item = &mut program.clone()[i];
         // macro_rules! node_type_check {
@@ -27,24 +27,26 @@ pub fn compiler(
         //         }
         //     };
         // }
-        if is_inside_function_call {
-            // passing lists inside function calls
-            // issue:
-            // int x[] = {1, 2, 3, 4, 5};
-            // printf("%d\n", sum(x));
-            //
-            // // both give error
-            // // printf("%d\n", sum({1, 2, 3, 4, 5}));
-            // // int x[] = (int[]){1, 2, 3, 4, 5};
-            //
-            // printf("%d\n", sum((int[]){1, 2, 3, 4, 5}));
-            // return 0;
-        } else {
-        }
+        // if is_inside_function_call {
+
+        // passing lists inside function calls
+        // issue:
+        // int x[] = {1, 2, 3, 4, 5};
+        // printf("%d\n", sum(x));
+        //
+        // // both give error
+        // // printf("%d\n", sum({1, 2, 3, 4, 5}));
+        // // int x[] = (int[]){1, 2, 3, 4, 5};
+        //
+        // printf("%d\n", sum((int[]){1, 2, 3, 4, 5}));
+        // return 0;
+
+        // } else {
+        // }
         if let Some(l) = &item.literal {
-            if l.literal.contains("_") {
-                let enum_vals: Vec<&str> = l.literal.split("_").collect();
-                output += &enum_vals[1];
+            if l.literal.contains('_') {
+                let enum_vals: Vec<&str> = l.literal.split('_').collect();
+                output += enum_vals[1];
             } else {
                 output += &l.literal;
             }

@@ -1,8 +1,8 @@
-use comrade::{lexer::Parser, node, Literal, Math, Node, Operations, Types};
+use comrade::{lexer::Lexer, node, Literal, Math, Node, Operations, Types};
 
 macro_rules! math_test {
     ($op_str: expr, $op: expr) => {
-        let lexer = Parser::new(format!("5 {} 5", $op_str));
+        let lexer = Lexer::new(format!("5 {} 5", $op_str));
         let program = lexer.parse(false, false, false, false);
         assert_eq!(
             program.0,

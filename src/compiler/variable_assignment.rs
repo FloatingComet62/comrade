@@ -29,7 +29,7 @@ fn value(input: &mut VariableAssignment) -> String {
         }
     }
     output += " }";
-    return output;
+    output
 }
 
 fn types(input: &VariableAssignment) -> (String, bool) {
@@ -49,5 +49,5 @@ fn types(input: &VariableAssignment) -> (String, bool) {
         return (output, false);
     }
     let res = type_to_c_type(&type_check);
-    return (res.0.to_string(), res.1);
+    (res.0.to_string(), res.1)
 }

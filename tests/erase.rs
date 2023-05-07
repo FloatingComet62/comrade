@@ -1,8 +1,8 @@
-use comrade::{lexer::Parser, node, Expression, Node, Statement};
+use comrade::{lexer::Lexer, node, Expression, Node, Statement};
 
 #[test]
 fn test() {
-    let lexer = Parser::new(
+    let lexer = Lexer::new(
         "
 let a = 5
 erase a

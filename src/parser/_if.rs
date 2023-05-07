@@ -6,15 +6,15 @@ pub fn parser(
     data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
     text: &String,
     previous_text: &String,
-    input: &Vec<String>,
+    input: &[String],
     i: usize,
-    mut identifiers: &mut Vec<Vec<String>>,
-    mut enum_values: &mut Vec<Vec<String>>,
-    mut struct_data: &mut Vec<Vec<String>>,
+    identifiers: &mut Vec<Vec<String>>,
+    enum_values: &mut Vec<Vec<String>>,
+    struct_data: &mut Vec<Vec<String>>,
 ) -> usize {
     if text == "if" {
         if previous_text == "else" {
-            let last_data = is_last_an_if(&program);
+            let last_data = is_last_an_if(program);
             if last_data == 0 {
                 exit("Missing if part for else if", None);
             }
@@ -22,18 +22,8 @@ pub fn parser(
                 condition_block,
                 ConditionBlock {
                     keyword: "else if".to_string(),
-                    parameters: load(
-                        &data.1,
-                        &mut identifiers,
-                        &mut enum_values,
-                        &mut struct_data
-                    ),
-                    nodes: load(
-                        &data.2,
-                        &mut identifiers,
-                        &mut enum_values,
-                        &mut struct_data
-                    ),
+                    parameters: load(&data.1, identifiers, enum_values, struct_data),
+                    nodes: load(&data.2, identifiers, enum_values, struct_data),
                 }
             ));
             return data.0;
@@ -42,18 +32,8 @@ pub fn parser(
             condition_block,
             ConditionBlock {
                 keyword: "if".to_string(),
-                parameters: load(
-                    &data.1,
-                    &mut identifiers,
-                    &mut enum_values,
-                    &mut struct_data
-                ),
-                nodes: load(
-                    &data.2,
-                    &mut identifiers,
-                    &mut enum_values,
-                    &mut struct_data
-                ),
+                parameters: load(&data.1, identifiers, enum_values, struct_data),
+                nodes: load(&data.2, identifiers, enum_values, struct_data),
             }
         ));
     }
@@ -65,7 +45,7 @@ pub fn parser(
             return i;
         }
 
-        let last_node = is_last_an_if(&program);
+        let last_node = is_last_an_if(program);
         if last_node == 0 {
             exit("Missing if part for else", None);
         }
@@ -74,12 +54,7 @@ pub fn parser(
             ConditionBlock {
                 keyword: "else".to_string(),
                 parameters: vec![],
-                nodes: load(
-                    &data.2,
-                    &mut identifiers,
-                    &mut enum_values,
-                    &mut struct_data
-                ),
+                nodes: load(&data.2, identifiers, enum_values, struct_data),
             }
         ));
     }
@@ -93,12 +68,11 @@ pub fn parser(
 */
 fn is_last_an_if(program: &Vec<Node>) -> u8 {
     let blank = Node::blank();
-    let last_node;
-    if program.len() == 0 {
-        last_node = &blank;
+    let last_node = if program.is_empty() {
+        &blank
     } else {
-        last_node = program.get(program.len() - 1).unwrap_or(&blank);
-    }
+        program.last().unwrap_or(&blank)
+    };
     if let Some(condition_node) = &last_node.condition_block {
         if condition_node.keyword == "if" {
             return 1;
@@ -108,5 +82,5 @@ fn is_last_an_if(program: &Vec<Node>) -> u8 {
         }
         return 0;
     }
-    return 0;
+    0
 }

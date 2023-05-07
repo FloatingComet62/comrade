@@ -8,9 +8,9 @@ pub fn parser(
     data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
     input: &Vec<String>,
     i: usize,
-    mut identifiers: &mut Vec<Vec<String>>,
-    mut enum_values: &mut Vec<Vec<String>>,
-    mut struct_data: &mut Vec<Vec<String>>,
+    identifiers: &mut Vec<Vec<String>>,
+    enum_values: &mut Vec<Vec<String>>,
+    struct_data: &mut Vec<Vec<String>>,
 ) -> usize {
     let mut operator = "";
     let mut operation = Operations::NULL;
@@ -37,15 +37,15 @@ pub fn parser(
     }
 
     let mut lhs = vec![text.to_string()];
-    let mut raw_lhs = get_till_token_or_block_and_math_block(operator, &input, i, false);
-    let rhs = get_till_token_or_block_and_math_block("EOL", &input, raw_lhs.0, false);
+    let mut raw_lhs = get_till_token_or_block_and_math_block(operator, input, i, false);
+    let rhs = get_till_token_or_block_and_math_block("EOL", input, raw_lhs.0, false);
     lhs.append(&mut raw_lhs.1);
 
     program.push(node!(
         math,
         Math {
-            lhs: load(&lhs, &mut identifiers, &mut enum_values, &mut struct_data),
-            rhs: load(&rhs.1, &mut identifiers, &mut enum_values, &mut struct_data),
+            lhs: load(&lhs, identifiers, enum_values, struct_data),
+            rhs: load(&rhs.1, identifiers, enum_values, struct_data),
             operation,
         }
     ));

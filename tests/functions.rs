@@ -1,11 +1,11 @@
 use comrade::{
-    lexer::Parser, node, Argument, Expression, Function, Literal, Math, Node, Operations,
-    Statement, Types,
+    lexer::Lexer, node, Argument, Expression, Function, Literal, Math, Node, Operations, Statement,
+    Types,
 };
 
 #[test]
 fn test() {
-    let lexer = Parser::new(
+    let lexer = Lexer::new(
         "
 fun add_3(x -> u32) => u32 {
     return x + 3

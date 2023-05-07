@@ -1,14 +1,15 @@
 use super::{load, Argument, Function, Node, Types};
-use crate::exit;
-use crate::node;
-use crate::type_from_str;
+use crate::{
+    errors::{send_error, Errors},
+    exit, node, type_from_str,
+};
 
 pub fn parser(
     program: &mut Vec<Node>,
     data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
-    identifiers: &mut Vec<Vec<String>>,
-    mut enum_values: &mut Vec<Vec<String>>,
-    mut struct_data: &mut Vec<Vec<String>>,
+    identifiers: &mut [Vec<String>],
+    enum_values: &mut Vec<Vec<String>>,
+    struct_data: &mut Vec<Vec<String>>,
 ) -> usize {
     // todo: maybe reimplement this with get_till_token_or_block ?
     let mut getting_args = false;
@@ -36,16 +37,27 @@ pub fn parser(
     let return_type = type_from_str(&data.1[data.1.len() - 1]);
 
     // update identifiers
-    let arg_identifiers = arg_to_identifier(&args);
-    let mut fun_identifiers = identifiers.clone();
-    fun_identifiers.append(&mut arg_identifiers.clone());
+    let mut arg_identifiers = arg_to_identifier(&args);
+    let mut fun_identifiers = identifiers.to_owned();
+    fun_identifiers.append(&mut arg_identifiers);
 
-    let nodes = load(
-        &data.2,
-        &mut fun_identifiers,
-        &mut enum_values,
-        &mut struct_data,
-    );
+    let nodes = load(&data.2, &mut fun_identifiers, enum_values, struct_data);
+
+    // checking if an argument is missing type anotation
+    for arg in args.iter() {
+        if arg.a_type == Types::None {
+            send_error(
+                Errors::UNDEFINEDIDENTIFIER,
+                format!(
+                    "Argument {} of Function {} is missing type anotation",
+                    arg.identifier,
+                    identifier.join("->")
+                ),
+                0,
+                0,
+            );
+        }
+    }
 
     // original identifiers is untouched and all the variables are inside fun_identifiers
     // which is gonna die after this function call ends
@@ -73,7 +85,7 @@ fn arg_to_identifier(args: &Vec<Argument>) -> Vec<Vec<String>> {
 }
 
 fn handle_a_type(args: Vec<Argument>, cell: &String, a_type: Types) -> Vec<Argument> {
-    let mut output = args.clone();
+    let mut output = args;
     match a_type {
         Types::None => output.push(Argument {
             identifier: cell.to_string(),

@@ -6,9 +6,9 @@ use super::{load, ConditionBlock, Node};
 pub fn parser(
     program: &mut Vec<Node>,
     data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
-    mut identifiers: &mut Vec<Vec<String>>,
-    mut enum_values: &mut Vec<Vec<String>>,
-    mut struct_data: &mut Vec<Vec<String>>,
+    identifiers: &mut Vec<Vec<String>>,
+    enum_values: &mut Vec<Vec<String>>,
+    struct_data: &mut Vec<Vec<String>>,
 ) -> usize {
     let mut raw_params = vec![];
     for thingy in data.1.iter() {
@@ -22,18 +22,8 @@ pub fn parser(
         condition_block,
         ConditionBlock {
             keyword: "function".to_string(),
-            parameters: load(
-                &raw_params,
-                &mut identifiers,
-                &mut enum_values,
-                &mut struct_data
-            ),
-            nodes: load(
-                &data.2,
-                &mut identifiers,
-                &mut enum_values,
-                &mut struct_data
-            ),
+            parameters: load(&raw_params, identifiers, enum_values, struct_data),
+            nodes: load(&data.2, identifiers, enum_values, struct_data),
         }
     ));
     data.0

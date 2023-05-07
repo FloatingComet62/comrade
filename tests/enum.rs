@@ -1,8 +1,8 @@
-use comrade::{lexer::Parser, node, Enum, Node};
+use comrade::{lexer::Lexer, node, Enum, Node};
 
 #[test]
 fn test() {
-    let lexer = Parser::new(
+    let lexer = Lexer::new(
         "
 enum Emotions {
     Good,

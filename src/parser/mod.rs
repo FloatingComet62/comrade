@@ -1,15 +1,14 @@
 use crate::{
+    errors::{send_error, Errors},
     node, str_list_to_string_list, type_from_str, Argument, ConditionBlock, Enum, Expression,
     ExternC, Function, FunctionCall, Literal, Match, MatchCase, Math, Node, NodeData, Statement,
     Struct, StructMember, StructValue, Types, VariableAssignment,
 };
 use std::fmt::Debug;
 
-mod _const;
 mod _enum;
 mod _for;
 mod _if;
-mod _let;
 mod _match;
 mod _struct;
 mod _while;
@@ -19,6 +18,7 @@ mod fun;
 mod fun_call;
 mod include_n_return_n_erase;
 mod math;
+mod variable_assignment;
 
 impl Debug for Node {
     // don't display n_type
@@ -67,13 +67,13 @@ impl Node {
     }
 }
 
-pub struct Lexer {
+pub struct Parser {
     pub splitted_text: Vec<String>,
     pub program: Vec<Node>,
     pub keywords: Vec<Vec<String>>,
     pub libs: Vec<Vec<String>>,
 }
-impl Lexer {
+impl Parser {
     pub fn new(splitted_text: Vec<String>) -> Self {
         Self {
             splitted_text,
@@ -92,6 +92,7 @@ impl Lexer {
     new index
     content till token
     block found
+    & math block found
 */
 pub fn get_till_token_or_block_and_math_block(
     token: &str,
@@ -113,6 +114,7 @@ pub fn get_till_token_or_block_and_math_block(
             oh_god_we_reached_the_start_while_going_back = true;
             0
         });
+        send_error(Errors::MISSINGBLOCK, String::new(), 0, 0);
     } else {
         j += 1;
     }
@@ -130,40 +132,41 @@ pub fn get_till_token_or_block_and_math_block(
         if text == "EOL" {
             is_comment = false;
         }
-        if !is_comment {
-            let operator = is_math(text.to_string());
-            if let Ok(_) = &operator {
-                math_block.push(text.to_string());
-            }
+        if is_comment {
+            continue;
+        }
+        let operator = is_math(text.to_string());
+        if operator.is_ok() {
+            math_block.push(text.to_string());
+        }
 
-            if text == "{" {
-                getting_block += 1;
-            }
-            if text == "(" && token != "(" {
-                // we are not getting the (, then get the entire function
-                getting_function_call += 1;
-            }
-            if text == ")" {
-                getting_function_call -= 1;
-            }
-            if text == token && getting_block == 0 && getting_function_call == 0 {
+        if text == "{" {
+            getting_block += 1;
+        }
+        if text == "(" && token != "(" {
+            // we are not getting the (, then get the entire function
+            getting_function_call += 1;
+        }
+        if text == ")" {
+            getting_function_call -= 1;
+        }
+        if text == token && getting_block == 0 && getting_function_call == 0 {
+            break;
+        }
+        if getting_block > 0 {
+            block.push(text.to_string());
+        } else {
+            output.push(text.to_string());
+        }
+        // ! must be last
+        if text == "}" {
+            got_block = true;
+            getting_block -= 1;
+            if getting_block == 0 && getting_function_call == 0 {
+                // got a random block?
+                // IT PROBABLY WAS IMPORTANT OR SOMETHING, ISN'T IT
+                // stop everything, just return
                 break;
-            }
-            if getting_block > 0 {
-                block.push(text.to_string());
-            } else {
-                output.push(text.to_string());
-            }
-            // ! must be last
-            if text == "}" {
-                got_block = true;
-                getting_block -= 1;
-                if getting_block == 0 && getting_function_call == 0 {
-                    // got a random block?
-                    // IT PROBABLY WAS IMPORTANT OR SOMETHING, ISN'T IT
-                    // stop everything, just return
-                    break;
-                }
             }
         }
 
@@ -176,56 +179,37 @@ pub fn get_till_token_or_block_and_math_block(
             j += 1;
         }
     }
-    return (j, output, block, got_block, math_block);
+    (j, output, block, got_block, math_block)
 }
 
 fn is_math(token: String) -> Result<(), ()> {
-    if token == "+".to_string() {
-        return Ok(());
-    } else if token == "-".to_string() {
-        return Ok(());
-    } else if token == "*".to_string() {
-        return Ok(());
-    } else if token == "/".to_string() {
-        return Ok(());
-    } else if token == "+=".to_string() {
-        return Ok(());
-    } else if token == "-=".to_string() {
-        return Ok(());
-    } else if token == "*=".to_string() {
-        return Ok(());
-    } else if token == "/=".to_string() {
-        return Ok(());
-    } else if token == "=".to_string() {
-        return Ok(());
-    } else if token == "==".to_string() {
-        return Ok(());
-    } else if token == "!=".to_string() {
-        return Ok(());
-    } else if token == ">".to_string() {
-        return Ok(());
-    } else if token == "<".to_string() {
-        return Ok(());
-    } else if token == ">=".to_string() {
-        return Ok(());
-    } else if token == "<=".to_string() {
-        return Ok(());
-    } else if token == "(".to_string() {
-        return Ok(());
-    } else if token == ")".to_string() {
-        return Ok(());
-    } else {
-        return Err(());
+    let math_tokens = str_list_to_string_list(
+        [
+            "+", "-", "*", "/", "+=", "-=", "*=", "/=", "=", "==", "!=", ">", "<", ">=", "<=", "(",
+            ")",
+        ]
+        .to_vec(),
+    );
+    for math_token in math_tokens.iter() {
+        if &token == math_token {
+            return Ok(());
+        }
     }
+    Err(())
 }
 
+/// Generate the AST
+/// * `identifiers` - Identifiers to look out for
+/// * `enum_values` - Enum Values to look out for
+/// * `struct_data` - Structs to look out for
 pub fn load(
     input: &Vec<String>,
-    mut identifiers: &mut Vec<Vec<String>>,
-    mut enum_values: &mut Vec<Vec<String>>,
-    mut struct_data: &mut Vec<Vec<String>>,
+    identifiers: &mut Vec<Vec<String>>,
+    enum_values: &mut Vec<Vec<String>>,
+    struct_data: &mut Vec<Vec<String>>,
 ) -> Vec<Node> {
     let mut program = vec![];
+    // previous token
     let mut previous_text;
     let mut text = &String::new();
     let mut i = 0;
@@ -250,15 +234,15 @@ pub fn load(
             vec![
                 "+", "-", "*", "/", "==", "=", ">", "<", "<=", ">=", "!=", "+=", "-=", "*=", "/=",
             ],
-            Mode::OR,
+            Mode::Or,
         ) {
             // identifier check
-            for j in 0..identifiers.len() {
-                if text == identifiers[j][0].as_str() {
+            for iden in identifiers.iter() {
+                if text == iden[0].as_str() {
                     let mut identifer = true;
-                    for k in 0..identifiers[j].len() {
+                    for (k, id) in iden.iter().enumerate() {
                         if let Some(to_check) = input.get(i + k) {
-                            if to_check != identifiers[j][k].as_str() {
+                            if to_check != id.as_str() {
                                 identifer = false;
                             }
                         } else {
@@ -267,7 +251,7 @@ pub fn load(
                         }
                     }
                     if identifer {
-                        let mut idenf = identifiers[j].clone();
+                        let mut idenf = iden.clone();
                         if let Some(first) = input.get(i + 1) {
                             if first == "[" {
                                 if let Some(second) = input.get(i + 3) {
@@ -287,7 +271,7 @@ pub fn load(
                             }
                         }
                         program.push(node!(expression, Expression { expr: idenf }));
-                        i += identifiers[j].len();
+                        i += iden.len();
                         break;
                     }
                 }
@@ -314,26 +298,28 @@ pub fn load(
         if text == "externC" {
             i = extern_c::parser(&mut program, data);
         } else if text == "let" {
-            i = _let::parser(
+            i = variable_assignment::parser(
                 &mut program,
                 data,
                 input,
                 i,
                 &previous_text,
-                &mut identifiers,
-                &mut enum_values,
-                &mut struct_data,
+                identifiers,
+                enum_values,
+                struct_data,
+                false,
             );
         } else if text == "const" {
-            i = _const::parser(
+            i = variable_assignment::parser(
                 &mut program,
                 data,
                 input,
                 i,
                 &previous_text,
-                &mut identifiers,
-                &mut enum_values,
-                &mut struct_data,
+                identifiers,
+                enum_values,
+                struct_data,
+                true,
             );
         } else if text == "include" || text == "return" || text == "erase" {
             i = include_n_return_n_erase::parser(
@@ -341,8 +327,8 @@ pub fn load(
                 data,
                 text,
                 identifiers,
-                &mut enum_values,
-                &mut struct_data,
+                enum_values,
+                struct_data,
             );
         } else if text == "true" || text == "false" {
             i = booleans::parser(&mut program, data, text);
@@ -354,51 +340,27 @@ pub fn load(
                 &previous_text,
                 input,
                 i,
-                &mut identifiers,
-                &mut enum_values,
-                &mut struct_data,
+                identifiers,
+                enum_values,
+                struct_data,
             );
         } else if text == "while" {
-            i = _while::parser(
-                &mut program,
-                data,
-                &mut identifiers,
-                &mut enum_values,
-                &mut struct_data,
-            );
+            i = _while::parser(&mut program, data, identifiers, enum_values, struct_data);
         // } else if text == "for" {
         // i = _for::parser(&mut program, data, &mut identifiers);
         } else if text == "struct" {
-            i = _struct::parser(
-                &mut program,
-                data,
-                &mut identifiers,
-                &mut enum_values,
-                &mut struct_data,
-            );
+            i = _struct::parser(&mut program, data, identifiers, enum_values, struct_data);
         } else if text == "enum" {
-            i = _enum::parser(
-                &mut program,
-                data,
-                &mut identifiers,
-                &mut enum_values,
-                &mut struct_data,
-            );
+            i = _enum::parser(&mut program, data, identifiers, enum_values, struct_data);
         } else if text == "fun" {
-            i = fun::parser(
-                &mut program,
-                data,
-                &mut identifiers,
-                &mut enum_values,
-                &mut struct_data,
-            );
+            i = fun::parser(&mut program, data, identifiers, enum_values, struct_data);
         } else if has(
             &data.1,
             vec![
                 "+", "-", "*", "/", "==", "=", ">", "<", "<=", ">=", "!=", "+=", "-=", "*=", "/=",
             ],
-            Mode::OR,
-        ) && !has(&data.1, vec!["let", "const"], Mode::OR)
+            Mode::Or,
+        ) && !has(&data.1, vec!["let", "const"], Mode::Or)
             && {
                 //checking if the math found is inside a block
                 // eg. fib(x-1)
@@ -416,7 +378,7 @@ pub fn load(
                         blocked -= 1;
                     }
                 }
-                unblocked_op.len() != 0
+                !unblocked_op.is_empty()
             }
         {
             i = math::parser(
@@ -425,9 +387,9 @@ pub fn load(
                 data,
                 input,
                 i,
-                &mut identifiers,
-                &mut enum_values,
-                &mut struct_data,
+                identifiers,
+                enum_values,
+                struct_data,
             );
         } else if text.chars().next().unwrap_or('\0') == '\"' {
             program.push(node!(
@@ -454,23 +416,17 @@ pub fn load(
                 }
             ));
         } else if text == "match" {
-            i = _match::parser(
-                &mut program,
-                data,
-                &mut identifiers,
-                &mut enum_values,
-                &mut struct_data,
-            );
-        } else if has(&data.1, vec!["(", ")"], Mode::AND) {
+            i = _match::parser(&mut program, data, identifiers, enum_values, struct_data);
+        } else if has(&data.1, vec!["(", ")"], Mode::And) {
             // also, it's a function call when there is no fun
             i = fun_call::parser(
                 &mut program,
                 text,
                 input,
                 i,
-                &mut identifiers,
-                &mut enum_values,
-                &mut struct_data,
+                identifiers,
+                enum_values,
+                struct_data,
             );
         }
         i += 1;
@@ -480,16 +436,16 @@ pub fn load(
 }
 
 fn is_digit(c: char) -> bool {
-    c >= '0' && c <= '9'
+    ('0'..='9').contains(&c)
 }
 
 enum Mode {
-    OR,
-    AND,
+    Or,
+    And,
 }
-fn has(data: &Vec<String>, things: Vec<&str>, mode: Mode) -> bool {
+fn has(data: &[String], things: Vec<&str>, mode: Mode) -> bool {
     match mode {
-        Mode::AND => {
+        Mode::And => {
             for thing in things {
                 if !data.contains(&thing.to_string()) {
                     return false;
@@ -497,7 +453,7 @@ fn has(data: &Vec<String>, things: Vec<&str>, mode: Mode) -> bool {
             }
             true
         }
-        Mode::OR => {
+        Mode::Or => {
             for thing in things {
                 if data.contains(&thing.to_string()) {
                     return true;

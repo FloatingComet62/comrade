@@ -7,18 +7,18 @@ pub fn parser(
     text: &String,
     input: &Vec<String>,
     i: usize,
-    mut identifiers: &mut Vec<Vec<String>>,
-    mut enum_values: &mut Vec<Vec<String>>,
-    mut struct_data: &mut Vec<Vec<String>>,
+    identifiers: &mut Vec<Vec<String>>,
+    enum_values: &mut Vec<Vec<String>>,
+    struct_data: &mut Vec<Vec<String>>,
 ) -> usize {
     let mut identifier = vec![text.to_string()];
-    let mut raw_identifier = get_till_token_or_block_and_math_block("(", &input, i, false);
+    let mut raw_identifier = get_till_token_or_block_and_math_block("(", input, i, false);
 
     identifier.append(&mut raw_identifier.1);
 
     let mut raw_args = vec![];
     let mut raw_raw_args =
-        get_till_token_or_block_and_math_block(")", &input, raw_identifier.0 - 1, false);
+        get_till_token_or_block_and_math_block(")", input, raw_identifier.0 - 1, false);
 
     // basically, join the block you found with the main content
     raw_args.append(&mut raw_raw_args.1);
@@ -43,28 +43,18 @@ pub fn parser(
     let mut arg: Vec<String> = vec![];
     for item in &raw_args {
         if item == "," {
-            if arg.len() > 0 {
+            if !arg.is_empty() {
                 arg.push("EOL".to_string());
-                args.push(load(
-                    &arg,
-                    &mut identifiers,
-                    &mut enum_values,
-                    &mut struct_data,
-                ));
+                args.push(load(&arg, identifiers, enum_values, struct_data));
             }
             arg = vec![];
             continue;
         }
         arg.push(item.to_string());
     }
-    if arg.len() > 0 {
+    if !arg.is_empty() {
         arg.push("EOL".to_string());
-        args.push(load(
-            &arg,
-            &mut identifiers,
-            &mut enum_values,
-            &mut struct_data,
-        ));
+        args.push(load(&arg, identifiers, enum_values, struct_data));
     }
     program.push(node!(
         function_call,

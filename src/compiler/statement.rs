@@ -1,8 +1,8 @@
-use crate::{lexer::Parser, read_file, Expression, Node, Statement};
+use crate::{lexer::Lexer, read_file, Expression, Node, Statement};
 
 use super::compiler;
 
-fn param_to_path(param: &Vec<Node>) -> String {
+fn param_to_path(param: &[Node]) -> String {
     let mut path = String::new();
     let param_vec = param[0]
         .expression
@@ -19,7 +19,7 @@ fn param_to_path(param: &Vec<Node>) -> String {
     path
 }
 
-fn param_to_iden_vec(params: &Vec<Node>, identifier: &Vec<String>) -> Vec<String> {
+fn param_to_iden_vec(params: &Vec<Node>, identifier: &[String]) -> Vec<String> {
     let mut output = vec![];
     let expr = params[params.len() - 1]
         .expression
@@ -27,20 +27,20 @@ fn param_to_iden_vec(params: &Vec<Node>, identifier: &Vec<String>) -> Vec<String
         .unwrap_or(Expression { expr: vec![] })
         .expr;
     output.append(&mut vec![expr[expr.len() - 1].clone(), "_".to_string()]);
-    output.append(&mut identifier.clone());
+    output.append(&mut identifier.to_owned());
     output
 }
 
-pub fn compile(_program: &mut Vec<Node>, input: &mut Statement) -> String {
+pub fn compile(_program: &mut [Node], input: &mut Statement) -> String {
     let mut output = String::new();
     if input.action == "include" {
         let lib = param_to_path(&input.parameters);
-        let parse = Parser::new(read_file(&lib));
+        let parse = Lexer::new(read_file(&lib));
         let mut lib_tokens_to_parse = vec![];
         let (lib_tokens, _) = parse.parse(false, false, false, false);
         for i in 0..lib_tokens.len() {
             let raw_lib_token = &lib_tokens.get(i);
-            if let None = &raw_lib_token {
+            if raw_lib_token.is_none() {
                 continue;
             }
             let lib_token = &mut raw_lib_token.unwrap().clone();

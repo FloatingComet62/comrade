@@ -1,11 +1,11 @@
 use comrade::{
-    lexer::Parser, node, str_list_to_string_list, Expression, Literal, Node, Statement, Types,
+    lexer::Lexer, node, str_list_to_string_list, Expression, Literal, Node, Statement, Types,
     VariableAssignment,
 };
 
 #[test]
 fn test() {
-    let lexer = Parser::new("return 2".to_string());
+    let lexer = Lexer::new("return 2".to_string());
     let program = lexer.parse(false, false, false, false);
     assert_eq!(
         program.0,
@@ -24,7 +24,7 @@ fn test() {
         )]
     );
 
-    let lexer = Parser::new(
+    let lexer = Lexer::new(
         "
 let a = 2
 return a

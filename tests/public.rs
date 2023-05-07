@@ -1,8 +1,8 @@
-use comrade::{lexer::Parser, node, Literal, Node, Types, VariableAssignment};
+use comrade::{lexer::Lexer, node, Literal, Node, Types, VariableAssignment};
 
 #[test]
 fn test() {
-    let lexer = Parser::new("public const a = 5".to_string());
+    let lexer = Lexer::new("public const a = 5".to_string());
     let program = lexer.parse(false, false, false, false);
     assert_eq!(
         program.0,
@@ -23,7 +23,7 @@ fn test() {
             }
         )]
     );
-    let lexer = Parser::new("public let a = 5".to_string());
+    let lexer = Lexer::new("public let a = 5".to_string());
     let program = lexer.parse(false, false, false, false);
     assert_eq!(
         program.0,

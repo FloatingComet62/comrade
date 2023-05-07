@@ -1,8 +1,8 @@
-use comrade::{lexer::Parser, node, Node, Struct, StructMember, Types};
+use comrade::{lexer::Lexer, node, Node, Struct, StructMember, Types};
 
 #[test]
 fn test() {
-    let lexer = Parser::new(
+    let lexer = Lexer::new(
         "
 struct User {
     name -> str

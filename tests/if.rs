@@ -1,10 +1,10 @@
 use comrade::{
-    lexer::Parser, node, ConditionBlock, FunctionCall, Literal, Math, Node, Operations, Types,
+    lexer::Lexer, node, ConditionBlock, FunctionCall, Literal, Math, Node, Operations, Types,
 };
 
 #[test]
 fn test() {
-    let lexer = Parser::new(
+    let lexer = Lexer::new(
         "
 if 5 > 5 {
     io->out(\"Hello World\")

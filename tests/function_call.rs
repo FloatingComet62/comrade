@@ -1,11 +1,11 @@
 use comrade::{
-    lexer::Parser, node, Expression, FunctionCall, Literal, Node, Statement, Types,
+    lexer::Lexer, node, Expression, FunctionCall, Literal, Node, Statement, Types,
     VariableAssignment,
 };
 
 #[test]
 fn test() {
-    let lexer = Parser::new(
+    let lexer = Lexer::new(
         "
 let a = 5
 someRandomFunction(a, \"Hello World\", 35, {

@@ -1,11 +1,11 @@
 use comrade::{
-    lexer::Parser, node, str_list_to_string_list, Expression, FunctionCall, Literal, Match,
+    lexer::Lexer, node, str_list_to_string_list, Expression, FunctionCall, Literal, Match,
     MatchCase, Node, Types, VariableAssignment,
 };
 
 #[test]
 fn test() {
-    let lexer = Parser::new(
+    let lexer = Lexer::new(
         "
 match io->in(i32) {
     5 => {

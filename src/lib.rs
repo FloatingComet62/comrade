@@ -4,10 +4,11 @@ use std::ops::{Deref, DerefMut};
 use std::process;
 
 pub mod compiler;
+pub mod errors;
 pub mod lexer;
 pub mod parser;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Types {
     U4 = 1,
     U4List = 33,
@@ -141,7 +142,7 @@ macro_rules! node {
     }};
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Operations {
     NULL,
 
@@ -191,35 +192,35 @@ pub enum Operations {
     /// divide rhs to lhs
     DIVEQT,
 }
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Argument {
     pub identifier: String,
     pub a_type: Types,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Literal {
     pub literal: String,
     pub l_type: Types,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Statement {
     pub action: String,
     pub parameters: Vec<Node>,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Function {
     pub identifier: Vec<String>,
     pub return_type: Types,
     pub arguments: Vec<Argument>,
     pub nodes: Vec<Node>,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct FunctionCall {
     pub identifier: Vec<String>,
     pub arguments: Vec<Vec<Node>>,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct VariableAssignment {
     pub identifier: Vec<String>,
     pub value: Box<Vec<Node>>,
@@ -227,57 +228,75 @@ pub struct VariableAssignment {
     pub publicity: bool,
     pub type_data: String,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Expression {
     pub expr: Vec<String>, // maybe node? idk
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct ConditionBlock {
     pub keyword: String,
     pub parameters: Vec<Node>,
     pub nodes: Vec<Node>,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct MatchCase {
     pub case: Vec<Node>,
     pub block: Vec<Node>,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Match {
     pub condition: Vec<Node>,
     pub block: Vec<MatchCase>,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct StructMember {
     pub identifier: Vec<String>,
     pub t_mem: Types,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Struct {
     pub identifier: Vec<String>,
     pub members: Vec<StructMember>,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct StructValue {
     pub identifier: Vec<String>,
     pub values: Vec<Node>,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Enum {
     pub identifier: Vec<String>,
     pub members: Vec<String>,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Math {
     pub lhs: Vec<Node>,
     pub rhs: Vec<Node>,
     pub operation: Operations,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct ExternC {
     pub block: String,
 }
-#[derive(PartialEq, Clone)]
+
+// todo ->
+#[derive(Debug)]
+pub enum ND {
+    Statement(Statement),
+    Function(Function),
+    FunctionCall(FunctionCall),
+    VariableAssignment(VariableAssignment),
+    Expression(Expression),
+    ConditionBlock(ConditionBlock),
+    Match(Match),
+    Literal(Literal),
+    Math(Math),
+    Struct(Struct),
+    Enum(Enum),
+    ExternC(ExternC),
+    StructValue(StructValue),
+}
+#[derive(PartialEq, Eq, Clone)]
 pub struct NodeData {
     pub statement: Option<Statement>,
     pub function: Option<Function>,
@@ -321,7 +340,7 @@ impl Debug for NodeData {
     }
 }
 // todo: if by the end of the parser, all node has is "data", just make Node NodeData
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Eq, Clone)]
 pub struct Node {
     pub data: NodeData,
 }

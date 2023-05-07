@@ -1,11 +1,11 @@
 use comrade::{
-    lexer::Parser, node, str_list_to_string_list, ConditionBlock, Expression, FunctionCall,
-    Literal, Math, Node, Operations, Types, VariableAssignment,
+    lexer::Lexer, node, str_list_to_string_list, ConditionBlock, Expression, FunctionCall, Literal,
+    Math, Node, Operations, Types, VariableAssignment,
 };
 
 #[test]
 fn test() {
-    let lexer = Parser::new(
+    let lexer = Lexer::new(
         "
 let i = 0
 while i != 5 {

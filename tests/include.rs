@@ -1,8 +1,8 @@
-use comrade::{lexer::Parser, node, str_list_to_string_list, Expression, Node, Statement};
+use comrade::{lexer::Lexer, node, str_list_to_string_list, Expression, Node, Statement};
 
 #[test]
 fn test() {
-    let lexer = Parser::new(
+    let lexer = Lexer::new(
         "
 include std->io
 include std->math
