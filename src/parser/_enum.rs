@@ -1,6 +1,4 @@
-use crate::node;
-
-use super::{Enum, Node};
+use super::{Enum, Node, NodeData};
 
 pub fn parser(
     program: &mut Vec<Node>,
@@ -15,12 +13,13 @@ pub fn parser(
     for member in members.iter() {
         enum_values.push(vec![data.1.join("_"), member.to_string()]);
     }
-    program.push(node!(
-        _enum,
-        Enum {
+    program.push(Node::new(
+        NodeData::Enum(Enum {
             identifier: data.1,
             members,
-        }
+        }),
+        0,
+        0,
     ));
     data.0
 }

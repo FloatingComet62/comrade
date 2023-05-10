@@ -1,6 +1,6 @@
-use crate::node;
-
-use super::{super::Operations, get_till_token_or_block_and_math_block, load, Math, Node};
+use super::{
+    super::Operations, get_till_token_or_block_and_math_block, load, Math, Node, NodeData,
+};
 
 pub fn parser(
     program: &mut Vec<Node>,
@@ -41,13 +41,14 @@ pub fn parser(
     let rhs = get_till_token_or_block_and_math_block("EOL", input, raw_lhs.0, false);
     lhs.append(&mut raw_lhs.1);
 
-    program.push(node!(
-        math,
-        Math {
+    program.push(Node::new(
+        NodeData::Math(Math {
             lhs: load(&lhs, identifiers, enum_values, struct_data),
             rhs: load(&rhs.1, identifiers, enum_values, struct_data),
             operation,
-        }
+        }),
+        0,
+        0,
     ));
     rhs.0 // skip to next and ignore the data
 }

@@ -1,4 +1,4 @@
-use crate::{type_from_str, Types, VariableAssignment};
+use crate::{type_from_str, NodeData, Types, VariableAssignment};
 
 use super::{compiler, type_to_c_type};
 
@@ -19,11 +19,11 @@ pub fn compile(input: &VariableAssignment) -> String {
 
 fn value(input: &mut VariableAssignment) -> String {
     if input.value.len() == 1 {
-        return compiler(&mut input.value, String::new(), false, false);
+        return compiler(&input.value, String::new(), false, false);
     }
     let mut output = "{ ".to_string();
     for (i, item) in input.value.iter().enumerate() {
-        output += &compiler(&mut vec![item.clone()], String::new(), false, true);
+        output += &compiler(&vec![item.clone()], String::new(), false, true);
         if i != input.value.len() - 1 {
             output += ", ";
         }
@@ -34,13 +34,17 @@ fn value(input: &mut VariableAssignment) -> String {
 
 fn types(input: &VariableAssignment) -> (String, bool) {
     if input.value.len() == 1 {
-        if let Some(l) = &input.value[0].literal {
-            let res = type_to_c_type(&l.l_type);
-            return (res.0.to_string(), res.1);
-        }
-        let t = type_from_str(&input.type_data);
-        let res = type_to_c_type(&t);
-        return (res.0.to_string(), res.1);
+        match &input.value[0].data {
+            NodeData::Literal(l) => {
+                let res = type_to_c_type(&l.l_type);
+                return (res.0.to_string(), res.1);
+            }
+            _ => {
+                let t = type_from_str(&input.type_data);
+                let res = type_to_c_type(&t);
+                return (res.0.to_string(), res.1);
+            }
+        };
     }
     let type_check = type_from_str(&input.type_data);
     if type_check == Types::None {

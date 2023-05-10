@@ -1,4 +1,4 @@
-use comrade::{lexer::Lexer, node, Enum, Node};
+use comrade::{lexer::Lexer, Enum, Node, NodeData};
 
 #[test]
 fn test() {
@@ -16,9 +16,8 @@ enum Emotions {
     let program = lexer.parse(false, false, false, false);
     assert_eq!(
         program.0,
-        vec![node!(
-            _enum,
-            Enum {
+        vec![Node::new(
+            NodeData::Enum(Enum {
                 identifier: vec!["Emotions".to_string()],
                 members: vec![
                     "Good".to_string(),
@@ -26,7 +25,9 @@ enum Emotions {
                     "Awful".to_string(),
                     "WorstEver".to_string()
                 ]
-            }
+            }),
+            0,
+            0
         )]
     )
 }

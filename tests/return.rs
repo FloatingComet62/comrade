@@ -1,5 +1,5 @@
 use comrade::{
-    lexer::Lexer, node, str_list_to_string_list, Expression, Literal, Node, Statement, Types,
+    lexer::Lexer, str_list_to_string_list, Expression, Literal, Node, NodeData, Statement, Types,
     VariableAssignment,
 };
 
@@ -9,18 +9,20 @@ fn test() {
     let program = lexer.parse(false, false, false, false);
     assert_eq!(
         program.0,
-        vec![node!(
-            statement,
-            Statement {
+        vec![Node::new(
+            NodeData::Statement(Statement {
                 action: "return".to_string(),
-                parameters: vec![node!(
-                    literal,
-                    Literal {
+                parameters: vec![Node::new(
+                    NodeData::Literal(Literal {
                         literal: "2".to_string(),
                         l_type: Types::I32
-                    }
+                    }),
+                    0,
+                    0
                 )]
-            }
+            }),
+            0,
+            0
         )]
     );
 
@@ -35,33 +37,37 @@ return a
     assert_eq!(
         program.0,
         vec![
-            node!(
-                variable_assignment,
-                VariableAssignment {
+            Node::new(
+                NodeData::VariableAssignment(VariableAssignment {
                     identifier: str_list_to_string_list(vec!["a"]),
                     immutability: false,
                     publicity: false,
                     type_data: String::new(),
-                    value: Box::new(vec![node!(
-                        literal,
-                        Literal {
+                    value: Box::new(vec![Node::new(
+                        NodeData::Literal(Literal {
                             literal: "2".to_string(),
                             l_type: Types::I32
-                        }
+                        }),
+                        0,
+                        0
                     )])
-                }
+                }),
+                0,
+                0
             ),
-            node!(
-                statement,
-                Statement {
+            Node::new(
+                NodeData::Statement(Statement {
                     action: "return".to_string(),
-                    parameters: vec![node!(
-                        expression,
-                        Expression {
+                    parameters: vec![Node::new(
+                        NodeData::Expression(Expression {
                             expr: vec!["a".to_string()]
-                        }
+                        }),
+                        0,
+                        0
                     )]
-                }
+                }),
+                0,
+                0
             )
         ]
     );

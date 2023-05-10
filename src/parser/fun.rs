@@ -1,7 +1,7 @@
 use super::{load, Argument, Function, Node, Types};
 use crate::{
     errors::{send_error, Errors},
-    exit, node, type_from_str,
+    exit, type_from_str, NodeData,
 };
 
 pub fn parser(
@@ -62,14 +62,15 @@ pub fn parser(
     // original identifiers is untouched and all the variables are inside fun_identifiers
     // which is gonna die after this function call ends
 
-    program.push(node!(
-        function,
-        Function {
+    program.push(Node::new(
+        NodeData::Function(Function {
             identifier,
             arguments: args,
             return_type,
             nodes,
-        }
+        }),
+        0,
+        0,
     ));
     data.0
 }

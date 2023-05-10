@@ -1,4 +1,4 @@
-use crate::{exit, node, type_from_str, Types};
+use crate::{exit, type_from_str, NodeData, Types};
 
 use super::{get_till_token_or_block_and_math_block, load, Node, VariableAssignment};
 
@@ -39,19 +39,25 @@ pub fn parser(
             let mut self_data = struct_data.clone();
             self_data.retain(|x| x[0] == i_type); // only 1 answer
             for (i, cell) in val.iter().enumerate() {
-                if cell.literal.is_some() {
-                    let mut item_iden = iden.clone();
-                    let raw_member = self_data[0].get(i + 1);
-                    // at self_data[0][0] is the struct name
-                    if let Some(member) = raw_member {
-                        item_iden.push(member.clone());
-                    } else {
-                        exit(
-                            &format!("Unknown values of struct {} were passed", self_data[0][0]),
-                            None,
-                        )
+                match &cell.data {
+                    NodeData::Literal(_) => {
+                        let mut item_iden = iden.clone();
+                        let raw_member = self_data[0].get(i + 1);
+                        // at self_data[0][0] is the struct name
+                        if let Some(member) = raw_member {
+                            item_iden.push(member.clone());
+                        } else {
+                            exit(
+                                &format!(
+                                    "Unknown values of struct {} were passed",
+                                    self_data[0][0]
+                                ),
+                                None,
+                            )
+                        }
+                        identifiers.push(item_iden);
                     }
-                    identifiers.push(item_iden);
+                    _ => todo!(),
                 }
             }
         } else {
@@ -61,15 +67,16 @@ pub fn parser(
         val = load(&raw_val.1, identifiers, enum_values, struct_data);
     }
     identifiers.push(iden.clone());
-    program.push(node!(
-        variable_assignment,
-        VariableAssignment {
+    program.push(Node::new(
+        NodeData::VariableAssignment(VariableAssignment {
             identifier: iden,
             value: Box::new(val),
             immutability: immutable,
             publicity: previous_text == "public",
             type_data: i_type,
-        }
+        }),
+        0,
+        0,
     ));
     data.0 // skip to next and ignore the data
 }

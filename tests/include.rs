@@ -1,4 +1,4 @@
-use comrade::{lexer::Lexer, node, str_list_to_string_list, Expression, Node, Statement};
+use comrade::{lexer::Lexer, str_list_to_string_list, Expression, Node, NodeData, Statement};
 
 #[test]
 fn test() {
@@ -13,29 +13,33 @@ include std->math
     assert_eq!(
         program.0,
         vec![
-            node!(
-                statement,
-                Statement {
+            Node::new(
+                NodeData::Statement(Statement {
                     action: "include".to_string(),
-                    parameters: vec![node!(
-                        expression,
-                        Expression {
+                    parameters: vec![Node::new(
+                        NodeData::Expression(Expression {
                             expr: str_list_to_string_list(vec!["std", "io"])
-                        }
+                        }),
+                        0,
+                        0
                     ),]
-                }
+                }),
+                0,
+                0
             ),
-            node!(
-                statement,
-                Statement {
+            Node::new(
+                NodeData::Statement(Statement {
                     action: "include".to_string(),
-                    parameters: vec![node!(
-                        expression,
-                        Expression {
+                    parameters: vec![Node::new(
+                        NodeData::Expression(Expression {
                             expr: str_list_to_string_list(vec!["std", "math"])
-                        }
+                        }),
+                        0,
+                        0
                     )]
-                }
+                }),
+                0,
+                0
             )
         ]
     );

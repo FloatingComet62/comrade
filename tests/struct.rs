@@ -1,4 +1,4 @@
-use comrade::{lexer::Lexer, node, Node, Struct, StructMember, Types};
+use comrade::{lexer::Lexer, Node, NodeData, Struct, StructMember, Types};
 
 #[test]
 fn test() {
@@ -15,9 +15,8 @@ struct User {
     let program = lexer.parse(false, false, false, false);
     assert_eq!(
         program.0,
-        vec![node!(
-            _struct,
-            Struct {
+        vec![Node::new(
+            NodeData::Struct(Struct {
                 identifier: vec!["User".to_string()],
                 members: vec![
                     StructMember {
@@ -33,7 +32,9 @@ struct User {
                         t_mem: Types::Str
                     }
                 ]
-            }
+            }),
+            0,
+            0
         )]
     )
 }

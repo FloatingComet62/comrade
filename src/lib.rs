@@ -133,15 +133,6 @@ pub fn str_list_to_string_list(input: Vec<&str>) -> Vec<String> {
     output
 }
 
-#[macro_export]
-macro_rules! node {
-    ($x: ident , $y: expr) => {{
-        let mut n = Node::blank();
-        n.$x = Some($y);
-        n
-    }};
-}
-
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Operations {
     NULL,
@@ -280,8 +271,8 @@ pub struct ExternC {
 }
 
 // todo ->
-#[derive(Debug)]
-pub enum ND {
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub enum NodeData {
     Statement(Statement),
     Function(Function),
     FunctionCall(FunctionCall),
@@ -295,54 +286,34 @@ pub enum ND {
     Enum(Enum),
     ExternC(ExternC),
     StructValue(StructValue),
+    None,
 }
-#[derive(PartialEq, Eq, Clone)]
-pub struct NodeData {
-    pub statement: Option<Statement>,
-    pub function: Option<Function>,
-    pub function_call: Option<FunctionCall>,
-    pub variable_assignment: Option<VariableAssignment>,
-    pub expression: Option<Expression>,
-    pub condition_block: Option<ConditionBlock>,
-    pub _match: Option<Match>,
-    pub literal: Option<Literal>,
-    pub math: Option<Math>,
-    pub _struct: Option<Struct>,
-    pub _enum: Option<Enum>,
-    pub extern_c: Option<ExternC>,
-    pub struct_value: Option<StructValue>,
-}
-impl Debug for NodeData {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        macro_rules! check {
-            ($x: expr) => {
-                if let Some(x) = $x {
-                    return f.write_str(&format!("{:?}", x));
-                }
-            };
-        }
 
-        check!(&self.statement);
-        check!(&self.function);
-        check!(&self.function_call);
-        check!(&self.variable_assignment);
-        check!(&self.expression);
-        check!(&self.condition_block);
-        check!(&self._match);
-        check!(&self.literal);
-        check!(&self.math);
-        check!(&self._struct);
-        check!(&self._enum);
-        check!(&self.extern_c);
-        check!(&self.struct_value);
-
-        f.write_str("{}")
-    }
-}
 // todo: if by the end of the parser, all node has is "data", just make Node NodeData
 #[derive(PartialEq, Eq, Clone)]
 pub struct Node {
     pub data: NodeData,
+    pub line: i32,
+    pub column: i32,
+}
+
+impl Debug for Node {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("{:?}", self.data))
+    }
+}
+
+impl Node {
+    pub fn new(data: NodeData, line: i32, column: i32) -> Self {
+        Self { data, line, column }
+    }
+    fn blank() -> Self {
+        Self {
+            data: NodeData::None,
+            line: 0,
+            column: 0,
+        }
+    }
 }
 
 impl Deref for Node {

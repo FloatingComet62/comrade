@@ -1,7 +1,7 @@
-use super::{get_till_token_or_block_and_math_block, Node, Struct, StructMember};
+use super::{get_till_token_or_block_and_math_block, Node, NodeData, Struct, StructMember};
 use crate::{
     errors::{send_error, Errors},
-    node, type_from_str, Types,
+    type_from_str, Types,
 };
 
 pub fn get_struct_member(i: usize, input: &Vec<String>) -> (usize, Option<StructMember>) {
@@ -56,12 +56,13 @@ pub fn parser(
 
     struct_data.push(self_data);
 
-    program.push(node!(
-        _struct,
-        Struct {
+    program.push(Node::new(
+        NodeData::Struct(Struct {
             identifier: data.1,
             members: block,
-        }
+        }),
+        0,
+        0,
     ));
     data.0 // skip to next and ignore the data
 }

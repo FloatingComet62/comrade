@@ -1,6 +1,4 @@
-use crate::node;
-
-use super::{get_till_token_or_block_and_math_block, load, FunctionCall, Node};
+use super::{get_till_token_or_block_and_math_block, load, FunctionCall, Node, NodeData};
 
 pub fn parser(
     program: &mut Vec<Node>,
@@ -56,12 +54,13 @@ pub fn parser(
         arg.push("EOL".to_string());
         args.push(load(&arg, identifiers, enum_values, struct_data));
     }
-    program.push(node!(
-        function_call,
-        FunctionCall {
+    program.push(Node::new(
+        NodeData::FunctionCall(FunctionCall {
             identifier,
             arguments: args,
-        }
+        }),
+        0,
+        0,
     ));
     raw_raw_args.0
 }

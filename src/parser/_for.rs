@@ -1,6 +1,4 @@
-use crate::node;
-
-use super::{load, ConditionBlock, Node};
+use super::{load, ConditionBlock, Node, NodeData};
 
 #[allow(dead_code)]
 pub fn parser(
@@ -18,13 +16,14 @@ pub fn parser(
         }
         raw_params.push(thingy.to_string());
     }
-    program.push(node!(
-        condition_block,
-        ConditionBlock {
+    program.push(Node::new(
+        NodeData::ConditionBlock(ConditionBlock {
             keyword: "function".to_string(),
             parameters: load(&raw_params, identifiers, enum_values, struct_data),
             nodes: load(&data.2, identifiers, enum_values, struct_data),
-        }
+        }),
+        0,
+        0,
     ));
     data.0
 }

@@ -1,5 +1,5 @@
 use comrade::{
-    lexer::Lexer, node, Expression, FunctionCall, Literal, Node, Statement, Types,
+    lexer::Lexer, Expression, FunctionCall, Literal, Node, NodeData, Statement, Types,
     VariableAssignment,
 };
 
@@ -18,63 +18,71 @@ someRandomFunction(a, \"Hello World\", 35, {
     let program = lexer.parse(false, false, false, false);
     assert_eq!(
         program.0[1], // not checking the let statement
-        node!(
-            function_call,
-            FunctionCall {
+        Node::new(
+            NodeData::FunctionCall(FunctionCall {
                 identifier: vec!["someRandomFunction".to_string()],
                 arguments: vec![
-                    vec![node!(
-                        expression,
-                        Expression {
+                    vec![Node::new(
+                        NodeData::Expression(Expression {
                             expr: vec!["a".to_string()]
-                        }
+                        }),
+                        0,
+                        0
                     )],
-                    vec![node!(
-                        literal,
-                        Literal {
+                    vec![Node::new(
+                        NodeData::Literal(Literal {
                             literal: "\"Hello World\"".to_string(),
                             l_type: Types::Str
-                        }
+                        }),
+                        0,
+                        0
                     )],
-                    vec![node!(
-                        literal,
-                        Literal {
+                    vec![Node::new(
+                        NodeData::Literal(Literal {
                             literal: "35".to_string(),
                             l_type: Types::I32
-                        }
+                        }),
+                        0,
+                        0
                     )],
                     vec![
-                        node!(
-                            variable_assignment,
-                            VariableAssignment {
+                        Node::new(
+                            NodeData::VariableAssignment(VariableAssignment {
                                 identifier: vec!["x".to_string()],
                                 immutability: false,
                                 publicity: false,
                                 type_data: String::new(),
-                                value: Box::new(vec![node!(
-                                    literal,
-                                    Literal {
+                                value: Box::new(vec![Node::new(
+                                    NodeData::Literal(Literal {
                                         literal: "5".to_string(),
                                         l_type: Types::I32
-                                    }
+                                    }),
+                                    0,
+                                    0
                                 )])
-                            }
+                            }),
+                            0,
+                            0
                         ),
-                        node!(
-                            statement,
-                            Statement {
+                        Node::new(
+                            NodeData::Statement(Statement {
                                 action: "return".to_string(),
-                                parameters: vec![node!(
-                                    expression,
-                                    Expression {
+                                parameters: vec![Node::new(
+                                    NodeData::Expression(Expression {
                                         expr: vec!["x".to_string()]
-                                    }
+                                    }),
+                                    0,
+                                    0
                                 )]
-                            }
+                            }),
+                            0,
+                            0
                         )
                     ]
                 ]
-            }
+            }),
+            0,
+            0
         )
     )
 }

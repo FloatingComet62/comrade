@@ -1,6 +1,6 @@
 use comrade::{
-    lexer::Lexer, node, Argument, Expression, Function, Literal, Math, Node, Operations, Statement,
-    Types,
+    lexer::Lexer, Argument, Expression, Function, Literal, Math, Node, NodeData, Operations,
+    Statement, Types,
 };
 
 #[test]
@@ -16,41 +16,46 @@ fun add_3(x -> u32) => u32 {
     let program = lexer.parse(false, false, false, false);
     assert_eq!(
         program.0,
-        vec![node!(
-            function,
-            Function {
+        vec![Node::new(
+            NodeData::Function(Function {
                 identifier: vec!["add_3".to_string()],
                 arguments: vec![Argument {
                     identifier: "x".to_string(),
                     a_type: Types::U32
                 }],
                 return_type: Types::U32,
-                nodes: vec![node!(
-                    statement,
-                    Statement {
+                nodes: vec![Node::new(
+                    NodeData::Statement(Statement {
                         action: "return".to_string(),
-                        parameters: vec![node!(
-                            math,
-                            Math {
-                                lhs: vec![node!(
-                                    expression,
-                                    Expression {
+                        parameters: vec![Node::new(
+                            NodeData::Math(Math {
+                                lhs: vec![Node::new(
+                                    NodeData::Expression(Expression {
                                         expr: vec!["x".to_string()]
-                                    }
+                                    }),
+                                    0,
+                                    0
                                 )],
-                                rhs: vec![node!(
-                                    literal,
-                                    Literal {
+                                rhs: vec![Node::new(
+                                    NodeData::Literal(Literal {
                                         literal: "3".to_string(),
                                         l_type: Types::I32
-                                    }
+                                    }),
+                                    0,
+                                    0
                                 )],
                                 operation: Operations::ADD
-                            }
+                            }),
+                            0,
+                            0
                         )]
-                    }
+                    }),
+                    0,
+                    0
                 )]
-            }
+            }),
+            0,
+            0
         )]
     );
 }

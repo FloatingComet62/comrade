@@ -1,10 +1,9 @@
 use crate::{
     errors::{send_error, Errors},
-    node, str_list_to_string_list, type_from_str, Argument, ConditionBlock, Enum, Expression,
-    ExternC, Function, FunctionCall, Literal, Match, MatchCase, Math, Node, NodeData, Statement,
-    Struct, StructMember, StructValue, Types, VariableAssignment,
+    str_list_to_string_list, type_from_str, Argument, ConditionBlock, Enum, Expression, Function,
+    FunctionCall, Literal, Match, MatchCase, Math, Node, NodeData, Statement, Struct, StructMember,
+    Types, VariableAssignment,
 };
-use std::fmt::Debug;
 
 mod _enum;
 mod _for;
@@ -19,53 +18,6 @@ mod fun_call;
 mod include_n_return_n_erase;
 mod math;
 mod variable_assignment;
-
-impl Debug for Node {
-    // don't display n_type
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!("{:?}", self.data))
-    }
-}
-impl Node {
-    pub fn new(
-        statement: Option<Statement>,
-        function: Option<Function>,
-        function_call: Option<FunctionCall>,
-        variable_assignment: Option<VariableAssignment>,
-        expression: Option<Expression>,
-        condition_block: Option<ConditionBlock>,
-        _match: Option<Match>,
-        literal: Option<Literal>,
-        m: Option<Math>,
-        s: Option<Struct>,
-        e: Option<Enum>,
-        e_c: Option<ExternC>,
-        struct_value: Option<StructValue>,
-    ) -> Self {
-        Self {
-            data: NodeData {
-                statement,
-                function,
-                function_call,
-                variable_assignment,
-                expression,
-                condition_block,
-                _match,
-                literal,
-                math: m,
-                _struct: s,
-                _enum: e,
-                extern_c: e_c,
-                struct_value,
-            },
-        }
-    }
-    pub fn blank() -> Node {
-        Node::new(
-            None, None, None, None, None, None, None, None, None, None, None, None, None,
-        )
-    }
-}
 
 pub struct Parser {
     pub splitted_text: Vec<String>,
@@ -270,7 +222,11 @@ pub fn load(
                                 }
                             }
                         }
-                        program.push(node!(expression, Expression { expr: idenf }));
+                        program.push(Node::new(
+                            NodeData::Expression(Expression { expr: idenf }),
+                            0,
+                            0,
+                        ));
                         i += iden.len();
                         break;
                     }
@@ -281,12 +237,13 @@ pub fn load(
                 if text == &_enum[0] {
                     for (j, val) in _enum.iter().enumerate() {
                         if &input[i + j] == val {
-                            program.push(node!(
-                                literal,
-                                Literal {
+                            program.push(Node::new(
+                                NodeData::Literal(Literal {
                                     literal: _enum.join("_"),
-                                    l_type: Types::I32
-                                }
+                                    l_type: Types::I32,
+                                }),
+                                0,
+                                0,
                             ))
                         }
                     }
@@ -392,28 +349,31 @@ pub fn load(
                 struct_data,
             );
         } else if text.chars().next().unwrap_or('\0') == '\"' {
-            program.push(node!(
-                literal,
-                Literal {
+            program.push(Node::new(
+                NodeData::Literal(Literal {
                     literal: text.to_string(),
                     l_type: Types::Str,
-                }
+                }),
+                0,
+                0,
             ));
         } else if is_digit(text.chars().next().unwrap_or('\0')) {
-            program.push(node!(
-                literal,
-                Literal {
+            program.push(Node::new(
+                NodeData::Literal(Literal {
                     literal: text.to_string(),
                     l_type: Types::I32, // * i32 is the default number
-                }
+                }),
+                0,
+                0,
             ));
         } else if type_from_str(text) != Types::None {
-            program.push(node!(
-                literal,
-                Literal {
+            program.push(Node::new(
+                NodeData::Literal(Literal {
                     literal: text.to_string(),
                     l_type: Types::Type, // * i32 is the default number
-                }
+                }),
+                0,
+                0,
             ));
         } else if text == "match" {
             i = _match::parser(&mut program, data, identifiers, enum_values, struct_data);

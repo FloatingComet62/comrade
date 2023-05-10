@@ -1,6 +1,4 @@
-use crate::node;
-
-use super::{get_till_token_or_block_and_math_block, load, Match, MatchCase, Node};
+use super::{get_till_token_or_block_and_math_block, load, Match, MatchCase, Node, NodeData};
 
 pub fn get_match_case(
     i: usize,
@@ -59,12 +57,13 @@ pub fn parser(
         j = x.0;
     }
 
-    program.push(node!(
-        _match,
-        Match {
+    program.push(Node::new(
+        NodeData::Match(Match {
             condition: load(&data.1, identifiers, enum_values, struct_data),
             block,
-        }
+        }),
+        0,
+        0,
     ));
     data.0 // skip to next and ignore the data
 }

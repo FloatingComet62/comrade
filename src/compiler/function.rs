@@ -2,7 +2,7 @@ use crate::Function;
 
 use super::{compiler, type_to_c_type};
 
-pub fn compile(input: &mut Function) -> String {
+pub fn compile(input: &Function) -> String {
     let mut output = String::new();
     let type_data = type_to_c_type(&input.return_type);
     output += type_data.0;
@@ -25,7 +25,7 @@ pub fn compile(input: &mut Function) -> String {
         }
     }
     output += ") {\n";
-    output += &compiler(&mut input.nodes, String::new(), true, false);
+    output += &compiler(&input.nodes, String::new(), true, false);
     output += "}";
     output
 }

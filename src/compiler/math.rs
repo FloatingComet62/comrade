@@ -2,9 +2,9 @@ use crate::{exit, Math, Operations};
 
 use super::compiler;
 
-pub fn compile(semi_colon_needed: bool, input: &mut Math) -> String {
+pub fn compile(input: &Math, semi_colon_needed: bool) -> String {
     let mut output = String::new();
-    output += &compiler(&mut input.lhs, String::new(), false, false);
+    output += &compiler(&input.lhs, String::new(), false, false);
     output += match input.operation {
         Operations::ADD => "+",
         Operations::ADDEQT => "+=",
@@ -23,7 +23,7 @@ pub fn compile(semi_colon_needed: bool, input: &mut Math) -> String {
         Operations::EQT => "==",
         Operations::EQ => "=",
     };
-    output += &compiler(&mut input.rhs, String::new(), false, false);
+    output += &compiler(&input.rhs, String::new(), false, false);
     if semi_colon_needed {
         output += ";";
     }

@@ -198,7 +198,7 @@ impl Lexer {
         }
 
         let c_code = compiler::compiler(
-            &mut lexer.program,
+            &lexer.program,
             "
 #include <stdbool.h>
         "

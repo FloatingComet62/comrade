@@ -17,7 +17,7 @@ pub fn compile(input: &FunctionCall, semi_colon_needed: bool) -> String {
     }
     output += "(";
     for item in &input.arguments {
-        output += &compiler(&mut item.clone(), String::new(), false, true);
+        output += &compiler(&item.clone(), String::new(), false, true);
     }
     output += ")";
     if semi_colon_needed {

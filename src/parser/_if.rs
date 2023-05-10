@@ -1,5 +1,5 @@
-use super::{load, ConditionBlock, Node};
-use crate::{exit, node};
+use super::{load, ConditionBlock, Node, NodeData};
+use crate::exit;
 
 pub fn parser(
     program: &mut Vec<Node>,
@@ -18,23 +18,25 @@ pub fn parser(
             if last_data == 0 {
                 exit("Missing if part for else if", None);
             }
-            program.push(node!(
-                condition_block,
-                ConditionBlock {
+            program.push(Node::new(
+                NodeData::ConditionBlock(ConditionBlock {
                     keyword: "else if".to_string(),
                     parameters: load(&data.1, identifiers, enum_values, struct_data),
                     nodes: load(&data.2, identifiers, enum_values, struct_data),
-                }
+                }),
+                0,
+                0,
             ));
             return data.0;
         }
-        program.push(node!(
-            condition_block,
-            ConditionBlock {
+        program.push(Node::new(
+            NodeData::ConditionBlock(ConditionBlock {
                 keyword: "if".to_string(),
                 parameters: load(&data.1, identifiers, enum_values, struct_data),
                 nodes: load(&data.2, identifiers, enum_values, struct_data),
-            }
+            }),
+            0,
+            0,
         ));
     }
     if text == "else" {
@@ -49,13 +51,14 @@ pub fn parser(
         if last_node == 0 {
             exit("Missing if part for else", None);
         }
-        program.push(node!(
-            condition_block,
-            ConditionBlock {
+        program.push(Node::new(
+            NodeData::ConditionBlock(ConditionBlock {
                 keyword: "else".to_string(),
                 parameters: vec![],
                 nodes: load(&data.2, identifiers, enum_values, struct_data),
-            }
+            }),
+            0,
+            0,
         ));
     }
     data.0 // skip to next and ignore the data
@@ -73,14 +76,16 @@ fn is_last_an_if(program: &Vec<Node>) -> u8 {
     } else {
         program.last().unwrap_or(&blank)
     };
-    if let Some(condition_node) = &last_node.condition_block {
-        if condition_node.keyword == "if" {
-            return 1;
+    match &last_node.data {
+        NodeData::ConditionBlock(condition_node) => {
+            if condition_node.keyword == "if" {
+                return 1;
+            }
+            if condition_node.keyword == "else if" {
+                return 2;
+            }
+            0
         }
-        if condition_node.keyword == "else if" {
-            return 2;
-        }
-        return 0;
+        _ => todo!(),
     }
-    0
 }

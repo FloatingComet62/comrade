@@ -1,4 +1,4 @@
-use comrade::{lexer::Lexer, node, Expression, Node, Statement};
+use comrade::{lexer::Lexer, Expression, Node, NodeData, Statement};
 
 #[test]
 fn test() {
@@ -12,17 +12,19 @@ erase a
     let program = lexer.parse(false, false, false, false);
     assert_eq!(
         program.0[1],
-        node!(
-            statement,
-            Statement {
+        Node::new(
+            NodeData::Statement(Statement {
                 action: "erase".to_string(),
-                parameters: vec![node!(
-                    expression,
-                    Expression {
+                parameters: vec![Node::new(
+                    NodeData::Expression(Expression {
                         expr: vec!["a".to_string()]
-                    }
+                    }),
+                    0,
+                    0
                 )]
-            }
+            }),
+            0,
+            0
         )
     );
 }

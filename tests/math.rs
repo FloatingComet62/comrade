@@ -1,4 +1,4 @@
-use comrade::{lexer::Lexer, node, Literal, Math, Node, Operations, Types};
+use comrade::{lexer::Lexer, Literal, Math, Node, NodeData, Operations, Types};
 
 macro_rules! math_test {
     ($op_str: expr, $op: expr) => {
@@ -6,25 +6,28 @@ macro_rules! math_test {
         let program = lexer.parse(false, false, false, false);
         assert_eq!(
             program.0,
-            vec![node!(
-                math,
-                Math {
-                    lhs: vec![node!(
-                        literal,
-                        Literal {
+            vec![Node::new(
+                NodeData::Math(Math {
+                    lhs: vec![Node::new(
+                        NodeData::Literal(Literal {
                             literal: "5".to_string(),
                             l_type: Types::I32
-                        }
+                        }),
+                        0,
+                        0
                     )],
-                    rhs: vec![node!(
-                        literal,
-                        Literal {
+                    rhs: vec![Node::new(
+                        NodeData::Literal(Literal {
                             literal: "5".to_string(),
                             l_type: Types::I32
-                        }
+                        }),
+                        0,
+                        0
                     )],
                     operation: $op
-                }
+                }),
+                0,
+                0
             )]
         );
     };

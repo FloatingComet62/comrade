@@ -1,6 +1,6 @@
 use comrade::{
-    lexer::Lexer, node, str_list_to_string_list, ConditionBlock, Expression, FunctionCall, Literal,
-    Math, Node, Operations, Types, VariableAssignment,
+    lexer::Lexer, str_list_to_string_list, ConditionBlock, Expression, FunctionCall, Literal, Math,
+    Node, NodeData, Operations, Types, VariableAssignment,
 };
 
 #[test]
@@ -19,79 +19,90 @@ while i != 5 {
     assert_eq!(
         program.0,
         vec![
-            node!(
-                variable_assignment,
-                VariableAssignment {
+            Node::new(
+                NodeData::VariableAssignment(VariableAssignment {
                     identifier: vec!["i".to_string()],
                     immutability: false,
                     publicity: false,
                     type_data: String::new(),
-                    value: Box::new(vec![node!(
-                        literal,
-                        Literal {
+                    value: Box::new(vec![Node::new(
+                        NodeData::Literal(Literal {
                             literal: "0".to_string(),
                             l_type: Types::I32
-                        }
+                        }),
+                        0,
+                        0
                     )])
-                }
+                }),
+                0,
+                0
             ),
-            node!(
-                condition_block,
-                ConditionBlock {
+            Node::new(
+                NodeData::ConditionBlock(ConditionBlock {
                     keyword: "while".to_string(),
-                    parameters: vec![node!(
-                        math,
-                        Math {
-                            lhs: vec![node!(
-                                expression,
-                                Expression {
+                    parameters: vec![Node::new(
+                        NodeData::Math(Math {
+                            lhs: vec![Node::new(
+                                NodeData::Expression(Expression {
                                     expr: vec!["i".to_string()]
-                                }
+                                }),
+                                0,
+                                0
                             )],
-                            rhs: vec![node!(
-                                literal,
-                                Literal {
+                            rhs: vec![Node::new(
+                                NodeData::Literal(Literal {
                                     literal: "5".to_string(),
                                     l_type: Types::I32
-                                }
+                                }),
+                                0,
+                                0
                             )],
                             operation: Operations::NEQ
-                        }
+                        }),
+                        0,
+                        0
                     )],
                     nodes: vec![
-                        node!(
-                            function_call,
-                            FunctionCall {
+                        Node::new(
+                            NodeData::FunctionCall(FunctionCall {
                                 identifier: str_list_to_string_list(vec!["io", "->", "out"]),
-                                arguments: vec![vec![node!(
-                                    expression,
-                                    Expression {
+                                arguments: vec![vec![Node::new(
+                                    NodeData::Expression(Expression {
                                         expr: vec!["i".to_string()]
-                                    }
+                                    }),
+                                    0,
+                                    0
                                 )]],
-                            }
+                            }),
+                            0,
+                            0
                         ),
-                        node!(
-                            math,
-                            Math {
-                                lhs: vec![node!(
-                                    expression,
-                                    Expression {
+                        Node::new(
+                            NodeData::Math(Math {
+                                lhs: vec![Node::new(
+                                    NodeData::Expression(Expression {
                                         expr: vec!["i".to_string()],
-                                    }
+                                    }),
+                                    0,
+                                    0
                                 )],
-                                rhs: vec![node!(
-                                    literal,
-                                    Literal {
+                                rhs: vec![Node::new(
+                                    NodeData::Literal(Literal {
                                         literal: "1".to_string(),
                                         l_type: Types::I32
-                                    }
+                                    }),
+                                    0,
+                                    0
                                 )],
                                 operation: Operations::ADDEQT
-                            }
+                            }),
+                            0,
+                            0
                         )
                     ]
-                }
+                }),
+                0,
+                0
             ),
         ]
     )
