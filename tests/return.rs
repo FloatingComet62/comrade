@@ -42,7 +42,7 @@ return a
                     identifier: str_list_to_string_list(vec!["a"]),
                     immutability: false,
                     publicity: false,
-                    type_data: String::new(),
+                    type_data: Types::I32,
                     value: Box::new(vec![Node::new(
                         NodeData::Literal(Literal {
                             literal: "2".to_string(),

@@ -1,4 +1,4 @@
-use crate::{compiler, str_list_to_string_list};
+use crate::{compiler, str_list_to_string_list, type_checker};
 
 use super::{
     parser::{load, Parser},
@@ -27,12 +27,13 @@ impl Lexer {
         Self {
             data,
             token_splits: str_list_to_string_list(vec![
-                " ", "\r\n", "\n", "\t", "->", ".", "=>", "(", ")", "{", "}", ",", ">=", "<=",
-                "==", "+=", "-=", "*=", "/=", "!=", ">", "<", "=", "+", "-", "*", "/", "[", "]",
+                "//", " ", "\r\n", "\n", "\t", "->", ".", "=>", "(", ")", "{", "}", ",", ">=",
+                "<=", "==", "+=", "-=", "*=", "/=", "!=", ">", "<", "=", "+", "-", "*", "/", "[",
+                "]",
             ]),
             important_splits: str_list_to_string_list(vec![
-                "(", ")", "{", "}", ",", "\r\n", "\n", "->", ">=", "<=", "==", "+=", "-=", "*=",
-                "/=", "!=", ">", "<", "=", "=>", "+", "-", "*", "/", "[", "]",
+                "//", "(", ")", "{", "}", ",", "\r\n", "\n", "->", ">=", "<=", "==", "+=", "-=",
+                "*=", "/=", "!=", ">", "<", "=", "=>", "+", "-", "*", "/", "[", "]",
             ]),
             types: str_list_to_string_list(vec![
                 "u4", "u8", "u16", "u32", "u64", "u128", "i4", "i8", "i16", "i32", "i64", "i128",
@@ -138,6 +139,15 @@ impl Lexer {
                 output.push(current_item.clone());
             }
             if let Some(valid_split) = &splitter {
+                if to_split_chars.len() > i + 1
+                    && to_split_chars[i + 1].is_numeric()
+                    && valid_split == "-"
+                {
+                    current_item += "-";
+                    // don't split, it's a negative number
+                    i += 1;
+                    continue;
+                }
                 if !getting_string && !valid_split.is_empty() {
                     if self.important_splits.contains(valid_split) {
                         output.push(Lexer::split_print(valid_split));
@@ -196,6 +206,8 @@ impl Lexer {
         if !compile {
             return (lexer.program, String::new());
         }
+
+        type_checker::check_main(&lexer.program);
 
         let c_code = compiler::compiler(
             &lexer.program,

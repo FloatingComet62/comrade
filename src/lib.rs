@@ -7,6 +7,9 @@ pub mod compiler;
 pub mod errors;
 pub mod lexer;
 pub mod parser;
+pub mod type_checker;
+
+pub const FILE_EXTENSION: &str = ".cmr";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Types {
@@ -217,7 +220,7 @@ pub struct VariableAssignment {
     pub value: Box<Vec<Node>>,
     pub immutability: bool,
     pub publicity: bool,
-    pub type_data: String,
+    pub type_data: Types,
 }
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Expression {

@@ -78,13 +78,14 @@ pub fn get_till_token_or_block_and_math_block(
     while j < input.len() {
         let text = &input[j];
         // ! must be first
-        if text == "#" {
+        if text == "//" {
             is_comment = true;
         }
         if text == "EOL" {
             is_comment = false;
         }
         if is_comment {
+            j += 1;
             continue;
         }
         let operator = is_math(text.to_string());
@@ -170,7 +171,7 @@ pub fn load(
         previous_text = text.clone();
         text = &input[i];
 
-        if text == "#" {
+        if text == "//" {
             i += data.0;
             continue;
         }
@@ -210,7 +211,7 @@ pub fn load(
                                     if second == "]" {
                                         if let Some(middle) = input.get(i + 2) {
                                             let chars: Vec<char> = middle.chars().collect();
-                                            if is_digit(chars[0]) {
+                                            if chars[0].is_numeric() {
                                                 // it is a list indexing
                                                 idenf.append(&mut str_list_to_string_list(vec![
                                                     "[", middle, "]",
@@ -357,7 +358,22 @@ pub fn load(
                 0,
                 0,
             ));
-        } else if is_digit(text.chars().next().unwrap_or('\0')) {
+        } else if {
+            let mut output = false;
+            if text.len() >= 2 {
+                if text.chars().nth(0).expect("impossible") == '-'
+                    && text.chars().nth(1).expect("impossible").is_numeric()
+                {
+                    output = true;
+                }
+            }
+            if !output {
+                // there is only 1 previous true assignment for output, so if output is true, then that means it is -ve
+                output = text.chars().next().unwrap_or('\0').is_numeric();
+            }
+
+            output
+        } {
             program.push(Node::new(
                 NodeData::Literal(Literal {
                     literal: text.to_string(),
@@ -393,10 +409,6 @@ pub fn load(
     }
 
     program
-}
-
-fn is_digit(c: char) -> bool {
-    ('0'..='9').contains(&c)
 }
 
 enum Mode {

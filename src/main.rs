@@ -1,4 +1,4 @@
-use comrade::{exit, lexer::Lexer, read_file, write_file};
+use comrade::{exit, lexer::Lexer, read_file, write_file, FILE_EXTENSION};
 use open::that;
 use std::{env, process::Command};
 
@@ -11,6 +11,7 @@ fn main() {
     let print_ast = args.contains(&"-a".to_string());
     let print_c_code = args.contains(&"-c".to_string());
     let clang = args.contains(&"-clang".to_string());
+    let compile = !args.contains(&"-noc".to_string());
 
     // gcc or clang
     let compiler = if clang { "clang" } else { "gcc" };
@@ -26,16 +27,19 @@ fn main() {
             if path == "help" {
                 println!(
                     "
-comrade test.cmr -t
+comrade test{} -t
 Print the tokens
 
-comrade test.cmr -a
+comrade test{} -a
 Print the AST generated
 
-comrade test.cmr -c
+comrade test{} -c
 Print the c code generated
 
-comrade test.cmr -clang
+comrade test{} -noc
+Don't compile
+
+comrade test{} -clang
 Use clang to compile instead of gcc
 
 comrade report
@@ -43,13 +47,17 @@ To report a bug
 
 comrade help
 To print this message
-                "
+                ",
+                    FILE_EXTENSION, FILE_EXTENSION, FILE_EXTENSION, FILE_EXTENSION, FILE_EXTENSION
                 );
                 exit("", Some(0));
             }
             let data = read_file(path);
             let parser = Lexer::new(data);
             let (_program, c_code) = parser.parse(true, print_tokens, print_ast, print_c_code);
+            if !compile {
+                return;
+            }
             if let Err(e) = write_file(out_path, c_code) {
                 exit(
                     &format!("Failed to write to {}\nError Trace:\n{}", out_path, e),

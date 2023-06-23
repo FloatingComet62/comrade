@@ -34,7 +34,7 @@ fn type_to_msg(error: Errors) -> String {
     .to_string()
 }
 
-pub fn send_error(error_type: Errors, error_message: String, line: i32, column: i32) {
+pub fn send_error(error_type: Errors, error_message: String, line: i32, column: i32) -> ! {
     println!(
         "{}\n{}\n\nLine: {}\nColumn: {}\n{}",
         type_to_msg(error_type).red().bold(),

@@ -27,9 +27,9 @@ pub fn compiler(
         // int x[] = {1, 2, 3, 4, 5};
         // printf("%d\n", sum(x));
         //
-        // // both give error
-        // // printf("%d\n", sum({1, 2, 3, 4, 5}));
-        // // int x[] = (int[]){1, 2, 3, 4, 5};
+        // both give error
+        // printf("%d\n", sum({1, 2, 3, 4, 5}));
+        // int x[] = (int[]){1, 2, 3, 4, 5};
         //
         // printf("%d\n", sum((int[]){1, 2, 3, 4, 5}));
         // return 0;

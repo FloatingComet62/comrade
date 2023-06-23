@@ -40,18 +40,16 @@ fn types(input: &VariableAssignment) -> (String, bool) {
                 return (res.0.to_string(), res.1);
             }
             _ => {
-                let t = type_from_str(&input.type_data);
-                let res = type_to_c_type(&t);
+                let res = type_to_c_type(&input.type_data);
                 return (res.0.to_string(), res.1);
             }
         };
     }
-    let type_check = type_from_str(&input.type_data);
-    if type_check == Types::None {
+    if input.type_data == Types::None {
         let mut output = "struct ".to_string();
-        output += &input.type_data;
+        output += &format!("{:?}", &input.type_data);
         return (output, false);
     }
-    let res = type_to_c_type(&type_check);
+    let res = type_to_c_type(&input.type_data);
     (res.0.to_string(), res.1)
 }

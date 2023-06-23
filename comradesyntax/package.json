@@ -1,0 +1,25 @@
+{
+  "name": "comradesyntax",
+  "displayName": "comradeSyntax",
+  "description": "Syntax Highlight for Comrade Programming Language",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.78.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "comrade",
+      "aliases": ["Comrade", "comrade"],
+      "extensions": [".cmr"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "comrade",
+      "scopeName": "main.cmr",
+      "path": "./syntaxes/comrade.tmLanguage.json"
+    }]
+  }
+}

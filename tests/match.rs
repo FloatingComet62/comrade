@@ -55,7 +55,7 @@ match io->in(i32) {
                                     identifier: vec!["x".to_string()],
                                     immutability: false,
                                     publicity: false,
-                                    type_data: String::new(),
+                                    type_data: Types::I32,
                                     value: Box::new(vec![Node::new(
                                         NodeData::Literal(Literal {
                                             literal: "3".to_string(),

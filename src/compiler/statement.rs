@@ -1,4 +1,4 @@
-use crate::{lexer::Lexer, read_file, Node, NodeData, Statement};
+use crate::{lexer::Lexer, read_file, Node, NodeData, Statement, FILE_EXTENSION};
 
 use super::compiler;
 
@@ -14,7 +14,7 @@ fn param_to_path(param: &[Node]) -> String {
             path += "/";
         }
     }
-    path += ".cmr";
+    path += FILE_EXTENSION;
     path
 }
 

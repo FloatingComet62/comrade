@@ -26,9 +26,10 @@ v 0.1
 v 0.2
 | Lexer | Compiler | Feature |
 | ----- | -------- | ------- |
-| [ ] | [ ] | Comments |
+| [x] | [x] | Comments |
 | [ ] | [ ] | Dictionaries |
 | [ ] | [ ] | For loops |
 | [ ] | [ ] | Macros |
 | [ ] | [ ] | Traits |
 | [ ] | [ ] | Implementations |
+| [ ] | [ ] | Type checking |

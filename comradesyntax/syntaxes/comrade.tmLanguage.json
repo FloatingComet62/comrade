@@ -1,0 +1,42 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Comrade",
+  "patterns": [
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#strings"
+    }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.comrade",
+          "match": "\\b(if|while|for|return|fun|include|externC|match|let|const|else| in|struct|enum|trait|implement|macro|erase|public|or|and|with|for|default)\\b"
+        },
+        {
+          "name": "entity.name.type",
+          "match": "\\b(u4|u8|u16|u32|u64|u128|i4|i8|i16|i32|i64|i128|f4|f8|f16|f32|f64|f128|str|bool)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.comrade",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.comrade",
+          "match": "\\\\."
+        },
+        {
+          "name": "constant.numeric",
+          "match": "[0-9]"
+        }
+      ]
+    }
+  },
+  "scopeName": "main.cmr"
+}

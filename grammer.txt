@@ -16,6 +16,7 @@ const immutable_letiable = VALUE
 
 const list = [ITEM1, ITEM2, ITEM3]
 const list2 = ITEM1, ITEM2, ITEM3
+const list3 = ITEM1 ITEM2 ITEM3
 const dictionary = {
   KEY1 => VALUE1
   KEY2 => VALUE2
@@ -43,6 +44,7 @@ for let i = 0 -> i32 / TRUE_FALSE_STATEMENT / i++ {
 }
 
 // Example Comment
+# Example Comment
 
 struct STRCUTURE_NAME : InheritStruct1 | InheritStruct2 {
   ATTRIBUTE1 -> TYPE1

@@ -34,7 +34,7 @@ pub fn parser(
     let i_type_type = type_from_str(&i_type);
     if i_type_type == Types::None {
         // it's not list
-        if i_type != String::new() {
+        if i_type.len() > 0 {
             val = load(&raw_val.2, identifiers, enum_values, struct_data);
             let mut self_data = struct_data.clone();
             self_data.retain(|x| x[0] == i_type); // only 1 answer
@@ -73,7 +73,7 @@ pub fn parser(
             value: Box::new(val),
             immutability: immutable,
             publicity: previous_text == "public",
-            type_data: i_type,
+            type_data: type_from_str(&i_type),
         }),
         0,
         0,
