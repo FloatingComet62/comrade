@@ -51,7 +51,7 @@ someRandomFunction(a, \"Hello World\", 35, {
                                 identifier: vec!["x".to_string()],
                                 immutability: false,
                                 publicity: false,
-                                type_data: Types::I32,
+                                type_data: Types::None,
                                 value: Box::new(vec![Node::new(
                                     NodeData::Literal(Literal {
                                         literal: "5".to_string(),

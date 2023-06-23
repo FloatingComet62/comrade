@@ -11,7 +11,7 @@ fn test() {
                 identifier: vec!["a".to_string()],
                 immutability: true,
                 publicity: true,
-                type_data: Types::I32,
+                type_data: Types::None,
                 value: Box::new(vec![Node::new(
                     NodeData::Literal(Literal {
                         literal: "5".to_string(),
@@ -34,7 +34,7 @@ fn test() {
                 identifier: vec!["a".to_string()],
                 immutability: false,
                 publicity: true,
-                type_data: Types::I32,
+                type_data: Types::None,
                 value: Box::new(vec![Node::new(
                     NodeData::Literal(Literal {
                         literal: "5".to_string(),
