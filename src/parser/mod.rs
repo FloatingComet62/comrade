@@ -14,6 +14,7 @@ mod booleans;
 mod extern_c;
 mod fun;
 mod fun_call;
+mod literal;
 mod math;
 mod statement;
 mod variable_assignment;
@@ -134,6 +135,88 @@ fn is_math(token: String) -> Result<(), ()> {
     Err(())
 }
 
+fn list_check(idenf: &mut Vec<String>, input: &Vec<String>, i: usize) -> Option<()> {
+    if let Some(first) = input.get(i + 1) {
+        if !(first == "[") {
+            return None;
+        }
+    }
+    if let Some(second) = input.get(i + 3) {
+        if !(second == "]") {
+            return None;
+        }
+    }
+    if let Some(middle) = input.get(i + 2) {
+        let chars: Vec<char> = middle.chars().collect();
+        if !chars[0].is_numeric() {
+            return None;
+        }
+        // it is a list indexing
+        idenf.append(&mut str_list_to_string_list(vec!["[", middle, "]"]));
+        return Some(());
+    }
+    return None;
+}
+
+fn identifier_check(
+    program: &mut Vec<Node>,
+    i: usize,
+    iden: &Vec<String>,
+    input: &Vec<String>,
+) -> Option<usize> {
+    let mut identifer = true;
+    let mut i_adder: usize = 0;
+    for (k, id) in iden.iter().enumerate() {
+        if let Some(to_check) = input.get(i + k) {
+            if to_check != id.as_str() {
+                identifer = false;
+            }
+        } else {
+            // we reached the end of the file
+            break;
+        }
+    }
+    if !identifer {
+        return None;
+    }
+    let mut idenf = iden.clone();
+    if list_check(&mut idenf, input, i).is_some() {
+        i_adder += 3;
+    }
+    program.push(Node::new(
+        NodeData::Expression(Expression { expr: idenf }),
+        0,
+        0,
+    ));
+    i_adder += iden.len();
+    Some(i_adder)
+}
+
+fn enum_check(
+    program: &mut Vec<Node>,
+    text: String,
+    enum_val: &Vec<String>,
+    input: &Vec<String>,
+    i: usize,
+) {
+    if !(text == enum_val[0]) {
+        return;
+    }
+    for (j, val) in enum_val.iter().enumerate() {
+        if !(&input[i + j] == val) {
+            continue;
+        }
+        program.push(Node::new(
+            NodeData::Literal(Literal {
+                literal: enum_val.join("_"),
+                l_type: Types::I32,
+            }),
+            0,
+            0,
+        ))
+    }
+}
+
 /// Generate the AST
 /// * `identifiers` - Identifiers to look out for
 /// * `enum_values` - Enum Values to look out for
@@ -174,64 +257,20 @@ pub fn load(
         ) {
             // identifier check
             for iden in identifiers.iter() {
-                if text == iden[0].as_str() {
-                    let mut identifer = true;
-                    for (k, id) in iden.iter().enumerate() {
-                        if let Some(to_check) = input.get(i + k) {
-                            if to_check != id.as_str() {
-                                identifer = false;
-                            }
-                        } else {
-                            // we reached the end of the file
-                            break;
-                        }
-                    }
-                    if identifer {
-                        let mut idenf = iden.clone();
-                        if let Some(first) = input.get(i + 1) {
-                            if first == "[" {
-                                if let Some(second) = input.get(i + 3) {
-                                    if second == "]" {
-                                        if let Some(middle) = input.get(i + 2) {
-                                            let chars: Vec<char> = middle.chars().collect();
-                                            if chars[0].is_numeric() {
-                                                // it is a list indexing
-                                                idenf.append(&mut str_list_to_string_list(vec![
-                                                    "[", middle, "]",
-                                                ]));
-                                                i += 3;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        program.push(Node::new(
-                            NodeData::Expression(Expression { expr: idenf }),
-                            0,
-                            0,
-                        ));
-                        i += iden.len();
+                if !(text == iden[0].as_str()) {
+                    continue;
+                }
+                match identifier_check(&mut program, i, iden, input) {
+                    None => {}
+                    Some(x) => {
+                        i += x;
                         break;
                     }
                 }
             }
             // enum values
-            for _enum in enum_values.iter() {
-                if text == &_enum[0] {
-                    for (j, val) in _enum.iter().enumerate() {
-                        if &input[i + j] == val {
-                            program.push(Node::new(
-                                NodeData::Literal(Literal {
-                                    literal: _enum.join("_"),
-                                    l_type: Types::I32,
-                                }),
-                                0,
-                                0,
-                            ))
-                        }
-                    }
-                }
+            for enum_val in enum_values.iter() {
+                enum_check(&mut program, text.to_string(), enum_val, input, i);
             }
         }
 
@@ -343,32 +382,12 @@ pub fn load(
                 (identifiers, enum_values, struct_data),
             );
         } else if string_check {
-            program.push(Node::new(
-                NodeData::Literal(Literal {
-                    literal: text.to_string(),
-                    l_type: Types::Str,
-                }),
-                0,
-                0,
-            ));
+            literal::parser(&mut program, text.to_string(), Types::Str);
         } else if number_check {
-            program.push(Node::new(
-                NodeData::Literal(Literal {
-                    literal: text.to_string(),
-                    l_type: Types::I32, // * i32 is the default number
-                }),
-                0,
-                0,
-            ));
+            // default number type is i32
+            literal::parser(&mut program, text.to_string(), Types::I32);
         } else if type_check {
-            program.push(Node::new(
-                NodeData::Literal(Literal {
-                    literal: text.to_string(),
-                    l_type: Types::Type, // * i32 is the default number
-                }),
-                0,
-                0,
-            ));
+            literal::parser(&mut program, text.to_string(), Types::Type);
         } else if match_check {
             i = _match::parser(&mut program, data, (identifiers, enum_values, struct_data));
         } else if function_call_check {

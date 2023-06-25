@@ -38,14 +38,16 @@ macro_rules! iden {
 fn find_in_identifier_data(name: &String, identifier_data: &[Identifier]) -> Option<Identifier> {
     for iden in identifier_data.iter() {
         if let Some(fun) = &iden.function {
-            if name == &fun.name {
-                return Some(iden.clone());
+            if !(name == &fun.name) {
+                continue;
             }
+            return Some(iden.clone());
         }
         if let Some(var) = &iden.variable {
-            if name == &var.name {
-                return Some(iden.clone());
+            if !(name == &var.name) {
+                continue;
             }
+            return Some(iden.clone());
         }
     }
 
