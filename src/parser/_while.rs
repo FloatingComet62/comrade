@@ -1,11 +1,9 @@
-use super::{load, ConditionBlock, Node, NodeData};
+use super::{load, ConditionBlock, Node, NodeData, ParserData};
 
 pub fn parser(
     program: &mut Vec<Node>,
     data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
-    identifiers: &mut Vec<Vec<String>>,
-    enum_values: &mut Vec<Vec<String>>,
-    struct_data: &mut Vec<Vec<String>>,
+    (identifiers, enum_values, struct_data): ParserData,
 ) -> usize {
     program.push(Node::new(
         NodeData::ConditionBlock(ConditionBlock {

@@ -1,4 +1,4 @@
-use super::{load, ConditionBlock, Node, NodeData};
+use super::{load, ConditionBlock, Node, NodeData, ParserData};
 use crate::exit;
 
 pub fn parser(
@@ -8,9 +8,7 @@ pub fn parser(
     previous_text: &String,
     input: &[String],
     i: usize,
-    identifiers: &mut Vec<Vec<String>>,
-    enum_values: &mut Vec<Vec<String>>,
-    struct_data: &mut Vec<Vec<String>>,
+    (identifiers, enum_values, struct_data): ParserData,
 ) -> usize {
     if text == "if" {
         if previous_text == "else" {

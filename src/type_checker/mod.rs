@@ -1,4 +1,4 @@
-use crate::{errors::send_error, errors::Errors, Expression, Node, NodeData, Types};
+use crate::{errors::send_error, errors::Errors, Node, NodeData, Types};
 
 #[derive(Debug, Clone)]
 pub struct Variable {
@@ -19,7 +19,7 @@ pub struct Identifier {
     pub function: Option<Function>,
 }
 
-pub fn check_main(input: &Vec<Node>) {
+pub fn check_main(input: &[Node]) {
     let mut identifiers = vec![];
     check(&mut identifiers, input);
 }
@@ -35,7 +35,7 @@ macro_rules! iden {
     }};
 }
 
-fn find_in_identifier_data(name: &String, identifier_data: &Vec<Identifier>) -> Option<Identifier> {
+fn find_in_identifier_data(name: &String, identifier_data: &[Identifier]) -> Option<Identifier> {
     for iden in identifier_data.iter() {
         if let Some(fun) = &iden.function {
             if name == &fun.name {
@@ -49,10 +49,10 @@ fn find_in_identifier_data(name: &String, identifier_data: &Vec<Identifier>) -> 
         }
     }
 
-    return None;
+    None
 }
 
-pub fn check(identifier_data: &mut Vec<Identifier>, input: &Vec<Node>) {
+pub fn check(identifier_data: &mut Vec<Identifier>, input: &[Node]) {
     for item in input.iter() {
         match &item.data {
             NodeData::Statement(_) => {}
@@ -75,7 +75,7 @@ pub fn check(identifier_data: &mut Vec<Identifier>, input: &Vec<Node>) {
             )),
             NodeData::FunctionCall(fc) => {
                 let fun_definition =
-                    find_in_identifier_data(&fc.identifier.join("___"), &identifier_data)
+                    find_in_identifier_data(&fc.identifier.join("___"), identifier_data)
                         .unwrap_or(Identifier {
                             variable: None,
                             function: None,
@@ -118,7 +118,7 @@ pub fn check(identifier_data: &mut Vec<Identifier>, input: &Vec<Node>) {
             }
             NodeData::VariableAssignment(va) => {
                 let actual_type = match va.value.first() {
-                    Some(n) => get_self_type(&n, &identifier_data),
+                    Some(n) => get_self_type(n, identifier_data),
                     None => send_error(
                         Errors::INCORRECTTYPE,
                         format!("Unknown type of variable {}", va.identifier.join("->")),
@@ -169,7 +169,7 @@ fn get_self_type(node: &Node, identifier_data: &Vec<Identifier>) -> (Types, bool
             if s.action == "return" {
                 // todo: idk maybe more than the first parameter?
                 return get_self_type(
-                    &s.parameters.first().unwrap_or_else(|| {
+                    s.parameters.first().unwrap_or_else(|| {
                         send_error(
                             Errors::INCORRECTTYPE,
                             "Missing Return statement".to_string(),

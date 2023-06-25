@@ -1,4 +1,4 @@
-use super::{load, Argument, Function, Node, Types};
+use super::{load, Argument, Function, Node, ParserData, Types};
 use crate::{
     errors::{send_error, Errors},
     exit, type_from_str, NodeData,
@@ -7,9 +7,7 @@ use crate::{
 pub fn parser(
     program: &mut Vec<Node>,
     data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
-    identifiers: &mut [Vec<String>],
-    enum_values: &mut Vec<Vec<String>>,
-    struct_data: &mut Vec<Vec<String>>,
+    (identifiers, enum_values, struct_data): ParserData,
 ) -> usize {
     // todo: maybe reimplement this with get_till_token_or_block ?
     let mut getting_args = false;

@@ -1,5 +1,6 @@
 use super::{
     super::Operations, get_till_token_or_block_and_math_block, load, Math, Node, NodeData,
+    ParserData,
 };
 
 pub fn parser(
@@ -8,9 +9,7 @@ pub fn parser(
     data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
     input: &Vec<String>,
     i: usize,
-    identifiers: &mut Vec<Vec<String>>,
-    enum_values: &mut Vec<Vec<String>>,
-    struct_data: &mut Vec<Vec<String>>,
+    (identifiers, enum_values, struct_data): ParserData,
 ) -> usize {
     let mut operator = "";
     let mut operation = Operations::NULL;
@@ -37,8 +36,8 @@ pub fn parser(
     }
 
     let mut lhs = vec![text.to_string()];
-    let mut raw_lhs = get_till_token_or_block_and_math_block(operator, input, i, false);
-    let rhs = get_till_token_or_block_and_math_block("EOL", input, raw_lhs.0, false);
+    let mut raw_lhs = get_till_token_or_block_and_math_block(operator, input, i);
+    let rhs = get_till_token_or_block_and_math_block("EOL", input, raw_lhs.0);
     lhs.append(&mut raw_lhs.1);
 
     program.push(Node::new(

@@ -1,11 +1,9 @@
-use super::{Enum, Node, NodeData};
+use super::{Enum, Node, NodeData, ParserData};
 
 pub fn parser(
     program: &mut Vec<Node>,
     data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
-    _identifiers: &mut [Vec<String>],
-    enum_values: &mut Vec<Vec<String>>,
-    _struct_data: &mut [Vec<String>],
+    (_identifiers, enum_values, _struct_data): ParserData,
 ) -> usize {
     let mut members = data.2.clone();
     members.retain(|x| !vec!["EOL", ",", "{", "}"].contains(&x.as_str()));

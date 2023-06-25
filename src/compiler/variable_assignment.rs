@@ -1,4 +1,4 @@
-use crate::{type_from_str, NodeData, Types, VariableAssignment};
+use crate::{NodeData, Types, VariableAssignment};
 
 use super::{compiler, type_to_c_type};
 

@@ -1,4 +1,6 @@
-use super::{get_till_token_or_block_and_math_block, load, Match, MatchCase, Node, NodeData};
+use super::{
+    get_till_token_or_block_and_math_block, load, Match, MatchCase, Node, NodeData, ParserData,
+};
 
 pub fn get_match_case(
     i: usize,
@@ -7,8 +9,8 @@ pub fn get_match_case(
     enum_values: &mut Vec<Vec<String>>,
     struct_data: &mut Vec<Vec<String>>,
 ) -> (usize, Option<MatchCase>) {
-    let case_data = get_till_token_or_block_and_math_block("=>", input, i, false);
-    let expr_data = get_till_token_or_block_and_math_block("EOL", input, case_data.0, false);
+    let case_data = get_till_token_or_block_and_math_block("=>", input, i);
+    let expr_data = get_till_token_or_block_and_math_block("EOL", input, case_data.0);
     let case_target = if case_data.3 {
         if case_data.2.is_empty() {
             return (case_data.0, None);
@@ -43,9 +45,7 @@ pub fn get_match_case(
 pub fn parser(
     program: &mut Vec<Node>,
     data: (usize, Vec<String>, Vec<String>, bool, Vec<String>),
-    identifiers: &mut Vec<Vec<String>>,
-    enum_values: &mut Vec<Vec<String>>,
-    struct_data: &mut Vec<Vec<String>>,
+    (identifiers, enum_values, struct_data): ParserData,
 ) -> usize {
     let mut block = vec![];
     let mut j = 0;

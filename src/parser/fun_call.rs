@@ -1,22 +1,21 @@
-use super::{get_till_token_or_block_and_math_block, load, FunctionCall, Node, NodeData};
+use super::{
+    get_till_token_or_block_and_math_block, load, FunctionCall, Node, NodeData, ParserData,
+};
 
 pub fn parser(
     program: &mut Vec<Node>,
     text: &String,
     input: &Vec<String>,
     i: usize,
-    identifiers: &mut Vec<Vec<String>>,
-    enum_values: &mut Vec<Vec<String>>,
-    struct_data: &mut Vec<Vec<String>>,
+    (identifiers, enum_values, struct_data): ParserData,
 ) -> usize {
     let mut identifier = vec![text.to_string()];
-    let mut raw_identifier = get_till_token_or_block_and_math_block("(", input, i, false);
+    let mut raw_identifier = get_till_token_or_block_and_math_block("(", input, i);
 
     identifier.append(&mut raw_identifier.1);
 
     let mut raw_args = vec![];
-    let mut raw_raw_args =
-        get_till_token_or_block_and_math_block(")", input, raw_identifier.0 - 1, false);
+    let mut raw_raw_args = get_till_token_or_block_and_math_block(")", input, raw_identifier.0 - 1);
 
     // basically, join the block you found with the main content
     raw_args.append(&mut raw_raw_args.1);

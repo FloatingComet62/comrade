@@ -1,5 +1,4 @@
 use crate::{
-    errors::{send_error, Errors},
     str_list_to_string_list, type_from_str, Argument, ConditionBlock, Enum, Expression, Function,
     FunctionCall, Literal, Match, MatchCase, Math, Node, NodeData, Statement, Struct, StructMember,
     Types, VariableAssignment,
@@ -15,9 +14,15 @@ mod booleans;
 mod extern_c;
 mod fun;
 mod fun_call;
-mod include_n_return_n_erase;
 mod math;
+mod statement;
 mod variable_assignment;
+
+type ParserData<'a> = (
+    &'a mut Vec<Vec<String>>,
+    &'a mut Vec<Vec<String>>,
+    &'a mut Vec<Vec<String>>,
+);
 
 pub struct Parser {
     pub splitted_text: Vec<String>,
@@ -50,7 +55,6 @@ pub fn get_till_token_or_block_and_math_block(
     token: &str,
     input: &Vec<String>,
     i: usize,
-    back: bool,
 ) -> (usize, Vec<String>, Vec<String>, bool, Vec<String>) {
     let mut output: Vec<String> = vec![];
     let mut block: Vec<String> = vec![];
@@ -59,21 +63,7 @@ pub fn get_till_token_or_block_and_math_block(
     let mut getting_block = 0;
     let mut getting_function_call = 0;
     let mut is_comment = false;
-    let mut j = i;
-    let mut oh_god_we_reached_the_start_while_going_back = false;
-    if back {
-        j = j.checked_sub(1).unwrap_or_else(|| {
-            oh_god_we_reached_the_start_while_going_back = true;
-            0
-        });
-        send_error(Errors::MISSINGBLOCK, String::new(), 0, 0);
-    } else {
-        j += 1;
-    }
-
-    if oh_god_we_reached_the_start_while_going_back {
-        return (j, output, block, got_block, math_block);
-    }
+    let mut j = i + 1;
 
     while j < input.len() {
         let text = &input[j];
@@ -123,14 +113,7 @@ pub fn get_till_token_or_block_and_math_block(
             }
         }
 
-        if back {
-            j = j.checked_sub(1).unwrap_or_else(|| {
-                oh_god_we_reached_the_start_while_going_back = true;
-                0
-            });
-        } else {
-            j += 1;
-        }
+        j += 1;
     }
     (j, output, block, got_block, math_block)
 }
@@ -167,7 +150,7 @@ pub fn load(
     let mut text = &String::new();
     let mut i = 0;
     while i < input.len() {
-        let data = get_till_token_or_block_and_math_block("EOL", input, i, false);
+        let data = get_till_token_or_block_and_math_block("EOL", input, i);
         previous_text = text.clone();
         text = &input[i];
 
@@ -252,67 +235,17 @@ pub fn load(
             }
         }
 
-        // ! externC -> let -> math -> literal -> others
-        if text == "externC" {
-            i = extern_c::parser(&mut program, data);
-        } else if text == "let" {
-            i = variable_assignment::parser(
-                &mut program,
-                data,
-                input,
-                i,
-                &previous_text,
-                identifiers,
-                enum_values,
-                struct_data,
-                false,
-            );
-        } else if text == "const" {
-            i = variable_assignment::parser(
-                &mut program,
-                data,
-                input,
-                i,
-                &previous_text,
-                identifiers,
-                enum_values,
-                struct_data,
-                true,
-            );
-        } else if text == "include" || text == "return" || text == "erase" {
-            i = include_n_return_n_erase::parser(
-                &mut program,
-                data,
-                text,
-                identifiers,
-                enum_values,
-                struct_data,
-            );
-        } else if text == "true" || text == "false" {
-            i = booleans::parser(&mut program, data, text);
-        } else if text == "if" || text == "else" {
-            i = _if::parser(
-                &mut program,
-                data,
-                text,
-                &previous_text,
-                input,
-                i,
-                identifiers,
-                enum_values,
-                struct_data,
-            );
-        } else if text == "while" {
-            i = _while::parser(&mut program, data, identifiers, enum_values, struct_data);
-        // } else if text == "for" {
-        // i = _for::parser(&mut program, data, &mut identifiers);
-        } else if text == "struct" {
-            i = _struct::parser(&mut program, data, identifiers, enum_values, struct_data);
-        } else if text == "enum" {
-            i = _enum::parser(&mut program, data, identifiers, enum_values, struct_data);
-        } else if text == "fun" {
-            i = fun::parser(&mut program, data, identifiers, enum_values, struct_data);
-        } else if has(
+        let extern_c_check = text == "externC";
+        let variable_assignment_check = text == "let" || text == "const";
+        let is_const = text == "const";
+        let statement_text = text == "include" || text == "return" || text == "erase";
+        let boolean_check = text == "true" || text == "false";
+        let if_check = text == "if" || text == "else";
+        let while_check = text == "while";
+        let struct_check = text == "struct";
+        let enum_check = text == "enum";
+        let function_check = text == "fun";
+        let math_check = has(
             &data.1,
             vec![
                 "+", "-", "*", "/", "==", "=", ">", "<", "<=", ">=", "!=", "+=", "-=", "*=", "/=",
@@ -337,19 +270,79 @@ pub fn load(
                     }
                 }
                 !unblocked_op.is_empty()
+            };
+        let string_check = text.chars().next().unwrap_or('\0') == '\"';
+        let number_check = {
+            let mut output = false;
+            if text.len() >= 2
+                && text.chars().next().expect("impossible") == '-'
+                && text.chars().nth(1).expect("impossible").is_numeric()
+            {
+                output = true;
             }
-        {
+            if !output {
+                // there is only 1 previous true assignment for output, so if output is true, then that means it is -ve
+                output = text.chars().next().unwrap_or('\0').is_numeric();
+            }
+
+            output
+        };
+        let type_check = type_from_str(text) != Types::None;
+        let match_check = text == "match";
+        let function_call_check = has(&data.1, vec!["(", ")"], Mode::And);
+
+        // ! externC -> let -> math -> literal
+        if extern_c_check {
+            i = extern_c::parser(&mut program, data);
+        } else if variable_assignment_check {
+            i = variable_assignment::parser(
+                &mut program,
+                data,
+                input,
+                i,
+                &previous_text,
+                (identifiers, enum_values, struct_data),
+                is_const,
+            );
+        } else if statement_text {
+            i = statement::parser(
+                &mut program,
+                data,
+                text,
+                (identifiers, enum_values, struct_data),
+            );
+        } else if boolean_check {
+            i = booleans::parser(&mut program, data, text);
+        } else if if_check {
+            i = _if::parser(
+                &mut program,
+                data,
+                text,
+                &previous_text,
+                input,
+                i,
+                (identifiers, enum_values, struct_data),
+            );
+        } else if while_check {
+            i = _while::parser(&mut program, data, (identifiers, enum_values, struct_data));
+        // } else if text == "for" {
+        // i = _for::parser(&mut program, data, &mut identifiers);
+        } else if struct_check {
+            i = _struct::parser(&mut program, data, (identifiers, enum_values, struct_data));
+        } else if enum_check {
+            i = _enum::parser(&mut program, data, (identifiers, enum_values, struct_data));
+        } else if function_check {
+            i = fun::parser(&mut program, data, (identifiers, enum_values, struct_data));
+        } else if math_check {
             i = math::parser(
                 &mut program,
                 text,
                 data,
                 input,
                 i,
-                identifiers,
-                enum_values,
-                struct_data,
+                (identifiers, enum_values, struct_data),
             );
-        } else if text.chars().next().unwrap_or('\0') == '\"' {
+        } else if string_check {
             program.push(Node::new(
                 NodeData::Literal(Literal {
                     literal: text.to_string(),
@@ -358,22 +351,7 @@ pub fn load(
                 0,
                 0,
             ));
-        } else if {
-            let mut output = false;
-            if text.len() >= 2 {
-                if text.chars().nth(0).expect("impossible") == '-'
-                    && text.chars().nth(1).expect("impossible").is_numeric()
-                {
-                    output = true;
-                }
-            }
-            if !output {
-                // there is only 1 previous true assignment for output, so if output is true, then that means it is -ve
-                output = text.chars().next().unwrap_or('\0').is_numeric();
-            }
-
-            output
-        } {
+        } else if number_check {
             program.push(Node::new(
                 NodeData::Literal(Literal {
                     literal: text.to_string(),
@@ -382,7 +360,7 @@ pub fn load(
                 0,
                 0,
             ));
-        } else if type_from_str(text) != Types::None {
+        } else if type_check {
             program.push(Node::new(
                 NodeData::Literal(Literal {
                     literal: text.to_string(),
@@ -391,18 +369,16 @@ pub fn load(
                 0,
                 0,
             ));
-        } else if text == "match" {
-            i = _match::parser(&mut program, data, identifiers, enum_values, struct_data);
-        } else if has(&data.1, vec!["(", ")"], Mode::And) {
+        } else if match_check {
+            i = _match::parser(&mut program, data, (identifiers, enum_values, struct_data));
+        } else if function_call_check {
             // also, it's a function call when there is no fun
             i = fun_call::parser(
                 &mut program,
                 text,
                 input,
                 i,
-                identifiers,
-                enum_values,
-                struct_data,
+                (identifiers, enum_values, struct_data),
             );
         }
         i += 1;
