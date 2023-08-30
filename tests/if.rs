@@ -1,20 +1,19 @@
+use comrade::parser::{Parser, ParserData};
+use comrade::run;
 use comrade::{
     lexer::Lexer, ConditionBlock, FunctionCall, Literal, Math, Node, NodeData, Operations, Types,
 };
 
 #[test]
 fn test() {
-    let lexer = Lexer::new(
-        "
+    assert_eq!(
+        run!(
+            "
 if 5 > 5 {
     io->out(\"Hello World\")
 }
-"
-        .to_string(),
-    );
-    let program = lexer.parse(false, false, false, false);
-    assert_eq!(
-        program.0,
+        "
+        ),
         vec![Node::new(
             NodeData::ConditionBlock(ConditionBlock {
                 keyword: "if".to_string(),

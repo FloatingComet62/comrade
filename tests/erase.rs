@@ -1,17 +1,16 @@
+use comrade::parser::{Parser, ParserData};
+use comrade::run;
 use comrade::{lexer::Lexer, Expression, Node, NodeData, Statement};
 
 #[test]
 fn test() {
-    let lexer = Lexer::new(
-        "
+    assert_eq!(
+        run!(
+            "
 let a = 5
 erase a
-"
-        .to_string(),
-    );
-    let program = lexer.parse(false, false, false, false);
-    assert_eq!(
-        program.0[1],
+        "
+        )[1],
         Node::new(
             NodeData::Statement(Statement {
                 action: "erase".to_string(),

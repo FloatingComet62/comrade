@@ -1,11 +1,11 @@
+use comrade::parser::{Parser, ParserData};
+use comrade::run;
 use comrade::{lexer::Lexer, Literal, Math, Node, NodeData, Operations, Types};
 
 macro_rules! math_test {
     ($op_str: expr, $op: expr) => {
-        let lexer = Lexer::new(format!("5 {} 5", $op_str));
-        let program = lexer.parse(false, false, false, false);
         assert_eq!(
-            program.0,
+            run!(format!("5 {} 5", $op_str)),
             vec![Node::new(
                 NodeData::Math(Math {
                     lhs: vec![Node::new(

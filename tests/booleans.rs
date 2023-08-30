@@ -1,11 +1,10 @@
-use comrade::{lexer::Lexer, Literal, Node, NodeData, Types};
+use comrade::parser::{Parser, ParserData};
+use comrade::{lexer::Lexer, run, Literal, Node, NodeData, Types};
 
 #[test]
 fn test() {
-    let lexer = Lexer::new("true".to_string());
-    let program = lexer.parse(false, false, false, false);
     assert_eq!(
-        program.0,
+        run!("true"),
         vec![Node::new(
             NodeData::Literal(Literal {
                 literal: "true".to_string(),
@@ -15,10 +14,8 @@ fn test() {
             0
         )]
     );
-    let lexer = Lexer::new("false".to_string());
-    let program = lexer.parse(false, false, false, false);
     assert_eq!(
-        program.0,
+        run!("false"),
         vec![Node::new(
             NodeData::Literal(Literal {
                 literal: "false".to_string(),

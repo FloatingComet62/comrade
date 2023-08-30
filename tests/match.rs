@@ -1,3 +1,5 @@
+use comrade::parser::{Parser, ParserData};
+use comrade::run;
 use comrade::{
     lexer::Lexer, str_list_to_string_list, Expression, FunctionCall, Literal, Match, MatchCase,
     Node, NodeData, Types, VariableAssignment,
@@ -5,8 +7,9 @@ use comrade::{
 
 #[test]
 fn test() {
-    let lexer = Lexer::new(
-        "
+    assert_eq!(
+        run!(
+            "
 match io->in(i32) {
     5 => {
         let x = 3
@@ -16,12 +19,8 @@ match io->in(i32) {
     420 => io->out(\"nice\")
     default => io->out(\"bruh\")
 }
-"
-        .to_string(),
-    );
-    let program = lexer.parse(false, false, false, false);
-    assert_eq!(
-        program.0,
+        "
+        ),
         vec![Node::new(
             NodeData::Match(Match {
                 condition: vec![Node::new(

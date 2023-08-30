@@ -1,21 +1,19 @@
-use comrade::{lexer::Lexer, Enum, Node, NodeData};
+use comrade::parser::{Parser, ParserData};
+use comrade::{lexer::Lexer, run, Enum, Node, NodeData};
 
 #[test]
 fn test() {
-    let lexer = Lexer::new(
-        "
+    assert_eq!(
+        run!(
+            "
 enum Emotions {
     Good,
     Neutral,
     Awful,
     WorstEver
 }
-    "
-        .to_string(),
-    );
-    let program = lexer.parse(false, false, false, false);
-    assert_eq!(
-        program.0,
+        "
+        ),
         vec![Node::new(
             NodeData::Enum(Enum {
                 identifier: vec!["Emotions".to_string()],

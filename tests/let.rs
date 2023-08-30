@@ -1,11 +1,15 @@
+use comrade::parser::{Parser, ParserData};
+use comrade::run;
 use comrade::{lexer::Lexer, Literal, Node, NodeData, Types, VariableAssignment};
 
 #[test]
 fn test() {
-    let lexer = Lexer::new("let a = 5".to_string());
-    let program = lexer.parse(false, false, false, false);
     assert_eq!(
-        program.0,
+        run!(
+            "
+let a = 5
+        "
+        ),
         vec![Node::new(
             NodeData::VariableAssignment(VariableAssignment {
                 identifier: vec!["a".to_string()],
@@ -26,10 +30,12 @@ fn test() {
         )]
     );
 
-    let lexer = Lexer::new("let a -> u32 = 5".to_string());
-    let program = lexer.parse(false, false, false, false);
     assert_eq!(
-        program.0,
+        run!(
+            "
+        let a -> u32 = 5
+        "
+        ),
         vec![Node::new(
             NodeData::VariableAssignment(VariableAssignment {
                 identifier: vec!["a".to_string()],

@@ -1,3 +1,5 @@
+use comrade::parser::{Parser, ParserData};
+use comrade::run;
 use comrade::{
     lexer::Lexer, Expression, FunctionCall, Literal, Node, NodeData, Statement, Types,
     VariableAssignment,
@@ -5,19 +7,16 @@ use comrade::{
 
 #[test]
 fn test() {
-    let lexer = Lexer::new(
-        "
+    assert_eq!(
+        run!(
+            "
 let a = 5
 someRandomFunction(a, \"Hello World\", 35, {
     let x = 5
     return x
 })
-    "
-        .to_string(),
-    );
-    let program = lexer.parse(false, false, false, false);
-    assert_eq!(
-        program.0[1], // not checking the let statement
+        "
+        )[1],
         Node::new(
             NodeData::FunctionCall(FunctionCall {
                 identifier: vec!["someRandomFunction".to_string()],

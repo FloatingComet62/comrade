@@ -6,6 +6,7 @@ use std::process;
 pub mod compiler;
 pub mod errors;
 pub mod lexer;
+pub mod nodes;
 pub mod parser;
 pub mod type_checker;
 
@@ -329,4 +330,15 @@ impl DerefMut for Node {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.data
     }
+}
+
+#[macro_export]
+macro_rules! run {
+    ($x: expr) => {{
+        let lexer = Lexer::new($x.to_string());
+        let tokens = lexer.token_splitter();
+        let mut parser = Parser::new(tokens, ParserData::new(true));
+        parser.load();
+        parser.program
+    }};
 }

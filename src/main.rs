@@ -1,4 +1,11 @@
-use comrade::{exit, lexer::Lexer, read_file, write_file, FILE_EXTENSION};
+use comrade::{
+    compiler, exit,
+    lexer::Lexer,
+    parser::{Parser, ParserData},
+    read_file,
+    type_checker::{self},
+    write_file, FILE_EXTENSION,
+};
 use open::that;
 use std::{env, process::Command};
 
@@ -52,11 +59,44 @@ To print this message
                 );
                 exit("", Some(0));
             }
+
             let data = read_file(path);
-            let parser = Lexer::new(data);
-            let (_program, c_code) = parser.parse(true, print_tokens, print_ast, print_c_code);
+            let lexer = Lexer::new(data);
+            let tokens = lexer.token_splitter();
+            if print_tokens {
+                println!("{:?}", tokens);
+            }
+
+            // adding libs here so that they get recognized as identifiers
+            // maybe if I make a no std version, I can just make identifiers just do this
+            // ```rust
+            // let mut identifiers: Vec<Vec<String>> = vec![];
+            // ```
+
+            let mut parser = Parser::new(tokens, ParserData::new(true));
+            parser.load();
+
+            if print_ast {
+                println!("{:#?}", parser.program);
+            }
+
             if !compile {
-                return;
+                exit("", Some(0));
+            }
+
+            type_checker::check_main(&parser.program);
+
+            let c_code = compiler::compiler(
+                &parser.program,
+                "
+#include <stdbool.h>
+        "
+                .to_string(),
+                true,
+                false,
+            );
+            if print_c_code {
+                println!("{:?}", c_code);
             }
             if let Err(e) = write_file(out_path, c_code) {
                 exit(

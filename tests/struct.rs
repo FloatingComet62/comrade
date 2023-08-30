@@ -1,20 +1,18 @@
-use comrade::{lexer::Lexer, Node, NodeData, Struct, StructMember, Types};
+use comrade::parser::{Parser, ParserData};
+use comrade::{lexer::Lexer, run, Node, NodeData, Struct, StructMember, Types};
 
 #[test]
 fn test() {
-    let lexer = Lexer::new(
-        "
+    assert_eq!(
+        run!(
+            "
 struct User {
     name -> str
     age -> i32
     email -> str
 }
-"
-        .to_string(),
-    );
-    let program = lexer.parse(false, false, false, false);
-    assert_eq!(
-        program.0,
+        "
+        ),
         vec![Node::new(
             NodeData::Struct(Struct {
                 identifier: vec!["User".to_string()],

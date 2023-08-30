@@ -1,9 +1,4 @@
-use crate::{compiler, str_list_to_string_list, type_checker};
-
-use super::{
-    parser::{load, Parser},
-    Node,
-};
+use crate::str_list_to_string_list;
 
 /// # Lexer
 /// Lexer will split the code into tokens
@@ -88,7 +83,7 @@ impl Lexer {
     }
 
     // split code into tokens
-    fn token_splitter(self: &Lexer, to_split: &String) -> Vec<String> {
+    pub fn token_splitter(self: &Lexer) -> Vec<String> {
         let mut output: Vec<String> = vec![];
         // Item we are working on
         let mut current_item = String::new();
@@ -96,10 +91,10 @@ impl Lexer {
         let mut getting_string = false;
         // Are we getting externC
         let mut getting_exter_c = 0;
-        let to_split_chars: Vec<char> = to_split.chars().collect();
+        let to_split_chars: Vec<char> = self.data.chars().collect();
 
         let mut i = 0;
-        while i < to_split.len() {
+        while i < self.data.len() {
             let item_to_check = to_split_chars[i];
             if item_to_check == '"' {
                 getting_string = !getting_string;
@@ -164,74 +159,4 @@ impl Lexer {
         output.push(current_item);
         output
     }
-    /// Generate tokens, Generate AST, Generate C code, all in 1
-    /// * `compile` - Compile to C?
-    /// * `print_tokens` - Print the generated tokens?
-    /// * `print_ast` - Print the generated Abstract Syntax Tree?
-    /// * `print_c_code` - Print the generated C Code?
-    pub fn parse(
-        self: &Lexer,
-        compile: bool,
-        print_tokens: bool,
-        print_ast: bool,
-        print_c_code: bool,
-    ) -> (Vec<Node>, String) {
-        let res = self.token_splitter(&self.data);
-        if print_tokens {
-            println!("{:?}", res);
-        }
-        let mut lexer = Parser::new(res);
-
-        // adding libs here so that they get recognized as identifiers
-        // maybe if I make a no std version, I can just make identifiers just do this
-        // ```rust
-        // let mut identifiers: Vec<Vec<String>> = vec![];
-        // ```
-        let mut identifiers: Vec<Vec<String>> = lexer.libs.clone();
-        let mut enum_values: Vec<Vec<String>> = vec![];
-        let mut struct_data: Vec<Vec<String>> = vec![];
-
-        identifiers.append(&mut lexer.keywords.clone());
-
-        lexer.program = load(
-            &lexer.splitted_text,
-            &mut identifiers,
-            &mut enum_values,
-            &mut struct_data,
-        );
-        if print_ast {
-            println!("{:?}", lexer.program);
-        }
-
-        if !compile {
-            return (lexer.program, String::new());
-        }
-
-        type_checker::check_main(&lexer.program);
-
-        let c_code = compiler::compiler(
-            &lexer.program,
-            "
-#include <stdbool.h>
-        "
-            .to_string(),
-            true,
-            false,
-        );
-        if print_c_code {
-            println!("{:?}", c_code);
-        }
-
-        (lexer.program, c_code)
-    }
-}
-
-pub fn get_first(input: &Vec<Vec<String>>) -> Vec<String> {
-    let mut output = vec![];
-
-    for item in input {
-        output.push(item[0].clone());
-    }
-
-    output
 }

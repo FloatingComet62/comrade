@@ -1,17 +1,16 @@
+use comrade::parser::{Parser, ParserData};
+use comrade::run;
 use comrade::{lexer::Lexer, str_list_to_string_list, Expression, Node, NodeData, Statement};
 
 #[test]
 fn test() {
-    let lexer = Lexer::new(
-        "
+    assert_eq!(
+        run!(
+            "
 include std->io
 include std->math
-"
-        .to_string(),
-    );
-    let program = lexer.parse(false, false, false, false);
-    assert_eq!(
-        program.0,
+        "
+        ),
         vec![
             Node::new(
                 NodeData::Statement(Statement {
