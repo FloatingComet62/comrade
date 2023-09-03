@@ -90,6 +90,10 @@ pub fn compiler(
             NodeData::Struct(x) => append!(strm, x),
             _ => todo!(),
         }
+
+        if is_inside_function_call && i != program.len() - 1 {
+            output += ",";
+        }
     }
 
     output

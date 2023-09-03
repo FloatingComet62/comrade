@@ -1,8 +1,11 @@
 include std->io
+include std->string
 
 fun main(_argc -> i32, _argv -> str[]) => u8 {
-    // Hello World example
-    const a = -5
-    io->out("Hello World")
+    let s = ""
+    io->out("Enter string: ")
+    io->in(s)
+    io->out(string->format("You entered %d", s))
+
     return 0
 }

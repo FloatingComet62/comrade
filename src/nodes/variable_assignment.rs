@@ -81,7 +81,7 @@ fn types(input: &VariableAssignment) -> (String, bool) {
     }
     if input.type_data == Types::None {
         let mut output = "struct ".to_string();
-        output += &format!("{:?}", &input.type_data);
+        output += &format!("{:#?}", &input.type_data);
         return (output, false);
     }
     let res = type_to_c_type(&input.type_data);
@@ -128,9 +128,24 @@ impl NodeInterferace<VariableAssignment> for VariableAssignmentManager {
         }
         let raw_val = parser.get_till_token_or_block_and_math_block("EOL", raw_iden.0);
         let val = val_getter(&i_type, raw_val, &mut parser_data, &iden.clone());
-        let iden_str = iden.clone();
 
-        parser_data.identifier.push(iden_str);
+        if type_from_str(&iden.join("->")) != Types::None {
+            // The user are trying to override a type
+            // eg.
+            // let str = ""
+            // let bool = true
+            // let u8 = 9
+
+            exit(
+                &format!(
+                    "Can't name an identifier {:?} because that is a typename",
+                    iden.join("->")
+                ),
+                None,
+            )
+        }
+
+        parser_data.identifier.push(iden.clone());
         program.push(Node::new(
             NodeData::VariableAssignment(VariableAssignment {
                 identifier: iden,

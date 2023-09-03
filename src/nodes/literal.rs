@@ -6,7 +6,7 @@ use crate::{
 use super::NodeInterferace;
 
 pub struct LiteralManager {
-    l_types: Types,
+    pub l_types: Types,
 }
 impl LiteralManager {
     pub fn new(l_types: Types) -> Self {

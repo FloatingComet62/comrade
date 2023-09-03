@@ -41,21 +41,9 @@ impl NodeInterferace<FunctionCall> for FunctionCallManager {
         // basically, join the block you found with the main content
         raw_args.append(&mut raw_raw_args.1);
         raw_args.append(&mut raw_raw_args.2);
+        raw_args.push(")".to_string());
 
-        // Raw_args: ["(", "5"]
-        // if there is only 1 "(", then it's fine
-        // but if there is more, than the missing ")" at the end messes up the program
-        // eg. ["(", "fib", "(", "5" , ")"]
-        let mut brack_count = 0;
-        for cell in raw_args.iter() {
-            if cell == "(" {
-                brack_count += 1;
-            }
-        }
-
-        if brack_count > 1 {
-            raw_args.push(")".to_string());
-        }
+        println!("{:?}", parser_data.identifier);
 
         let mut args: Vec<Vec<Node>> = vec![];
         let mut arg: Vec<String> = vec![];

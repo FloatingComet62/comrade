@@ -107,7 +107,7 @@ pub fn check(identifier_data: &mut Vec<Identifier>, input: &[Node]) {
                         send_error(
                             Errors::INCORRECTTYPE,
                             format!(
-                                "Incorrect type of argument {:?}, provided {:?}, expected {:?}",
+                                "Incorrect type of argument {:#?}, provided {:#?}, expected {:#?}",
                                 fun_definition.arguments[i].name,
                                 arg_type.0,
                                 fun_definition.arguments[i].t
@@ -133,7 +133,7 @@ pub fn check(identifier_data: &mut Vec<Identifier>, input: &[Node]) {
                     send_error(
                         Errors::INCORRECTTYPE,
                         format!(
-                            "Not matching types, Explicit type: {:?}\nActual type: {:?}",
+                            "Not matching types, Explicit type: {:#?}\nActual type: {:#?}",
                             va.type_data, actual_type.0
                         ),
                         item.line,

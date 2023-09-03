@@ -1,5 +1,7 @@
-fun __init__() {
-    externC {
+
+#include <stdbool.h>
+        
+
 // std->io ------------
 
 #include <stdio.h>
@@ -57,5 +59,30 @@ bool io__in__bool() {
   x = _Generic(x, int: io___in___in, char*: io___in___str, bool: io__in__bool)()
 
 // --------------------
-    }
+    
+
+
+// std->string ------------
+
+#include <stdarg.h>
+
+// source code of sprintf()
+char* string___format(
+    char const* const _Format,
+    ...
+) {
+    char* s;
+    va_list _ArgList;
+    _crt_va_start(_ArgList, _Format);
+
+    _vsprintf_l(s, _Format, NULL, _ArgList);
+
+    _crt_va_end(_ArgList);
+
+    return s;
 }
+
+// ------------------------
+   
+int main(int _argc, char* _argv[]) {
+char* s = "";io___out("Enter string: ");io___in(s);io___out("You entered %d"s);return 0;}

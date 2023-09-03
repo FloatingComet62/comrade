@@ -11,8 +11,8 @@ match STATEMENT {
   default => BLOCK
 }
 
-let mutable_letiable = VALUE
-const immutable_letiable = VALUE
+let mutable = VALUE
+const immutable = VALUE
 
 const list = [ITEM1, ITEM2, ITEM3]
 const list2 = ITEM1, ITEM2, ITEM3
@@ -44,7 +44,6 @@ for let i = 0 -> i32 / TRUE_FALSE_STATEMENT / i++ {
 }
 
 // Example Comment
-# Example Comment
 
 struct STRCUTURE_NAME : InheritStruct1 | InheritStruct2 {
   ATTRIBUTE1 -> TYPE1

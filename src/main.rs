@@ -1,10 +1,12 @@
 use comrade::{
-    compiler, exit,
+    compiler,
+    exit,
     lexer::Lexer,
     parser::{Parser, ParserData},
     read_file,
-    type_checker::{self},
-    write_file, FILE_EXTENSION,
+    // type_checker::{self},
+    write_file,
+    FILE_EXTENSION,
 };
 use open::that;
 use std::{env, process::Command};
@@ -64,7 +66,7 @@ To print this message
             let lexer = Lexer::new(data);
             let tokens = lexer.token_splitter();
             if print_tokens {
-                println!("{:?}", tokens);
+                println!("{:#?}", tokens);
             }
 
             // adding libs here so that they get recognized as identifiers
@@ -84,7 +86,7 @@ To print this message
                 exit("", Some(0));
             }
 
-            type_checker::check_main(&parser.program);
+            // type_checker::check_main(&parser.program);
 
             let c_code = compiler::compiler(
                 &parser.program,
@@ -96,7 +98,7 @@ To print this message
                 false,
             );
             if print_c_code {
-                println!("{:?}", c_code);
+                println!("{:#?}", c_code);
             }
             if let Err(e) = write_file(out_path, c_code) {
                 exit(
@@ -106,7 +108,7 @@ To print this message
             }
             Command::new(compiler)
                 .arg(out_path)
-                .arg("-o main.exe")
+                .arg("-omain.exe") // for some reason, using "-o main.exe" creates a file " main.exe"
                 .spawn()
                 .expect("Failed to compile C code");
         }

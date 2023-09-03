@@ -275,7 +275,7 @@ pub struct ExternC {
 }
 
 // todo ->
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(PartialEq, Eq, Clone)]
 pub enum NodeData {
     Statement(Statement),
     Function(Function),
@@ -293,7 +293,30 @@ pub enum NodeData {
     None,
 }
 
-// todo: if by the end of the parser, all node has is "data", just make Node NodeData
+impl Debug for NodeData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let x = {
+            match self {
+                NodeData::Statement(x) => format!("{:#?}", x),
+                NodeData::Function(x) => format!("{:#?}", x),
+                NodeData::FunctionCall(x) => format!("{:#?}", x),
+                NodeData::VariableAssignment(x) => format!("{:#?}", x),
+                NodeData::Expression(x) => format!("{:#?}", x),
+                NodeData::ConditionBlock(x) => format!("{:#?}", x),
+                NodeData::Match(x) => format!("{:#?}", x),
+                NodeData::Literal(x) => format!("{:#?}", x),
+                NodeData::Math(x) => format!("{:#?}", x),
+                NodeData::Struct(x) => format!("{:#?}", x),
+                NodeData::Enum(x) => format!("{:#?}", x),
+                NodeData::ExternC(x) => format!("{:#?}", x),
+                NodeData::StructValue(x) => format!("{:#?}", x),
+                NodeData::None => format!(""),
+            }
+        };
+        f.write_str(&x)
+    }
+}
+
 #[derive(PartialEq, Eq, Clone)]
 pub struct Node {
     pub data: NodeData,
@@ -303,7 +326,7 @@ pub struct Node {
 
 impl Debug for Node {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_fmt(format_args!("{:?}", self.data))
+        f.write_fmt(format_args!("{:#?}", self.data))
     }
 }
 

@@ -76,7 +76,6 @@ impl NodeInterferace<Match> for MatchManager {
     ) {
         let mut block = vec![];
         let mut j = 0;
-        println!("{:#?}", data);
         while j < data.2.len() {
             let x = get_match_case(&data.2, parser.parser_data.clone(), j);
             if let Some(y) = x.1 {

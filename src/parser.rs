@@ -35,7 +35,7 @@ impl ParserData {
     }
 }
 
-pub const LIB: [[&str; 2]; 2] = [["std", "io"], ["std", "math"]];
+pub const LIB: [[&str; 2]; 3] = [["std", "io"], ["std", "math"], ["std", "string"]];
 pub const KEYWORDS: [[&str; 1]; 2] = [["default"], ["NULL"]];
 
 pub enum Mode {
@@ -183,9 +183,6 @@ impl Parser {
     fn is_math(&self, token: String) -> bool {
         has(&[token], self.math_tokens.to_vec(), Mode::Or)
     }
-    fn is_math_vec(&self, token: &Vec<String>) -> bool {
-        has(token, self.math_tokens.to_vec(), Mode::Or)
-    }
 
     fn list_check(&self, idenf: &mut Vec<String>, input: &Vec<String>, i: usize) -> Option<()> {
         if let Some(first) = input.get(i + 1) {
@@ -220,7 +217,6 @@ impl Parser {
         let mut i_adder: usize = 0;
         for (k, id) in iden.iter().enumerate() {
             if let Some(to_check) = self.input.get(i + k) {
-                println!("{}", to_check);
                 if to_check != id.as_str() {
                     identifer = false;
                 }
@@ -290,11 +286,10 @@ impl Parser {
                 continue;
             }
 
-            let is_math = self.is_math_vec(&data.1);
             let is_math_op = has(&data.1, self.math_ops.to_vec(), Mode::Or);
 
             // check if no math
-            if !is_math {
+            if !is_math_op {
                 // identifier check
                 for iden in self.parser_data.identifier.iter() {
                     if !(text == &iden[0]) {
@@ -308,11 +303,12 @@ impl Parser {
                         }
                     }
                 }
-                // enum values
-                for enum_val in self.parser_data.enum_values.iter() {
-                    self.enum_check(&mut program, text.to_string(), enum_val, i);
-                }
             }
+            // enum values
+            for enum_val in self.parser_data.enum_values.iter() {
+                self.enum_check(&mut program, text.to_string(), enum_val, i);
+            }
+            // }
 
             let bm = nodes::booleans::BooleanManager::new();
             let em = nodes::enum_expr::EnumManager::new();
