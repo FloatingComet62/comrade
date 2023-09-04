@@ -60,29 +60,5 @@ bool io__in__bool() {
 
 // --------------------
     
-
-
-// std->string ------------
-
-#include <stdarg.h>
-
-// source code of sprintf()
-char* string___format(
-    char const* const _Format,
-    ...
-) {
-    char* s;
-    va_list _ArgList;
-    _crt_va_start(_ArgList, _Format);
-
-    _vsprintf_l(s, _Format, NULL, _ArgList);
-
-    _crt_va_end(_ArgList);
-
-    return s;
-}
-
-// ------------------------
-   
-int main(int _argc, char* _argv[]) {
-char* s = "";io___out("Enter string: ");io___in(s);io___out("You entered %d"s);return 0;}
+enum Emotions {Emotions_Happy, Emotions_Sad, Emotions_Angry, Emotions_Mad, };int main(int _argc, char* _argv[]) {
+struct None feeling = { Happy, Sad, Angry, Mad };io___out(feeling);return 0;}

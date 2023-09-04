@@ -1,11 +1,17 @@
 include std->io
-include std->string
+
+enum Emotions {
+    Happy Sad Angry Mad
+}
 
 fun main(_argc -> i32, _argv -> str[]) => u8 {
-    let s = ""
-    io->out("Enter string: ")
-    io->in(s)
-    io->out(string->format("You entered %d", s))
+    // let s = ""
+    // io->out("Enter string: ")
+    // io->in(s)
+    // io->out(string->format("You entered %d", s))
+
+    let feeling = Emotions->Happy
+    io->out(feeling)
 
     return 0
 }

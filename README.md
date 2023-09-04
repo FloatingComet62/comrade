@@ -1,5 +1,7 @@
 <div align="center">
+
 ![Comrade](/Comrade.svg)
+
 <h3>Comrade</h3>
 A flexible language transpiled to C
 <br>
@@ -205,6 +207,15 @@ let xx -> u8[] = 0 128 255
 let yy -> i8[] = -128 0 127
 ```
 
+Reserved keywords for types
+
+```rust
+    u4 u8 u16 u32 u64 u128
+    i4 i8 i16 i32 i64 i128
+    f4 f8 f16 f32 f64 f128
+    str bool
+```
+
 # Importing and Exporting
 
 src/file.cmr
@@ -272,5 +283,102 @@ externC {
 
         return x();
     }
+}
+```
+
+# Borrow Checker
+
+Borrow checker, same as rust
+
+# Classes
+
+Classes are bullshit
+
+# Traits
+
+Rust inspired traits
+
+```rust
+trait Vehicle {
+    fun drive(&mut self)
+    fun honk(&self) -> !None
+}
+```
+
+# Structs
+
+Plain old structs
+
+```rust
+struct Truck {
+    name -> str
+    capactity -> u8
+    on_road -> bool
+}
+```
+
+# Implementations
+
+Rust inspired implementation system
+
+```rust
+import std->io
+
+implement Vehicle for Truck {
+    drive(&mut self) {
+        self->on_road = true
+    }
+    honk(&self) -> !None {
+        io->out("HONK")
+    }
+}
+implement Truct {
+    fun set_capacity(&mut self, new_capacity) {
+        self->capacity = new_capacity
+    }
+}
+```
+
+# Enums
+
+```rust
+import std->io
+
+enum HumanEmotions {
+    Happy Sad Angry Fart Jealous
+}
+fun main() => i32 {
+    let emotion = HumanEmotions->Fart
+    io->out(emotion) // 3
+    return 0
+}
+```
+
+# Macros
+
+Rust inspired macros
+
+```rust
+import std->io
+import std->string
+
+macro test {
+  compile {
+    // code ran at compile time
+    () => {
+        io->out("compiling test macro")
+    }
+    (arg: i32) => {
+        io->out(string->format("compiling test macro with %d", arg))
+    }
+  }
+  main {
+    () => {
+        2 + 2
+    }
+    (arg: ) => {
+        2 + arg
+    }
+  }
 }
 ```

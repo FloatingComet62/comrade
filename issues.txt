@@ -1,2 +1,2 @@
-io->out() gets recognized
-string->format() doesn't
+io->out() gets recognized, string->format() doesn't
+enums are broken
